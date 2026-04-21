@@ -67,7 +67,7 @@ router.post('/register', async (req, res) => {
       city,
       paymentStatus: paymentId ? true : false,
       paymentId,
-      status: paymentId ? 'approved' : 'pending',
+      status: 'pending',
       players: []
     });
 
