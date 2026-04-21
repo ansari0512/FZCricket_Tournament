@@ -6,6 +6,19 @@ const teamSchema = new mongoose.Schema({
     required: true,
     unique: true
   },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    default: null
+  },
+  rejectReason: {
+    type: String,
+    default: ''
+  },
+  paymentDone: {
+    type: Boolean,
+    default: false
+  },
   captainName: {
     type: String,
     required: true

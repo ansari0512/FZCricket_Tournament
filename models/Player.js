@@ -27,9 +27,13 @@ const playerSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
-  photo: {
+  address: {
     type: String,
     default: ''
+  },
+  photo: {
+    type: String,
+    required: true
   },
   runsScored: {
     type: Number,

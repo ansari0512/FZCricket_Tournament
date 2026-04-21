@@ -45,29 +45,29 @@
   
   <script type="text/babel">
     const { useState, useEffect, createContext, useContext } = React;
-    
     const AppContext = createContext();
-    
-    // === CONFIGURATION ===
-    // Change this to your deployed backend URL
-    // For local: 'http://localhost:5000/api'
-    // For deployed: 'https://your-backend.onrender.com/api'
     const API_URL = 'https://fzcricket-backend.onrender.com/api';
     const CLOUDINARY_CLOUD = 'dujdkhzyk';
     const CLOUDINARY_PRESET = 'ml_default';
-    // ======================
-    
+
+    const uploadImage = async (file) => {
+      const fd = new FormData();
+      fd.append('file', file);
+      fd.append('upload_preset', CLOUDINARY_PRESET);
+      const res = await axios.post(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, fd);
+      return res.data.secure_url;
+    };
+
     function App() {
       const [currentPage, setCurrentPage] = useState('home');
       const [teams, setTeams] = useState([]);
       const [matches, setMatches] = useState([]);
       const [registrationOpen, setRegistrationOpen] = useState(true);
       const [loading, setLoading] = useState(true);
-      
-      useEffect(() => {
-        fetchData();
-      }, []);
-      
+      const [currentUser, setCurrentUser] = useState(JSON.parse(localStorage.getItem('fzUser') || 'null'));
+
+      useEffect(() => { fetchData(); }, []);
+
       const fetchData = async () => {
         try {
           const [teamsRes, matchesRes] = await Promise.all([
@@ -76,19 +76,28 @@
           ]);
           setTeams(teamsRes.data);
           setMatches(matchesRes.data);
-          setRegistrationOpen(teamsRes.data.filter(t => t.status === 'approved').length < 8);
+          setRegistrationOpen(teamsRes.data.length < 8);
           setLoading(false);
         } catch (err) {
-          console.error('Error fetching data:', err);
-          setTeams([]);
-          setMatches([]);
-          setRegistrationOpen(true);
-          setLoading(false);
+          setTeams([]); setMatches([]); setRegistrationOpen(true); setLoading(false);
         }
       };
-      
+
+      const loginUser = (user, token) => {
+        localStorage.setItem('fzUser', JSON.stringify(user));
+        localStorage.setItem('fzToken', token);
+        setCurrentUser(user);
+      };
+
+      const logoutUser = () => {
+        localStorage.removeItem('fzUser');
+        localStorage.removeItem('fzToken');
+        setCurrentUser(null);
+        setCurrentPage('home');
+      };
+
       return (
-        <AppContext.Provider value={{ currentPage, setCurrentPage, teams, matches, registrationOpen, loading, fetchData }}>
+        <AppContext.Provider value={{ currentPage, setCurrentPage, teams, matches, registrationOpen, loading, fetchData, currentUser, loginUser, logoutUser }}>
           <div className="min-h-screen flex flex-col">
             <Navbar />
             <main className="flex-1">
@@ -99,6 +108,9 @@
               {currentPage === 'results' && <Results />}
               {currentPage === 'contact' && <Contact />}
               {currentPage === 'admin' && <Admin />}
+              {currentPage === 'user-login' && <UserLogin />}
+              {currentPage === 'user-register' && <UserRegister />}
+              {currentPage === 'dashboard' && <UserDashboard />}
             </main>
             <BottomNav />
           </div>
@@ -107,13 +119,12 @@
     }
     
     function Navbar() {
-      const { setCurrentPage, currentPage } = useContext(AppContext);
-      
+      const { setCurrentPage, currentPage, currentUser, logoutUser } = useContext(AppContext);
       return (
         <nav className="cricket-gradient text-white sticky top-0 z-50 shadow-lg">
           <div className="max-w-7xl mx-auto px-4 py-3">
             <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2" onClick={() => setCurrentPage('home')}>
+              <div className="flex items-center space-x-2 cursor-pointer" onClick={() => setCurrentPage('home')}>
                 <span className="text-2xl">🏏</span>
                 <span className="font-bold text-lg">FZ Cricket</span>
               </div>
@@ -124,7 +135,16 @@
                 <NavLink page="results" current={currentPage} setCurrentPage={setCurrentPage}>Results</NavLink>
                 <NavLink page="contact" current={currentPage} setCurrentPage={setCurrentPage}>Contact</NavLink>
               </div>
-              <button onClick={() => setCurrentPage('admin')} className="text-sm bg-white/20 px-3 py-1 rounded">Admin</button>
+              <div className="flex items-center gap-2">
+                {currentUser ? (
+                  <button onClick={() => setCurrentPage('dashboard')} className="text-sm bg-yellow-400 text-gray-900 font-bold px-3 py-1 rounded-full">
+                    👤 {currentUser.username}
+                  </button>
+                ) : (
+                  <button onClick={() => setCurrentPage('user-login')} className="text-sm bg-white/20 px-3 py-1 rounded">Login</button>
+                )}
+                <button onClick={() => setCurrentPage('admin')} className="text-sm bg-white/20 px-3 py-1 rounded">Admin</button>
+              </div>
             </div>
           </div>
         </nav>
@@ -395,17 +415,22 @@
     }
     
     function Register() {
-      const { setCurrentPage, registrationOpen, teams, fetchData } = useContext(AppContext);
-      const [step, setStep] = useState(1);
-      const [formData, setFormData] = useState({
-        teamName: '', captainName: '', captainPhone: '', city: 'Odajhar'
-      });
-      const [players, setPlayers] = useState([]);
-      const [loading, setLoading] = useState(false);
-      const [error, setError] = useState('');
-      const [success, setSuccess] = useState(false);
-      const [currentTeamId, setCurrentTeamId] = useState('');
-      
+      const { setCurrentPage, registrationOpen, currentUser } = useContext(AppContext);
+
+      if (!currentUser) {
+        return (
+          <div className="py-16 px-4 text-center">
+            <div className="max-w-md mx-auto bg-white rounded-xl shadow-lg p-8">
+              <span className="text-6xl">🔒</span>
+              <h2 className="text-2xl font-bold mt-4">Login Required</h2>
+              <p className="text-gray-500 mt-2">Please login or create account to register your team.</p>
+              <button onClick={() => setCurrentPage('user-login')} className="mt-4 w-full cricket-gradient text-white font-bold py-3 rounded-lg">Login</button>
+              <button onClick={() => setCurrentPage('user-register')} className="mt-2 w-full bg-gray-100 font-bold py-3 rounded-lg">Create Account</button>
+            </div>
+          </div>
+        );
+      }
+
       if (!registrationOpen) {
         return (
           <div className="py-16 px-4 text-center">
@@ -413,146 +438,154 @@
               <span className="text-6xl">😔</span>
               <h2 className="text-2xl font-bold mt-4">Registration Closed</h2>
               <p className="text-gray-500 mt-2">All 8 teams have already registered.</p>
-              <button onClick={() => setCurrentPage('home')} className="mt-6 cricket-gradient text-white px-6 py-2 rounded-lg">
-                Back to Home
-              </button>
+              <button onClick={() => setCurrentPage('home')} className="mt-6 cricket-gradient text-white px-6 py-2 rounded-lg">Back to Home</button>
             </div>
           </div>
         );
       }
-      
+
+      return <TeamRegistrationForm />;
+    }
+
+    function TeamRegistrationForm() {
+      const { setCurrentPage, fetchData, currentUser } = useContext(AppContext);
+      const [step, setStep] = useState(1);
+      const [teamData, setTeamData] = useState({ teamName: '', captainName: '', captainPhone: '', city: 'Odajhar' });
+      const [teamId, setTeamId] = useState('');
+      const [players, setPlayers] = useState([]);
+      const [playerForm, setPlayerForm] = useState({ name: '', role: 'batsman', address: '', photo: null, photoPreview: '' });
+      const [uploading, setUploading] = useState(false);
+      const [loading, setLoading] = useState(false);
+      const [error, setError] = useState('');
+
       const handleTeamSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true);
-        setError('');
-        
+        setLoading(true); setError('');
         try {
-          const res = await axios.post(`${API_URL}/teams/register`, {
-            ...formData,
-            paymentId: 'demo_payment_' + Date.now()
-          });
-          setCurrentTeamId(res.data.team._id);
+          const res = await axios.post(`${API_URL}/teams/register`, { ...teamData, userId: currentUser._id });
+          setTeamId(res.data.team._id);
           setStep(2);
-          
-          const playersArray = [];
-          for (let i = 0; i < 15; i++) {
-            playersArray.push({ name: '', age: 18, jerseyNumber: i + 1, role: 'batsman', phone: '' });
-          }
-          setPlayers(playersArray);
-        } catch (err) {
-          setError(err.response?.data?.message || 'Registration failed');
-        }
+        } catch (err) { setError(err.response?.data?.message || 'Registration failed'); }
         setLoading(false);
       };
-      
-      const handlePlayerUpdate = (index, field, value) => {
-        const newPlayers = [...players];
-        newPlayers[index][field] = value;
-        setPlayers(newPlayers);
+
+      const handleAddPlayer = async () => {
+        if (!playerForm.name.trim()) return setError('Player name required');
+        if (!playerForm.address.trim()) return setError('Player address required');
+        if (!playerForm.photo) return setError('Player photo required');
+        if (players.length >= 15) return setError('Maximum 15 players allowed');
+        setUploading(true); setError('');
+        try {
+          const photoUrl = await uploadImage(playerForm.photo);
+          const res = await axios.post(`${API_URL}/players/register/${teamId}`, {
+            name: playerForm.name, role: playerForm.role, address: playerForm.address,
+            photo: photoUrl, jerseyNumber: players.length + 1, age: 18
+          });
+          setPlayers([...players, res.data.player]);
+          setPlayerForm({ name: '', role: 'batsman', address: '', photo: null, photoPreview: '' });
+        } catch (err) { setError(err.response?.data?.message || 'Failed to add player'); }
+        setUploading(false);
       };
-      
-      const handlePlayersSubmit = async () => {
+
+      const handleSubmitTeam = async () => {
+        if (players.length < 11) return setError('Minimum 11 players required');
         setLoading(true);
         try {
-          const validPlayers = players.filter(p => p.name.trim());
-          await axios.post(`${API_URL}/players/bulk-register/${currentTeamId}`, { players: validPlayers });
           await fetchData();
-          setSuccess(true);
-        } catch (err) {
-          setError(err.response?.data?.message || 'Player registration failed');
-        }
+          setStep(3);
+        } catch (err) { setError('Submission failed'); }
         setLoading(false);
       };
-      
-      if (success) {
-        return (
-          <div className="py-16 px-4 text-center">
-            <div className="max-w-md mx-auto bg-white rounded-xl shadow-lg p-8">
-              <span className="text-6xl">🎉</span>
-              <h2 className="text-2xl font-bold mt-4">Registration Successful!</h2>
-              <p className="text-gray-500 mt-2">Your team has been registered with 15 players.</p>
-              <button onClick={() => setCurrentPage('home')} className="mt-6 cricket-gradient text-white px-6 py-2 rounded-lg">
-                Go to Home
-              </button>
-            </div>
+
+      if (step === 3) return (
+        <div className="py-16 px-4 text-center">
+          <div className="max-w-md mx-auto bg-white rounded-xl shadow-lg p-8">
+            <span className="text-6xl">🎉</span>
+            <h2 className="text-2xl font-bold mt-4">Team Submitted!</h2>
+            <p className="text-gray-500 mt-2">Your team is under review. Admin will approve or reject it soon.</p>
+            <p className="text-sm text-blue-600 mt-2">Check notifications in your dashboard.</p>
+            <button onClick={() => setCurrentPage('dashboard')} className="mt-6 cricket-gradient text-white px-6 py-2 rounded-lg">Go to Dashboard</button>
           </div>
-        );
-      }
-      
+        </div>
+      );
+
       return (
         <div className="py-8 px-4">
           <div className="max-w-2xl mx-auto">
-            <div className="flex justify-center mb-8">
-              <div className="flex items-center">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${step >= 1 ? 'bg-green-500 text-white' : 'bg-gray-200'}`}>1</div>
-                <div className={`w-16 h-1 ${step >= 2 ? 'bg-green-500' : 'bg-gray-200'}`}></div>
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${step >= 2 ? 'bg-green-500 text-white' : 'bg-gray-200'}`}>2</div>
-              </div>
-            </div>
-            
-            <div className="bg-white rounded-xl shadow-lg p-6">
-              <h2 className="text-2xl font-bold text-center mb-6">
-                {step === 1 ? 'Team Registration' : 'Player Registration (15 Players)'}
-              </h2>
-              
-              <p className="text-center text-sm text-gray-500 mb-6">
-                Registration Fee: <span className="font-bold text-green-600">₹300 (Cash on Arrival)</span>
-              </p>
-              
-              {error && (
-                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4">
-                  {error}
+            <div className="flex justify-center mb-6">
+              {[1,2].map(s => (
+                <div key={s} className="flex items-center">
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${step >= s ? 'bg-green-500 text-white' : 'bg-gray-200'}`}>{s}</div>
+                  {s < 2 && <div className={`w-16 h-1 ${step >= 2 ? 'bg-green-500' : 'bg-gray-200'}`}></div>}
                 </div>
-              )}
-              
-              {step === 1 && (
+              ))}
+            </div>
+
+            {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4">{error}</div>}
+
+            {step === 1 && (
+              <div className="bg-white rounded-xl shadow-lg p-6">
+                <h2 className="text-2xl font-bold text-center mb-4">Team Registration</h2>
+                <p className="text-center text-sm text-gray-500 mb-4">Registration Fee: <span className="font-bold text-green-600">₹1,100 (Cash on Arrival)</span></p>
                 <form onSubmit={handleTeamSubmit} className="space-y-4">
-                  <input type="text" placeholder="Team Name *" value={formData.teamName}
-                    onChange={e => setFormData({...formData, teamName: e.target.value})}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" required />
-                  <input type="text" placeholder="Captain Name *" value={formData.captainName}
-                    onChange={e => setFormData({...formData, captainName: e.target.value})}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" required />
-                  <input type="tel" placeholder="Captain Phone *" value={formData.captainPhone}
-                    onChange={e => setFormData({...formData, captainPhone: e.target.value})}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" required />
-                  <input type="text" placeholder="City/Village" value={formData.city}
-                    onChange={e => setFormData({...formData, city: e.target.value})}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" />
-                  <button type="submit" disabled={loading || teams.length >= 8}
-                    className="w-full cricket-gradient text-white font-bold py-3 rounded-lg disabled:opacity-50">
-                    {loading ? 'Processing...' : 'Register Team'}
-                  </button>
+                  <input type="text" placeholder="Team Name *" value={teamData.teamName} onChange={e => setTeamData({...teamData, teamName: e.target.value})} className="w-full p-3 border rounded-lg" required />
+                  <input type="text" placeholder="Captain Name *" value={teamData.captainName} onChange={e => setTeamData({...teamData, captainName: e.target.value})} className="w-full p-3 border rounded-lg" required />
+                  <input type="tel" placeholder="Captain Phone *" value={teamData.captainPhone} onChange={e => setTeamData({...teamData, captainPhone: e.target.value})} className="w-full p-3 border rounded-lg" required />
+                  <input type="text" placeholder="City/Village" value={teamData.city} onChange={e => setTeamData({...teamData, city: e.target.value})} className="w-full p-3 border rounded-lg" />
+                  <button type="submit" disabled={loading} className="w-full cricket-gradient text-white font-bold py-3 rounded-lg disabled:opacity-50">{loading ? 'Processing...' : 'Next: Add Players →'}</button>
                 </form>
-              )}
-              
-              {step === 2 && (
-                <div>
-                  <p className="text-sm text-gray-500 mb-4">Enter at least 11 players (minimum required for a match)</p>
-                  <div className="space-y-3 max-h-96 overflow-y-auto">
-                    {players.map((player, index) => (
-                      <div key={index} className="flex gap-2 items-center">
-                        <span className="w-8 text-gray-400 font-bold">#{index + 1}</span>
-                        <input type="text" placeholder="Player Name" value={player.name}
-                          onChange={e => handlePlayerUpdate(index, 'name', e.target.value)}
-                          className="flex-1 p-2 border border-gray-300 rounded text-sm" />
-                        <select value={player.role} onChange={e => handlePlayerUpdate(index, 'role', e.target.value)}
-                          className="p-2 border border-gray-300 rounded text-sm">
-                          <option value="batsman">Bat</option>
-                          <option value="bowler">Bowl</option>
-                          <option value="all-rounder">AR</option>
-                          <option value="wicket-keeper">WK</option>
-                        </select>
+              </div>
+            )}
+
+            {step === 2 && (
+              <div className="bg-white rounded-xl shadow-lg p-6">
+                <h2 className="text-2xl font-bold text-center mb-2">Add Players ({players.length}/15)</h2>
+                <p className="text-center text-sm text-gray-500 mb-4">Minimum 11 players required</p>
+
+                <div className="bg-gray-50 rounded-xl p-4 mb-4 space-y-3">
+                  <input type="text" placeholder="Player Name *" value={playerForm.name} onChange={e => setPlayerForm({...playerForm, name: e.target.value})} className="w-full p-2 border rounded" />
+                  <select value={playerForm.role} onChange={e => setPlayerForm({...playerForm, role: e.target.value})} className="w-full p-2 border rounded">
+                    <option value="batsman">Batsman</option>
+                    <option value="bowler">Bowler</option>
+                    <option value="all-rounder">All-Rounder</option>
+                    <option value="wicket-keeper">Wicket Keeper</option>
+                  </select>
+                  <input type="text" placeholder="Address *" value={playerForm.address} onChange={e => setPlayerForm({...playerForm, address: e.target.value})} className="w-full p-2 border rounded" />
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Player Photo *</label>
+                    <input type="file" accept="image/*" onChange={e => {
+                      const file = e.target.files[0];
+                      if (file) setPlayerForm({...playerForm, photo: file, photoPreview: URL.createObjectURL(file)});
+                    }} className="w-full p-2 border rounded" />
+                    {playerForm.photoPreview && <img src={playerForm.photoPreview} className="mt-2 w-20 h-20 object-cover rounded-lg" />}
+                  </div>
+                  <button onClick={handleAddPlayer} disabled={uploading} className="w-full cricket-gradient text-white font-bold py-2 rounded-lg disabled:opacity-50">
+                    {uploading ? 'Uploading...' : '+ Add Player'}
+                  </button>
+                </div>
+
+                {players.length > 0 && (
+                  <div className="space-y-2 mb-4 max-h-64 overflow-y-auto">
+                    {players.map((p, i) => (
+                      <div key={i} className="flex items-center gap-3 p-2 bg-gray-50 rounded-lg">
+                        <img src={p.photo} className="w-10 h-10 rounded-full object-cover" />
+                        <div>
+                          <p className="font-medium text-sm">{p.name}</p>
+                          <p className="text-xs text-gray-500">{p.role} • #{p.jerseyNumber}</p>
+                        </div>
+                        <span className="ml-auto text-green-500">✓</span>
                       </div>
                     ))}
                   </div>
-                  <button onClick={handlePlayersSubmit} disabled={loading}
-                    className="w-full mt-4 cricket-gradient text-white font-bold py-3 rounded-lg disabled:opacity-50">
-                    {loading ? 'Registering...' : 'Submit Players'}
+                )}
+
+                {players.length >= 11 && (
+                  <button onClick={handleSubmitTeam} disabled={loading} className="w-full bg-blue-600 text-white font-bold py-3 rounded-lg disabled:opacity-50">
+                    {loading ? 'Submitting...' : '🚀 Submit Team for Review'}
                   </button>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       );
@@ -836,6 +869,8 @@
       const [activeTab, setActiveTab] = useState('teams');
       const [scoreModal, setScoreModal] = useState(null);
       const [scoreData, setScoreData] = useState({ t1runs: '', t1wickets: '', t2runs: '', t2wickets: '', winnerId: '' });
+      const [rejectModal, setRejectModal] = useState(null);
+      const [rejectReason, setRejectReason] = useState('');
       const token = localStorage.getItem('adminToken');
 
       const handleLogin = async (e) => {
@@ -867,10 +902,22 @@
       };
 
       const handleReject = async (teamId) => {
+        setRejectModal(teamId);
+      };
+
+      const confirmReject = async () => {
         try {
-          await axios.put(`${API_URL}/teams/${teamId}`, { status: 'rejected' }, { headers: { Authorization: `Bearer ${token}` } });
+          await axios.put(`${API_URL}/teams/${rejectModal}`, { status: 'rejected', rejectReason }, { headers: { Authorization: `Bearer ${token}` } });
+          setRejectModal(null); setRejectReason('');
           await fetchData();
         } catch (err) { alert('Error rejecting team'); }
+      };
+
+      const handlePaymentConfirm = async (teamId) => {
+        try {
+          await axios.put(`${API_URL}/teams/${teamId}`, { paymentDone: true }, { headers: { Authorization: `Bearer ${token}` } });
+          await fetchData();
+        } catch (err) { alert('Error confirming payment'); }
       };
 
       const handleMatchStatus = async (matchId, status) => {
@@ -970,6 +1017,10 @@
                           {team.status === 'rejected' && (
                             <button onClick={() => handleApprove(team._id)} className="text-green-600 hover:text-green-800 mr-2">Approve</button>
                           )}
+                          {team.status === 'approved' && !team.paymentDone && (
+                            <button onClick={() => handlePaymentConfirm(team._id)} className="text-blue-600 hover:text-blue-800 mr-2">₹ Confirm Payment</button>
+                          )}
+                          {team.paymentDone && <span className="text-green-600 mr-2 text-xs">✅ Paid</span>}
                           <button onClick={() => handleDelete(team._id)} className="text-red-600 hover:text-red-800">Delete</button>
                         </td>
                       </tr>
@@ -1055,6 +1106,204 @@
       );
     }
     
+    function UserLogin() {
+      const { setCurrentPage, loginUser } = useContext(AppContext);
+      const [form, setForm] = useState({ username: '', password: '' });
+      const [error, setError] = useState('');
+      const [loading, setLoading] = useState(false);
+
+      const handleLogin = async (e) => {
+        e.preventDefault(); setLoading(true); setError('');
+        try {
+          const res = await axios.post(`${API_URL}/auth/login`, form);
+          loginUser(res.data.user, res.data.token);
+          setCurrentPage('dashboard');
+        } catch (err) { setError(err.response?.data?.message || 'Login failed'); }
+        setLoading(false);
+      };
+
+      return (
+        <div className="py-16 px-4">
+          <div className="max-w-md mx-auto bg-white rounded-xl shadow-lg p-6">
+            <h2 className="text-2xl font-bold text-center mb-6">👤 User Login</h2>
+            {error && <div className="bg-red-100 text-red-700 px-4 py-2 rounded mb-4">{error}</div>}
+            <form onSubmit={handleLogin} className="space-y-4">
+              <input type="text" placeholder="Username or Mobile" value={form.username} onChange={e => setForm({...form, username: e.target.value})} className="w-full p-3 border rounded-lg" required />
+              <input type="password" placeholder="Password" value={form.password} onChange={e => setForm({...form, password: e.target.value})} className="w-full p-3 border rounded-lg" required />
+              <button type="submit" disabled={loading} className="w-full cricket-gradient text-white font-bold py-3 rounded-lg disabled:opacity-50">{loading ? 'Logging in...' : 'Login'}</button>
+            </form>
+            <p className="text-center mt-4 text-gray-500">New user? <button onClick={() => setCurrentPage('user-register')} className="text-green-600 font-bold">Create Account</button></p>
+            <button onClick={() => setCurrentPage('home')} className="w-full mt-2 text-gray-400 text-sm">Back to Home</button>
+          </div>
+        </div>
+      );
+    }
+
+    function UserRegister() {
+      const { setCurrentPage, loginUser } = useContext(AppContext);
+      const [form, setForm] = useState({ mobile: '', username: '', password: '', confirm: '' });
+      const [error, setError] = useState('');
+      const [loading, setLoading] = useState(false);
+
+      const handleRegister = async (e) => {
+        e.preventDefault(); setError('');
+        if (form.password !== form.confirm) return setError('Passwords do not match');
+        if (form.password.length < 6) return setError('Password must be at least 6 characters');
+        setLoading(true);
+        try {
+          const res = await axios.post(`${API_URL}/auth/register`, { mobile: form.mobile, username: form.username, password: form.password });
+          loginUser(res.data.user, res.data.token);
+          setCurrentPage('dashboard');
+        } catch (err) { setError(err.response?.data?.message || 'Registration failed'); }
+        setLoading(false);
+      };
+
+      return (
+        <div className="py-16 px-4">
+          <div className="max-w-md mx-auto bg-white rounded-xl shadow-lg p-6">
+            <h2 className="text-2xl font-bold text-center mb-6">🌟 Create Account</h2>
+            {error && <div className="bg-red-100 text-red-700 px-4 py-2 rounded mb-4">{error}</div>}
+            <form onSubmit={handleRegister} className="space-y-4">
+              <input type="tel" placeholder="Mobile Number *" value={form.mobile} onChange={e => setForm({...form, mobile: e.target.value})} className="w-full p-3 border rounded-lg" required />
+              <input type="text" placeholder="Username *" value={form.username} onChange={e => setForm({...form, username: e.target.value})} className="w-full p-3 border rounded-lg" required />
+              <input type="password" placeholder="Password *" value={form.password} onChange={e => setForm({...form, password: e.target.value})} className="w-full p-3 border rounded-lg" required />
+              <input type="password" placeholder="Confirm Password *" value={form.confirm} onChange={e => setForm({...form, confirm: e.target.value})} className="w-full p-3 border rounded-lg" required />
+              <button type="submit" disabled={loading} className="w-full cricket-gradient text-white font-bold py-3 rounded-lg disabled:opacity-50">{loading ? 'Creating...' : 'Create Account'}</button>
+            </form>
+            <p className="text-center mt-4 text-gray-500">Already have account? <button onClick={() => setCurrentPage('user-login')} className="text-green-600 font-bold">Login</button></p>
+          </div>
+        </div>
+      );
+    }
+
+    function UserDashboard() {
+      const { setCurrentPage, currentUser, logoutUser, registrationOpen } = useContext(AppContext);
+      const [notifications, setNotifications] = useState([]);
+      const [team, setTeam] = useState(null);
+      const [loading, setLoading] = useState(true);
+
+      useEffect(() => {
+        const fetchUserData = async () => {
+          try {
+            const notifRes = await axios.get(`${API_URL}/auth/notifications/${currentUser._id}`);
+            setNotifications(notifRes.data);
+            if (currentUser.teamId) {
+              const teamRes = await axios.get(`${API_URL}/teams/${currentUser.teamId}`);
+              setTeam(teamRes.data.team);
+            }
+          } catch (err) {}
+          setLoading(false);
+        };
+        fetchUserData();
+      }, []);
+
+      const markRead = async () => {
+        try {
+          await axios.put(`${API_URL}/auth/notifications/${currentUser._id}/read`);
+          setNotifications(notifications.map(n => ({...n, read: true})));
+        } catch (err) {}
+      };
+
+      const unread = notifications.filter(n => !n.read).length;
+
+      return (
+        <div className="py-8 px-4">
+          <div className="max-w-2xl mx-auto">
+            <div className="bg-white rounded-xl shadow-lg p-6 mb-4">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h2 className="text-2xl font-bold">👋 {currentUser.username}</h2>
+                  <p className="text-gray-500">{currentUser.mobile}</p>
+                </div>
+                <button onClick={logoutUser} className="text-red-500 font-medium">Logout</button>
+              </div>
+            </div>
+
+            {/* Notifications */}
+            <div className="bg-white rounded-xl shadow-lg p-6 mb-4">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-bold">🔔 Notifications {unread > 0 && <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full ml-2">{unread}</span>}</h3>
+                {unread > 0 && <button onClick={markRead} className="text-sm text-blue-600">Mark all read</button>}
+              </div>
+              {notifications.length === 0 ? (
+                <p className="text-gray-500 text-center">No notifications yet</p>
+              ) : (
+                <div className="space-y-3">
+                  {notifications.map((n, i) => (
+                    <div key={i} className={`p-3 rounded-lg border-l-4 ${
+                      n.type === 'success' ? 'bg-green-50 border-green-500' :
+                      n.type === 'error' ? 'bg-red-50 border-red-500' :
+                      'bg-blue-50 border-blue-500'
+                    } ${!n.read ? 'font-medium' : 'opacity-70'}`}>
+                      <p className="text-sm">{n.message}</p>
+                      <p className="text-xs text-gray-400 mt-1">{new Date(n.createdAt).toLocaleDateString('en-IN')}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Team Status */}
+            <div className="bg-white rounded-xl shadow-lg p-6">
+              <h3 className="text-lg font-bold mb-4">🏏 My Team</h3>
+              {loading ? <p className="text-gray-500">Loading...</p> :
+              team ? (
+                <div>
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <p className="font-bold text-xl">{team.teamName}</p>
+                      <p className="text-gray-500">Captain: {team.captainName}</p>
+                    </div>
+                    <span className={`px-3 py-1 rounded-full text-sm font-bold ${
+                      team.status === 'approved' ? 'bg-green-100 text-green-700' :
+                      team.status === 'rejected' ? 'bg-red-100 text-red-700' :
+                      'bg-yellow-100 text-yellow-700'
+                    }`}>{team.status === 'approved' ? '✅ Approved' : team.status === 'rejected' ? '❌ Rejected' : '⏳ Pending'}</span>
+                  </div>
+                  {team.status === 'rejected' && team.rejectReason && (
+                    <div className="mt-3 bg-red-50 border border-red-200 rounded-lg p-3">
+                      <p className="text-sm text-red-700"><span className="font-bold">Reason:</span> {team.rejectReason}</p>
+                    </div>
+                  )}
+                  {team.status === 'approved' && !team.paymentDone && (
+                    <div className="mt-3 bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                      <p className="text-sm text-yellow-700 font-bold">💰 Please pay ₹1,100 registration fee to confirm your spot!</p>
+                      <p className="text-xs text-gray-500 mt-1">Contact admin after payment for confirmation.</p>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="text-center">
+                  <p className="text-gray-500 mb-4">You haven't registered a team yet.</p>
+                  {registrationOpen && <button onClick={() => setCurrentPage('register')} className="cricket-gradient text-white font-bold py-2 px-6 rounded-lg">Register Team</button>}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+            {rejectModal && (
+              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                <div className="bg-white rounded-xl p-6 w-full max-w-md">
+                  <h3 className="text-xl font-bold mb-4">❌ Reject Team</h3>
+                  <p className="text-gray-500 mb-3">Please provide a reason for rejection:</p>
+                  <textarea value={rejectReason} onChange={e => setRejectReason(e.target.value)}
+                    placeholder="Reason for rejection..." rows={3}
+                    className="w-full p-3 border rounded-lg mb-4" />
+                  <div className="flex gap-2">
+                    <button onClick={confirmReject} className="flex-1 bg-red-500 text-white font-bold py-2 rounded-lg">Confirm Reject</button>
+                    <button onClick={() => { setRejectModal(null); setRejectReason(''); }} className="flex-1 bg-gray-200 py-2 rounded-lg">Cancel</button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
     function GallerySlider({ photos }) {
       const [current, setCurrent] = useState(0);
 

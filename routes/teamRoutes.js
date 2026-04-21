@@ -3,6 +3,7 @@ const router = express.Router();
 const Team = require('../models/Team');
 const Player = require('../models/Player');
 const Payment = require('../models/Payment');
+const User = require('../models/User');
 
 const MAX_TEAMS = 8;
 const REGISTRATION_FEE = 300;
@@ -16,9 +17,20 @@ router.get('/count', async (req, res) => {
   }
 });
 
+// Get only confirmed (approved + payment done) teams for public
 router.get('/', async (req, res) => {
   try {
-    const teams = await Team.find({ status: 'approved' }).sort({ registrationDate: -1 });
+    const teams = await Team.find({ status: 'approved', paymentDone: true }).sort({ registrationDate: -1 });
+    res.json(teams);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Get all teams for admin
+router.get('/all', async (req, res) => {
+  try {
+    const teams = await Team.find().sort({ registrationDate: -1 });
     res.json(teams);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -48,30 +60,22 @@ router.get('/:id/players', async (req, res) => {
 
 router.post('/register', async (req, res) => {
   try {
-    const teamCount = await Team.countDocuments({ status: 'approved' });
-    if (teamCount >= MAX_TEAMS) {
+    const approvedCount = await Team.countDocuments({ status: 'approved', paymentDone: true });
+    if (approvedCount >= MAX_TEAMS)
       return res.status(400).json({ message: 'Registration is closed. All 8 teams have registered.' });
-    }
 
-    const { teamName, captainName, captainPhone, city, paymentId } = req.body;
-
+    const { teamName, captainName, captainPhone, city, userId } = req.body;
     const existingTeam = await Team.findOne({ teamName });
-    if (existingTeam) {
+    if (existingTeam)
       return res.status(400).json({ message: 'Team name already exists' });
+
+    const team = new Team({ teamName, captainName, captainPhone, city, userId: userId || null, status: 'pending', players: [] });
+    await team.save();
+
+    if (userId) {
+      await User.findByIdAndUpdate(userId, { teamId: team._id });
     }
 
-    const team = new Team({
-      teamName,
-      captainName,
-      captainPhone,
-      city,
-      paymentStatus: paymentId ? true : false,
-      paymentId,
-      status: 'pending',
-      players: []
-    });
-
-    await team.save();
     res.status(201).json({ message: 'Team registered successfully', team });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -80,7 +84,27 @@ router.post('/register', async (req, res) => {
 
 router.put('/:id', async (req, res) => {
   try {
+    const { status, rejectReason, paymentDone } = req.body;
     const team = await Team.findByIdAndUpdate(req.params.id, req.body, { new: true });
+
+    // Send notification to user
+    if (team.userId) {
+      let msg = '', type = 'info';
+      if (status === 'approved') {
+        msg = `🎉 Congratulations! Your team "${team.teamName}" has been approved! Please pay the registration fee of ₹1100 to confirm your spot.`;
+        type = 'success';
+      } else if (status === 'rejected') {
+        msg = `❌ Your team "${team.teamName}" has been rejected. Reason: ${rejectReason || 'Not specified'}`;
+        type = 'error';
+      } else if (paymentDone) {
+        msg = `✅ Payment confirmed! Your team "${team.teamName}" is now officially registered in the tournament.`;
+        type = 'success';
+      }
+      if (msg) {
+        await User.findByIdAndUpdate(team.userId, { $push: { notifications: { message: msg, type } } });
+      }
+    }
+
     res.json(team);
   } catch (err) {
     res.status(500).json({ error: err.message });
