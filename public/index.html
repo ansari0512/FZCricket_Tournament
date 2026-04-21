@@ -178,7 +178,7 @@
     }
     
     function Home() {
-      const { teams, matches, registrationOpen, loading } = useContext(AppContext);
+      const { teams, matches, registrationOpen, loading, setCurrentPage } = useContext(AppContext);
       const liveMatch = matches.find(m => m.status === 'in-progress');
       
       if (loading) return <Loading />;
@@ -207,7 +207,7 @@
                 </div>
               </div>
               {registrationOpen ? (
-                <button onClick={() => useContext(AppContext).setCurrentPage('register')} 
+                <button onClick={() => setCurrentPage('register')} 
                   className="mt-8 bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-full text-lg transition transform hover:scale-105">
                   Register Your Team 🚀
                 </button>
