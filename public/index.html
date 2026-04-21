@@ -77,18 +77,8 @@
           setLoading(false);
         } catch (err) {
           console.error('Error fetching data:', err);
-          // Demo data - remove when real backend is running
-          setTeams([
-            { _id: '1', teamName: 'Royal Blazers', captainName: 'Rahul Sharma', captainPhone: '9876543210', city: 'Odajhar', wins: 3, losses: 1, points: 6, matchesPlayed: 4, status: 'approved' },
-            { _id: '2', teamName: 'Thunder Kings', captainName: 'Ajay Singh', captainPhone: '9876543211', city: 'Odajhar', wins: 2, losses: 2, points: 4, matchesPlayed: 4, status: 'approved' },
-            { _id: '3', teamName: 'Eagle Strikers', captainName: 'Mohammad Khan', captainPhone: '9876543212', city: 'Odajhar', wins: 4, losses: 0, points: 8, matchesPlayed: 4, status: 'approved' },
-            { _id: '4', teamName: 'Tiger Force', captainName: 'Sunil Yadav', captainPhone: '9876543213', city: 'Odajhar', wins: 1, losses: 3, points: 2, matchesPlayed: 4, status: 'approved' }
-          ]);
-          setMatches([
-            { _id: '1', team1: {teamName: 'Royal Blazers'}, team2: {teamName: 'Thunder Kings'}, matchDate: new Date('2026-04-25T09:00:00'), matchType: 'group', overs: 8, venue: 'Odajhar Village', status: 'scheduled' },
-            { _id: '2', team1: {teamName: 'Eagle Strikers'}, team2: {teamName: 'Tiger Force'}, matchDate: new Date('2026-04-25T12:00:00'), matchType: 'group', overs: 8, venue: 'Odajhar Village', status: 'scheduled' },
-            { _id: '3', team1: {teamName: 'Royal Blazers'}, team2: {teamName: 'Tiger Force'}, matchDate: new Date('2026-04-26T09:00:00'), matchType: 'group', overs: 8, venue: 'Odajhar Village', status: 'scheduled' }
-          ]);
+          setTeams([]);
+          setMatches([]);
           setRegistrationOpen(true);
           setLoading(false);
         }
@@ -424,7 +414,7 @@
               </h2>
               
               <p className="text-center text-sm text-gray-500 mb-6">
-                Registration Fee: <span className="font-bold text-green-600">₹300</span>
+                Registration Fee: <span className="font-bold text-green-600">₹300 (Cash on Arrival)</span>
               </p>
               
               {error && (
@@ -449,7 +439,7 @@
                     className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" />
                   <button type="submit" disabled={loading || teams.length >= 8}
                     className="w-full cricket-gradient text-white font-bold py-3 rounded-lg disabled:opacity-50">
-                    {loading ? 'Processing...' : 'Register Team (₹300)'}
+                    {loading ? 'Processing...' : 'Register Team'}
                   </button>
                 </form>
               )}

@@ -46,12 +46,10 @@ Upload the `public/` folder contents to any static hosting:
 ## Environment Variables (.env)
 
 ```
-MONGODB_URI=mongodb+sha://your_connection_string
+MONGODB_URI=your_mongodb_connection_string
 PORT=5000
-RAZORPAY_KEY_ID=your_key
-RAZORPAY_KEY_SECRET=your_secret
-ADMIN_SECRET=fzadmin2026
-JWT_SECRET=fzsecret2026
+ADMIN_SECRET=your_admin_password
+JWT_SECRET=your_jwt_secret
 ```
 
 ## API Endpoints
@@ -66,7 +64,7 @@ JWT_SECRET=fzsecret2026
 ## Admin Credentials
 
 - Username: admin
-- Password: fzadmin2026 (change in .env)
+- Password: Set in Render.com Environment Variables
 
 ## Tech Stack
 
@@ -81,4 +79,4 @@ ISC
 
 ---
 
-**For Support:** support@fzcricket.com
+**For Support:** shahidansari0512@gmail.com
