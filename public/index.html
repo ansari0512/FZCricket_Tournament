@@ -832,7 +832,7 @@
     function Admin() {
       const { setCurrentPage, teams, matches, fetchData } = useContext(AppContext);
       const [password, setPassword] = useState('');
-      const [loggedIn, setLoggedIn] = useState(false);
+      const [loggedIn, setLoggedIn] = useState(!!localStorage.getItem('adminToken'));
       const [activeTab, setActiveTab] = useState('teams');
       const [scoreModal, setScoreModal] = useState(null);
       const [scoreData, setScoreData] = useState({ t1runs: '', t1wickets: '', t2runs: '', t2wickets: '', winnerId: '' });
