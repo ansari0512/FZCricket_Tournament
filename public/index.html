@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FZ Cricket Tournament - Odajhar Village</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            cricket: { green: '#10B981', dark: '#1F2937', gold: '#F59E0B' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * { font-family: 'Poppins', sans-serif; }
+    .cricket-gradient { background: linear-gradient(135deg, #10B981 0%, #059669 50%, #047857 100%); }
+    .hero-gradient { background: linear-gradient(180deg, #1F2937 0%, #111827 100%); }
+    .card-shadow { box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
+    .live-pulse { animation: pulse 2s infinite; }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    .score-animation { animation: slideIn 0.3s ease-out; }
+    @keyframes slideIn {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <div id="root"></div>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="https://unpkg.com/socket.io-client@4.7.2/dist/socket.io.min.js"></script>
+  
+  <script type="text/babel">
+    const { useState, useEffect, createContext, useContext } = React;
+    
+    const AppContext = createContext();
+    
+    // === CONFIGURATION ===
+    // Change this to your deployed backend URL
+    // For local: 'http://localhost:5000/api'
+    // For deployed: 'https://your-backend.onrender.com/api'
+    const API_URL = 'http://localhost:5002/api';
+    // ======================
+    
+    function App() {
+      const [currentPage, setCurrentPage] = useState('home');
+      const [teams, setTeams] = useState([]);
+      const [matches, setMatches] = useState([]);
+      const [registrationOpen, setRegistrationOpen] = useState(true);
+      const [loading, setLoading] = useState(true);
+      
+      useEffect(() => {
+        fetchData();
+      }, []);
+      
+      const fetchData = async () => {
+        try {
+          const [teamsRes, matchesRes] = await Promise.all([
+            axios.get(`${API_URL}/teams`),
+            axios.get(`${API_URL}/matches`)
+          ]);
+          setTeams(teamsRes.data);
+          setMatches(matchesRes.data);
+          setRegistrationOpen(teamsRes.data.length < 8);
+          setLoading(false);
+        } catch (err) {
+          console.error('Error fetching data:', err);
+          // Demo data - remove when real backend is running
+          setTeams([
+            { _id: '1', teamName: 'Royal Blazers', captainName: 'Rahul Sharma', captainPhone: '9876543210', city: 'Odajhar', wins: 3, losses: 1, points: 6, matchesPlayed: 4, status: 'approved' },
+            { _id: '2', teamName: 'Thunder Kings', captainName: 'Ajay Singh', captainPhone: '9876543211', city: 'Odajhar', wins: 2, losses: 2, points: 4, matchesPlayed: 4, status: 'approved' },
+            { _id: '3', teamName: 'Eagle Strikers', captainName: 'Mohammad Khan', captainPhone: '9876543212', city: 'Odajhar', wins: 4, losses: 0, points: 8, matchesPlayed: 4, status: 'approved' },
+            { _id: '4', teamName: 'Tiger Force', captainName: 'Sunil Yadav', captainPhone: '9876543213', city: 'Odajhar', wins: 1, losses: 3, points: 2, matchesPlayed: 4, status: 'approved' }
+          ]);
+          setMatches([
+            { _id: '1', team1: {teamName: 'Royal Blazers'}, team2: {teamName: 'Thunder Kings'}, matchDate: new Date('2026-04-25T09:00:00'), matchType: 'group', overs: 8, venue: 'Odajhar Village', status: 'scheduled' },
+            { _id: '2', team1: {teamName: 'Eagle Strikers'}, team2: {teamName: 'Tiger Force'}, matchDate: new Date('2026-04-25T12:00:00'), matchType: 'group', overs: 8, venue: 'Odajhar Village', status: 'scheduled' },
+            { _id: '3', team1: {teamName: 'Royal Blazers'}, team2: {teamName: 'Tiger Force'}, matchDate: new Date('2026-04-26T09:00:00'), matchType: 'group', overs: 8, venue: 'Odajhar Village', status: 'scheduled' }
+          ]);
+          setRegistrationOpen(true);
+          setLoading(false);
+        }
+      };
+      
+      return (
+        <AppContext.Provider value={{ currentPage, setCurrentPage, teams, matches, registrationOpen, loading, fetchData }}>
+          <div className="min-h-screen flex flex-col">
+            <Navbar />
+            <main className="flex-1">
+              {currentPage === 'home' && <Home />}
+              {currentPage === 'register' && <Register />}
+              {currentPage === 'teams' && <Teams />}
+              {currentPage === 'schedule' && <Schedule />}
+              {currentPage === 'results' && <Results />}
+              {currentPage === 'contact' && <Contact />}
+              {currentPage === 'admin' && <Admin />}
+            </main>
+            <BottomNav />
+          </div>
+        </AppContext.Provider>
+      );
+    }
+    
+    function Navbar() {
+      const { setCurrentPage, currentPage } = useContext(AppContext);
+      
+      return (
+        <nav className="cricket-gradient text-white sticky top-0 z-50 shadow-lg">
+          <div className="max-w-7xl mx-auto px-4 py-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2" onClick={() => setCurrentPage('home')}>
+                <span className="text-2xl">🏏</span>
+                <span className="font-bold text-lg">FZ Cricket</span>
+              </div>
+              <div className="hidden md:flex space-x-4">
+                <NavLink page="home" current={currentPage} setCurrentPage={setCurrentPage}>Home</NavLink>
+                <NavLink page="teams" current={currentPage} setCurrentPage={setCurrentPage}>Teams</NavLink>
+                <NavLink page="schedule" current={currentPage} setCurrentPage={setCurrentPage}>Schedule</NavLink>
+                <NavLink page="results" current={currentPage} setCurrentPage={setCurrentPage}>Results</NavLink>
+              </div>
+              <button onClick={() => setCurrentPage('admin')} className="text-sm bg-white/20 px-3 py-1 rounded">Admin</button>
+            </div>
+          </div>
+        </nav>
+      );
+    }
+    
+    function NavLink({ page, current, setCurrentPage, children }) {
+      return (
+        <button 
+          onClick={() => setCurrentPage(page)}
+          className={`px-3 py-2 rounded-lg font-medium transition ${current === page ? 'bg-white/20' : 'hover:bg-white/10'}`}
+        >
+          {children}
+        </button>
+      );
+    }
+    
+    function BottomNav() {
+      const { currentPage, setCurrentPage } = useContext(AppContext);
+      
+      const navItems = [
+        { page: 'home', icon: '🏠', label: 'Home' },
+        { page: 'register', icon: '📝', label: 'Register' },
+        { page: 'teams', icon: '👥', label: 'Teams' },
+        { page: 'schedule', icon: '📅', label: 'Schedule' },
+        { page: 'results', icon: '🏆', label: 'Results' }
+      ];
+      
+      return (
+        <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 bottom-nav z-50">
+          <div className="flex justify-around py-2">
+            {navItems.map(item => (
+              <button 
+                key={item.page}
+                onClick={() => setCurrentPage(item.page)}
+                className={`flex flex-col items-center py-1 px-3 ${currentPage === item.page ? 'text-green-600' : 'text-gray-500'}`}
+              >
+                <span className="text-xl">{item.icon}</span>
+                <span className="text-xs">{item.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      );
+    }
+    
+    function Home() {
+      const { teams, matches, registrationOpen, loading } = useContext(AppContext);
+      const liveMatch = matches.find(m => m.status === 'in-progress');
+      
+      if (loading) return <Loading />;
+      
+      return (
+        <div>
+          <section className="hero-gradient text-white py-16 px-4">
+            <div className="max-w-4xl mx-auto text-center">
+              <h1 className="text-4xl md:text-6xl font-bold mb-4">
+                🏏 FZ Cricket Tournament
+              </h1>
+              <p className="text-xl text-gray-300 mb-2">Odajhar Village</p>
+              <p className="text-gray-400">8 Teams • 15 Players Each • 8 Overs Matches</p>
+              <div className="mt-8 flex flex-wrap justify-center gap-4">
+                <div className="bg-white/10 rounded-lg px-6 py-3">
+                  <p className="text-3xl font-bold">{teams.length}</p>
+                  <p className="text-sm text-gray-300">Teams Registered</p>
+                </div>
+                <div className="bg-white/10 rounded-lg px-6 py-3">
+                  <p className="text-3xl font-bold">{8 - teams.length}</p>
+                  <p className="text-sm text-gray-300">Spots Left</p>
+                </div>
+                <div className="bg-white/10 rounded-lg px-6 py-3">
+                  <p className="text-3xl font-bold">{matches.filter(m => m.status === 'completed').length}</p>
+                  <p className="text-sm text-gray-300">Matches Played</p>
+                </div>
+              </div>
+              {registrationOpen ? (
+                <button onClick={() => useContext(AppContext).setCurrentPage('register')} 
+                  className="mt-8 bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-full text-lg transition transform hover:scale-105">
+                  Register Your Team 🚀
+                </button>
+              ) : (
+                <div className="mt-8 bg-red-500/20 border border-red-500 rounded-lg px-6 py-3 inline-block">
+                  <p className="text-red-400 font-bold">Registration Closed</p>
+                </div>
+              )}
+            </div>
+          </section>
+          
+          {liveMatch && (
+            <section className="bg-yellow-50 py-6 px-4 border-b-4 border-yellow-400">
+              <div className="max-w-4xl mx-auto">
+                <div className="flex items-center justify-center space-x-2 mb-4">
+                  <span className="w-3 h-3 bg-red-600 rounded-full live-pulse"></span>
+                  <span className="font-bold text-red-600">LIVE MATCH</span>
+                </div>
+                <div className="bg-white rounded-xl p-4 shadow-lg">
+                  <div className="flex justify-between items-center text-center">
+                    <div className="flex-1">
+                      <p className="font-bold text-lg">{liveMatch.team1?.teamName || 'Team 1'}</p>
+                      <p className="text-2xl font-bold text-green-600">{liveMatch.team1Score?.runs || 0}/{liveMatch.team1Score?.wickets || 0}</p>
+                    </div>
+                    <span className="text-xl font-bold text-gray-400">VS</span>
+                    <div className="flex-1">
+                      <p className="font-bold text-lg">{liveMatch.team2?.teamName || 'Team 2'}</p>
+                      <p className="text-2xl font-bold text-green-600">{liveMatch.team2Score?.runs || 0}/{liveMatch.team2Score?.wickets || 0}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+          )}
+          
+          <section className="py-10 px-4">
+            <div className="max-w-6xl mx-auto">
+              <h2 className="text-2xl font-bold text-center mb-8">Registered Teams</h2>
+              {teams.length === 0 ? (
+                <p className="text-center text-gray-500">No teams registered yet</p>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {teams.slice(0, 8).map((team, index) => (
+                    <TeamCard key={team._id} team={team} index={index} />
+                  ))}
+                </div>
+              )}
+            </div>
+          </section>
+          
+          <section className="bg-gray-100 py-10 px-4">
+            <div className="max-w-6xl mx-auto">
+              <h2 className="text-2xl font-bold text-center mb-8">Upcoming Matches</h2>
+              {matches.filter(m => m.status === 'scheduled').length === 0 ? (
+                <p className="text-center text-gray-500">No matches scheduled yet</p>
+              ) : (
+                <div className="space-y-3">
+                  {matches.filter(m => m.status === 'scheduled').slice(0, 5).map((match, index) => (
+                    <MatchCard key={match._id} match={match} index={index} />
+                  ))}
+                </div>
+              )}
+            </div>
+          </section>
+        </div>
+      );
+    }
+    
+    function TeamCard({ team, index }) {
+      const colors = ['bg-green-500', 'bg-blue-500', 'bg-purple-500', 'bg-orange-500', 'bg-pink-500', 'bg-indigo-500', 'bg-teal-500', 'bg-red-500'];
+      
+      return (
+        <div className="bg-white rounded-xl shadow-lg overflow-hidden card-shadow score-animation">
+          <div className={`${colors[index % colors.length]} h-2`}></div>
+          <div className="p-4">
+            <div className="flex items-center space-x-3">
+              <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-2xl font-bold text-gray-600">
+                {team.teamName.charAt(0)}
+              </div>
+              <div>
+                <h3 className="font-bold text-gray-800">{team.teamName}</h3>
+                <p className="text-sm text-gray-500">Capt: {team.captainName}</p>
+              </div>
+            </div>
+            <div className="mt-3 flex justify-between text-sm">
+              <span className="text-gray-500">W: {team.wins} | L: {team.losses}</span>
+              <span className="font-bold text-green-600">{team.points} pts</span>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    
+    function MatchCard({ match, index }) {
+      const date = new Date(match.matchDate).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' });
+      const time = new Date(match.matchDate).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+      
+      return (
+        <div className="bg-white rounded-xl p-4 shadow-md flex justify-between items-center">
+          <div className="flex items-center space-x-3">
+            <span className="text-2xl font-bold text-gray-300">#{index + 1}</span>
+            <div>
+              <p className="font-semibold">{match.team1?.teamName} vs {match.team2?.teamName}</p>
+              <p className="text-sm text-gray-500">{match.venue} • {match.overs} overs</p>
+            </div>
+          </div>
+          <div className="text-right">
+            <p className="font-bold text-green-600">{date}</p>
+            <p className="text-sm text-gray-500">{time}</p>
+          </div>
+        </div>
+      );
+    }
+    
+    function Register() {
+      const { setCurrentPage, registrationOpen, teams, fetchData } = useContext(AppContext);
+      const [step, setStep] = useState(1);
+      const [formData, setFormData] = useState({
+        teamName: '', captainName: '', captainPhone: '', city: 'Odajhar'
+      });
+      const [players, setPlayers] = useState([]);
+      const [loading, setLoading] = useState(false);
+      const [error, setError] = useState('');
+      const [success, setSuccess] = useState(false);
+      const [currentTeamId, setCurrentTeamId] = useState('');
+      
+      if (!registrationOpen) {
+        return (
+          <div className="py-16 px-4 text-center">
+            <div className="max-w-md mx-auto bg-white rounded-xl shadow-lg p-8">
+              <span className="text-6xl">😔</span>
+              <h2 className="text-2xl font-bold mt-4">Registration Closed</h2>
+              <p className="text-gray-500 mt-2">All 8 teams have already registered.</p>
+              <button onClick={() => setCurrentPage('home')} className="mt-6 cricket-gradient text-white px-6 py-2 rounded-lg">
+                Back to Home
+              </button>
+            </div>
+          </div>
+        );
+      }
+      
+      const handleTeamSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setError('');
+        
+        try {
+          const res = await axios.post(`${API_URL}/teams/register`, {
+            ...formData,
+            paymentId: 'demo_payment_' + Date.now()
+          });
+          setCurrentTeamId(res.data.team._id);
+          setStep(2);
+          
+          const playersArray = [];
+          for (let i = 0; i < 15; i++) {
+            playersArray.push({ name: '', age: 18, jerseyNumber: i + 1, role: 'batsman', phone: '' });
+          }
+          setPlayers(playersArray);
+        } catch (err) {
+          setError(err.response?.data?.message || 'Registration failed');
+        }
+        setLoading(false);
+      };
+      
+      const handlePlayerUpdate = (index, field, value) => {
+        const newPlayers = [...players];
+        newPlayers[index][field] = value;
+        setPlayers(newPlayers);
+      };
+      
+      const handlePlayersSubmit = async () => {
+        setLoading(true);
+        try {
+          const validPlayers = players.filter(p => p.name.trim());
+          await axios.post(`${API_URL}/players/bulk-register/${currentTeamId}`, { players: validPlayers });
+          await fetchData();
+          setSuccess(true);
+        } catch (err) {
+          setError(err.response?.data?.message || 'Player registration failed');
+        }
+        setLoading(false);
+      };
+      
+      if (success) {
+        return (
+          <div className="py-16 px-4 text-center">
+            <div className="max-w-md mx-auto bg-white rounded-xl shadow-lg p-8">
+              <span className="text-6xl">🎉</span>
+              <h2 className="text-2xl font-bold mt-4">Registration Successful!</h2>
+              <p className="text-gray-500 mt-2">Your team has been registered with 15 players.</p>
+              <button onClick={() => setCurrentPage('home')} className="mt-6 cricket-gradient text-white px-6 py-2 rounded-lg">
+                Go to Home
+              </button>
+            </div>
+          </div>
+        );
+      }
+      
+      return (
+        <div className="py-8 px-4">
+          <div className="max-w-2xl mx-auto">
+            <div className="flex justify-center mb-8">
+              <div className="flex items-center">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${step >= 1 ? 'bg-green-500 text-white' : 'bg-gray-200'}`}>1</div>
+                <div className={`w-16 h-1 ${step >= 2 ? 'bg-green-500' : 'bg-gray-200'}`}></div>
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${step >= 2 ? 'bg-green-500 text-white' : 'bg-gray-200'}`}>2</div>
+              </div>
+            </div>
+            
+            <div className="bg-white rounded-xl shadow-lg p-6">
+              <h2 className="text-2xl font-bold text-center mb-6">
+                {step === 1 ? 'Team Registration' : 'Player Registration (15 Players)'}
+              </h2>
+              
+              <p className="text-center text-sm text-gray-500 mb-6">
+                Registration Fee: <span className="font-bold text-green-600">₹300</span>
+              </p>
+              
+              {error && (
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4">
+                  {error}
+                </div>
+              )}
+              
+              {step === 1 && (
+                <form onSubmit={handleTeamSubmit} className="space-y-4">
+                  <input type="text" placeholder="Team Name *" value={formData.teamName}
+                    onChange={e => setFormData({...formData, teamName: e.target.value})}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" required />
+                  <input type="text" placeholder="Captain Name *" value={formData.captainName}
+                    onChange={e => setFormData({...formData, captainName: e.target.value})}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" required />
+                  <input type="tel" placeholder="Captain Phone *" value={formData.captainPhone}
+                    onChange={e => setFormData({...formData, captainPhone: e.target.value})}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" required />
+                  <input type="text" placeholder="City/Village" value={formData.city}
+                    onChange={e => setFormData({...formData, city: e.target.value})}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" />
+                  <button type="submit" disabled={loading || teams.length >= 8}
+                    className="w-full cricket-gradient text-white font-bold py-3 rounded-lg disabled:opacity-50">
+                    {loading ? 'Processing...' : 'Register Team (₹300)'}
+                  </button>
+                </form>
+              )}
+              
+              {step === 2 && (
+                <div>
+                  <p className="text-sm text-gray-500 mb-4">Enter at least 11 players (minimum required for a match)</p>
+                  <div className="space-y-3 max-h-96 overflow-y-auto">
+                    {players.map((player, index) => (
+                      <div key={index} className="flex gap-2 items-center">
+                        <span className="w-8 text-gray-400 font-bold">#{index + 1}</span>
+                        <input type="text" placeholder="Player Name" value={player.name}
+                          onChange={e => handlePlayerUpdate(index, 'name', e.target.value)}
+                          className="flex-1 p-2 border border-gray-300 rounded text-sm" />
+                        <select value={player.role} onChange={e => handlePlayerUpdate(index, 'role', e.target.value)}
+                          className="p-2 border border-gray-300 rounded text-sm">
+                          <option value="batsman">Bat</option>
+                          <option value="bowler">Bowl</option>
+                          <option value="all-rounder">AR</option>
+                          <option value="wicket-keeper">WK</option>
+                        </select>
+                      </div>
+                    ))}
+                  </div>
+                  <button onClick={handlePlayersSubmit} disabled={loading}
+                    className="w-full mt-4 cricket-gradient text-white font-bold py-3 rounded-lg disabled:opacity-50">
+                    {loading ? 'Registering...' : 'Submit Players'}
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    }
+    
+    function Teams() {
+      const { teams } = useContext(AppContext);
+      
+      return (
+        <div className="py-8 px-4">
+          <div className="max-w-6xl mx-auto">
+            <h2 className="text-2xl font-bold text-center mb-8">Registered Teams ({teams.length}/8)</h2>
+            
+            {teams.length === 0 ? (
+              <p className="text-center text-gray-500">No teams registered yet</p>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {teams.map((team, index) => (
+                  <TeamCardDetailed key={team._id} team={team} index={index} />
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+    
+    function TeamCardDetailed({ team, index }) {
+      const [showPlayers, setShowPlayers] = useState(false);
+      const [players, setPlayers] = useState([]);
+      const colors = ['from-green-500', 'from-blue-500', 'from-purple-500', 'from-orange-500', 'from-pink-500', 'from-indigo-500', 'from-teal-500', 'from-red-500'];
+      
+      useEffect(() => {
+        if (showPlayers) {
+          axios.get(`${API_URL}/teams/${team._id}/players`).then(res => setPlayers(res.data));
+        }
+      }, [showPlayers]);
+      
+      return (
+        <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+          <div className={`bg-gradient-to-r ${colors[index % colors.length]} to-transparent h-2`}></div>
+          <div className="p-5">
+            <div className="flex items-start justify-between">
+              <div className="flex items-center space-x-3">
+                <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center text-3xl font-bold text-gray-600">
+                  {team.teamName.charAt(0)}
+                </div>
+                <div>
+                  <h3 className="font-bold text-xl">{team.teamName}</h3>
+                  <p className="text-gray-500">Capt: {team.captainName}</p>
+                  <p className="text-sm text-gray-400">{team.city}</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <span className="inline-block bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium">Approved</span>
+              </div>
+            </div>
+            
+            <div className="mt-4 flex justify-between text-sm">
+              <div><span className="text-gray-500">Matches:</span> <span className="font-bold">{team.matchesPlayed}</span></div>
+              <div><span className="text-gray-500">Wins:</span> <span className="font-bold text-green-600">{team.wins}</span></div>
+              <div><span className="text-gray-500">Losses:</span> <span className="font-bold text-red-600">{team.losses}</span></div>
+              <div><span className="text-gray-500">Points:</span> <span className="font-bold text-gold-600">{team.points}</span></div>
+            </div>
+            
+            <button onClick={() => setShowPlayers(!showPlayers)}
+              className="w-full mt-4 bg-gray-100 hover:bg-gray-200 py-2 rounded-lg text-sm font-medium transition">
+              {showPlayers ? 'Hide Players' : `View Players (${players.length || '...'})`}
+            </button>
+            
+            {showPlayers && players.length > 0 && (
+              <div className="mt-3 grid grid-cols-5 gap-2">
+                {players.map(p => (
+                  <div key={p._id} className="text-center p-2 bg-gray-50 rounded">
+                    <p className="font-bold text-sm">{p.jerseyNumber}</p>
+                    <p className="text-xs text-gray-500 truncate">{p.name}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+    
+    function Schedule() {
+      const { matches } = useContext(AppContext);
+      const scheduled = matches.filter(m => m.status === 'scheduled');
+      
+      return (
+        <div className="py-8 px-4">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-2xl font-bold text-center mb-8">Tournament Schedule</h2>
+            
+            {scheduled.length === 0 ? (
+              <p className="text-center text-gray-500">No matches scheduled yet</p>
+            ) : (
+              <div className="space-y-4">
+                {scheduled.map((match, index) => (
+                  <MatchCardDetailed key={match._id} match={match} index={index} />
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+    
+    function MatchCardDetailed({ match, index }) {
+      const date = new Date(match.matchDate).toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+      const time = new Date(match.matchDate).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+      
+      return (
+        <div className="bg-white rounded-xl shadow-lg p-5">
+          <div className="flex justify-between items-start mb-4">
+            <div className="flex items-center space-x-2">
+              <span className="bg-gray-800 text-white px-3 py-1 rounded-full text-sm font-medium">
+                {match.matchType.toUpperCase()}
+              </span>
+              <span className="text-gray-500 text-sm">{match.overs} Overs</span>
+            </div>
+            <span className="text-gray-500 text-sm">{match.venue}</span>
+          </div>
+          
+          <div className="flex justify-between items-center">
+            <div className="flex-1 text-center">
+              <p className="font-bold text-lg">{match.team1?.teamName || 'TBD'}</p>
+            </div>
+            <div className="px-4">
+              <span className="text-2xl font-bold text-gray-300">VS</span>
+            </div>
+            <div className="flex-1 text-center">
+              <p className="font-bold text-lg">{match.team2?.teamName || 'TBD'}</p>
+            </div>
+          </div>
+          
+          <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
+            <div>
+              <p className="font-bold text-green-600">{date}</p>
+              <p className="text-gray-500 text-sm">{time}</p>
+            </div>
+            <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm">
+              {match.status === 'scheduled' ? '🕐 Scheduled' : match.status === 'in-progress' ? '🔴 Live' : '✅ Completed'}
+            </span>
+          </div>
+        </div>
+      );
+    }
+    
+    function Results() {
+      const { matches, teams } = useContext(AppContext);
+      const completed = matches.filter(m => m.status === 'completed');
+      
+      return (
+        <div className="py-8 px-4">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-2xl font-bold text-center mb-8">Match Results</h2>
+            
+            {completed.length === 0 ? (
+              <p className="text-center text-gray-500">No matches completed yet</p>
+            ) : (
+              <div className="space-y-4">
+                {completed.map((match, index) => (
+                  <ResultCard key={match._id} match={match} index={index} />
+                ))}
+              </div>
+            )}
+            
+            <h2 className="text-2xl font-bold text-center mt-12 mb-8">Leaderboard</h2>
+            <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+              <table className="w-full">
+                <thead className="bg-gray-800 text-white">
+                  <tr>
+                    <th className="p-3 text-left">#</th>
+                    <th className="p-3 text-left">Team</th>
+                    <th className="p-3 text-center">M</th>
+                    <th className="p-3 text-center">W</th>
+                    <th className="p-3 text-center">L</th>
+                    <th className="p-3 text-center">Pts</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {teams.sort((a, b) => b.points - a.points).map((team, index) => (
+                    <tr key={team._id} className="border-b border-gray-100">
+                      <td className="p-3 font-bold">{index + 1}</td>
+                      <td className="p-3 font-medium">{team.teamName}</td>
+                      <td className="p-3 text-center">{team.matchesPlayed}</td>
+                      <td className="p-3 text-center text-green-600">{team.wins}</td>
+                      <td className="p-3 text-center text-red-600">{team.losses}</td>
+                      <td className="p-3 text-center font-bold text-green-600">{team.points}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    
+    function ResultCard({ match, index }) {
+      return (
+        <div className="bg-white rounded-xl shadow-lg p-5">
+          <div className="flex justify-between items-center mb-3">
+            <span className="text-gray-500 text-sm">{new Date(match.matchDate).toLocaleDateString('en-IN')}</span>
+            <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">Completed</span>
+          </div>
+          
+          <div className="flex justify-between items-center">
+            <div className="flex-1">
+              <p className="font-bold">{match.team1?.teamName}</p>
+              <p className="text-2xl font-bold text-green-600">{match.team1Score?.runs || 0}/{match.team1Score?.wickets || 0}</p>
+            </div>
+            <span className="text-xl font-bold text-gray-300">VS</span>
+            <div className="flex-1 text-right">
+              <p className="font-bold">{match.team2?.teamName}</p>
+              <p className="text-2xl font-bold text-green-600">{match.team2Score?.runs || 0}/{match.team2Score?.wickets || 0}</p>
+            </div>
+          </div>
+          
+          {match.winner && (
+            <div className="mt-3 pt-3 border-t border-gray-100 text-center">
+              <p className="font-bold text-gold-600">🏆 Winner: {match.winner?.teamName}</p>
+            </div>
+          )}
+        </div>
+      );
+    }
+    
+    function Contact() {
+      return (
+        <div className="py-8 px-4">
+          <div className="max-w-2xl mx-auto bg-white rounded-xl shadow-lg p-6">
+            <h2 className="text-2xl font-bold text-center mb-8">Contact & Support</h2>
+            
+            <div className="space-y-4">
+              <div className="flex items-center space-x-3 p-4 bg-gray-50 rounded-lg">
+                <span className="text-2xl">📧</span>
+                <div>
+                  <p className="font-medium">Email</p>
+                  <p className="text-gray-500">support@fzcricket.com</p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-3 p-4 bg-gray-50 rounded-lg">
+                <span className="text-2xl">📞</span>
+                <div>
+                  <p className="font-medium">Phone</p>
+                  <p className="text-gray-500">+91 9999-999-999</p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-3 p-4 bg-gray-50 rounded-lg">
+                <span className="text-2xl">📍</span>
+                <div>
+                  <p className="font-medium">Venue</p>
+                  <p className="text-gray-500">Odajhar Village, [State]</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    
+    function Admin() {
+      const { setCurrentPage, teams, matches, fetchData } = useContext(AppContext);
+      const [password, setPassword] = useState('');
+      const [loggedIn, setLoggedIn] = useState(false);
+      const [activeTab, setActiveTab] = useState('teams');
+      
+      const handleLogin = async (e) => {
+        e.preventDefault();
+        try {
+          const res = await axios.post(`${API_URL}/auth/admin/login`, { username: 'admin', password });
+          if (res.data.token) {
+            localStorage.setItem('adminToken', res.data.token);
+            setLoggedIn(true);
+          }
+        } catch (err) {
+          alert('Invalid password');
+        }
+      };
+      
+      if (!loggedIn) {
+        return (
+          <div className="py-16 px-4">
+            <div className="max-w-md mx-auto bg-white rounded-xl shadow-lg p-6">
+              <h2 className="text-2xl font-bold text-center mb-6">Admin Login</h2>
+              <form onSubmit={handleLogin} className="space-y-4">
+                <input type="password" placeholder="Admin Password" value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  className="w-full p-3 border border-gray-300 rounded-lg" />
+                <button type="submit" className="w-full cricket-gradient text-white font-bold py-3 rounded-lg">
+                  Login
+                </button>
+              </form>
+              <button onClick={() => setCurrentPage('home')} className="w-full mt-4 text-gray-500">
+                Back to Home
+              </button>
+            </div>
+          </div>
+        );
+      }
+      
+      return (
+        <div className="py-8 px-4">
+          <div className="max-w-6xl mx-auto">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold">Admin Dashboard</h2>
+              <button onClick={() => setLoggedIn(false)} className="text-red-500">Logout</button>
+            </div>
+            
+            <div className="flex space-x-2 mb-6 overflow-x-auto">
+              {['teams', 'matches', 'create-schedule'].map(tab => (
+                <button key={tab} onClick={() => setActiveTab(tab)}
+                  className={`px-4 py-2 rounded-lg font-medium whitespace-nowrap ${activeTab === tab ? 'cricket-gradient text-white' : 'bg-gray-200'}`}>
+                  {tab === 'teams' ? 'Manage Teams' : tab === 'matches' ? 'Manage Matches' : 'Create Schedule'}
+                </button>
+              ))}
+            </div>
+            
+            {activeTab === 'teams' && (
+              <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+                <table className="w-full">
+                  <thead className="bg-gray-800 text-white">
+                    <tr>
+                      <th className="p-3 text-left">Team</th>
+                      <th className="p-3 text-left">Captain</th>
+                      <th className="p-3 text-left">Phone</th>
+                      <th className="p-3 text-center">Status</th>
+                      <th className="p-3 text-center">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {teams.map(team => (
+                      <tr key={team._id} className="border-b border-gray-100">
+                        <td className="p-3 font-medium">{team.teamName}</td>
+                        <td className="p-3">{team.captainName}</td>
+                        <td className="p-3">{team.captainPhone}</td>
+                        <td className="p-3 text-center">
+                          <span className={`px-2 py-1 rounded text-sm ${team.status === 'approved' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                            {team.status}
+                          </span>
+                        </td>
+                        <td className="p-3 text-center">
+                          {team.status === 'pending' && (
+                            <button className="text-green-600 hover:text-green-800 mr-2">Approve</button>
+                          )}
+                          <button className="text-red-600 hover:text-red-800">Delete</button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+            
+            {activeTab === 'matches' && (
+              <div className="bg-white rounded-xl shadow-lg p-4">
+                <p className="text-gray-500 text-center">Manage match scores and update status</p>
+                <div className="mt-4 space-y-3">
+                  {matches.map(match => (
+                    <div key={match._id} className="flex justify-between items-center p-3 bg-gray-50 rounded">
+                      <div>
+                        <p className="font-medium">{match.team1?.teamName} vs {match.team2?.teamName}</p>
+                        <p className="text-sm text-gray-500">{match.status}</p>
+                      </div>
+                      <div className="flex space-x-2">
+                        <button className="px-3 py-1 bg-blue-500 text-white rounded text-sm">Start</button>
+                        <button className="px-3 py-1 bg-green-500 text-white rounded text-sm">Update Score</button>
+                        <button className="px-3 py-1 bg-gray-500 text-white rounded text-sm">End</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {activeTab === 'create-schedule' && (
+              <div className="bg-white rounded-xl shadow-lg p-6">
+                <h3 className="text-xl font-bold mb-4">Generate Tournament Schedule</h3>
+                <p className="text-gray-500 mb-4">This will create round-robin matches between all registered teams.</p>
+                <button className="cricket-gradient text-white font-bold py-3 px-6 rounded-lg">
+                  Generate Schedule
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+    
+    function Loading() {
+      return (
+        <div className="py-20 text-center">
+          <div className="inline-block w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin"></div>
+          <p className="mt-4 text-gray-500">Loading...</p>
+        </div>
+      );
+    }
+    
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
