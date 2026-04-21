@@ -749,7 +749,10 @@
       const [password, setPassword] = useState('');
       const [loggedIn, setLoggedIn] = useState(false);
       const [activeTab, setActiveTab] = useState('teams');
-      
+      const [scoreModal, setScoreModal] = useState(null);
+      const [scoreData, setScoreData] = useState({ t1runs: '', t1wickets: '', t2runs: '', t2wickets: '', winnerId: '' });
+      const token = localStorage.getItem('adminToken');
+
       const handleLogin = async (e) => {
         e.preventDefault();
         try {
@@ -762,7 +765,52 @@
           alert('Invalid password');
         }
       };
-      
+
+      const handleApprove = async (teamId) => {
+        try {
+          await axios.put(`${API_URL}/teams/${teamId}`, { status: 'approved' }, { headers: { Authorization: `Bearer ${token}` } });
+          await fetchData();
+        } catch (err) { alert('Error approving team'); }
+      };
+
+      const handleDelete = async (teamId) => {
+        if (!window.confirm('Are you sure?')) return;
+        try {
+          await axios.delete(`${API_URL}/teams/${teamId}`, { headers: { Authorization: `Bearer ${token}` } });
+          await fetchData();
+        } catch (err) { alert('Error deleting team'); }
+      };
+
+      const handleMatchStatus = async (matchId, status) => {
+        try {
+          await axios.put(`${API_URL}/matches/${matchId}/status`, { status }, { headers: { Authorization: `Bearer ${token}` } });
+          await fetchData();
+        } catch (err) { alert('Error updating match'); }
+      };
+
+      const handleScoreUpdate = async () => {
+        try {
+          await axios.put(`${API_URL}/matches/${scoreModal._id}/score`, {
+            team1Score: { runs: parseInt(scoreData.t1runs), wickets: parseInt(scoreData.t1wickets) },
+            team2Score: { runs: parseInt(scoreData.t2runs), wickets: parseInt(scoreData.t2wickets) }
+          }, { headers: { Authorization: `Bearer ${token}` } });
+          if (scoreData.winnerId) {
+            await axios.put(`${API_URL}/matches/${scoreModal._id}/status`, { status: 'completed', winnerId: scoreData.winnerId }, { headers: { Authorization: `Bearer ${token}` } });
+          }
+          setScoreModal(null);
+          await fetchData();
+        } catch (err) { alert('Error updating score'); }
+      };
+
+      const handleGenerateSchedule = async () => {
+        if (!window.confirm('This will generate matches for all registered teams. Continue?')) return;
+        try {
+          await axios.post(`${API_URL}/matches/generate-schedule`, {}, { headers: { Authorization: `Bearer ${token}` } });
+          await fetchData();
+          alert('Schedule generated successfully!');
+        } catch (err) { alert(err.response?.data?.message || 'Error generating schedule'); }
+      };
+
       if (!loggedIn) {
         return (
           <div className="py-16 px-4">
@@ -772,26 +820,22 @@
                 <input type="password" placeholder="Admin Password" value={password}
                   onChange={e => setPassword(e.target.value)}
                   className="w-full p-3 border border-gray-300 rounded-lg" />
-                <button type="submit" className="w-full cricket-gradient text-white font-bold py-3 rounded-lg">
-                  Login
-                </button>
+                <button type="submit" className="w-full cricket-gradient text-white font-bold py-3 rounded-lg">Login</button>
               </form>
-              <button onClick={() => setCurrentPage('home')} className="w-full mt-4 text-gray-500">
-                Back to Home
-              </button>
+              <button onClick={() => setCurrentPage('home')} className="w-full mt-4 text-gray-500">Back to Home</button>
             </div>
           </div>
         );
       }
-      
+
       return (
         <div className="py-8 px-4">
           <div className="max-w-6xl mx-auto">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold">Admin Dashboard</h2>
-              <button onClick={() => setLoggedIn(false)} className="text-red-500">Logout</button>
+              <button onClick={() => { localStorage.removeItem('adminToken'); setLoggedIn(false); }} className="text-red-500">Logout</button>
             </div>
-            
+
             <div className="flex space-x-2 mb-6 overflow-x-auto">
               {['teams', 'matches', 'create-schedule'].map(tab => (
                 <button key={tab} onClick={() => setActiveTab(tab)}
@@ -800,7 +844,7 @@
                 </button>
               ))}
             </div>
-            
+
             {activeTab === 'teams' && (
               <div className="bg-white rounded-xl shadow-lg overflow-hidden">
                 <table className="w-full">
@@ -826,9 +870,9 @@
                         </td>
                         <td className="p-3 text-center">
                           {team.status === 'pending' && (
-                            <button className="text-green-600 hover:text-green-800 mr-2">Approve</button>
+                            <button onClick={() => handleApprove(team._id)} className="text-green-600 hover:text-green-800 mr-2">Approve</button>
                           )}
-                          <button className="text-red-600 hover:text-red-800">Delete</button>
+                          <button onClick={() => handleDelete(team._id)} className="text-red-600 hover:text-red-800">Delete</button>
                         </td>
                       </tr>
                     ))}
@@ -836,35 +880,72 @@
                 </table>
               </div>
             )}
-            
+
             {activeTab === 'matches' && (
               <div className="bg-white rounded-xl shadow-lg p-4">
-                <p className="text-gray-500 text-center">Manage match scores and update status</p>
-                <div className="mt-4 space-y-3">
-                  {matches.map(match => (
-                    <div key={match._id} className="flex justify-between items-center p-3 bg-gray-50 rounded">
+                <div className="mt-2 space-y-3">
+                  {matches.length === 0 ? <p className="text-center text-gray-500">No matches yet. Generate schedule first.</p> : matches.map(match => (
+                    <div key={match._id} className="flex flex-wrap justify-between items-center p-3 bg-gray-50 rounded gap-2">
                       <div>
                         <p className="font-medium">{match.team1?.teamName} vs {match.team2?.teamName}</p>
-                        <p className="text-sm text-gray-500">{match.status}</p>
+                        <p className="text-sm text-gray-500">{match.status} • {match.team1Score ? `${match.team1Score.runs}/${match.team1Score.wickets} - ${match.team2Score.runs}/${match.team2Score.wickets}` : 'No score'}</p>
                       </div>
                       <div className="flex space-x-2">
-                        <button className="px-3 py-1 bg-blue-500 text-white rounded text-sm">Start</button>
-                        <button className="px-3 py-1 bg-green-500 text-white rounded text-sm">Update Score</button>
-                        <button className="px-3 py-1 bg-gray-500 text-white rounded text-sm">End</button>
+                        {match.status === 'scheduled' && (
+                          <button onClick={() => handleMatchStatus(match._id, 'in-progress')} className="px-3 py-1 bg-blue-500 text-white rounded text-sm">Start</button>
+                        )}
+                        {match.status === 'in-progress' && (
+                          <button onClick={() => { setScoreModal(match); setScoreData({ t1runs: match.team1Score?.runs || '', t1wickets: match.team1Score?.wickets || '', t2runs: match.team2Score?.runs || '', t2wickets: match.team2Score?.wickets || '', winnerId: '' }); }} className="px-3 py-1 bg-green-500 text-white rounded text-sm">Update Score</button>
+                        )}
+                        {match.status === 'in-progress' && (
+                          <button onClick={() => handleMatchStatus(match._id, 'completed')} className="px-3 py-1 bg-gray-500 text-white rounded text-sm">End</button>
+                        )}
                       </div>
                     </div>
                   ))}
                 </div>
               </div>
             )}
-            
+
             {activeTab === 'create-schedule' && (
               <div className="bg-white rounded-xl shadow-lg p-6">
                 <h3 className="text-xl font-bold mb-4">Generate Tournament Schedule</h3>
-                <p className="text-gray-500 mb-4">This will create round-robin matches between all registered teams.</p>
-                <button className="cricket-gradient text-white font-bold py-3 px-6 rounded-lg">
-                  Generate Schedule
-                </button>
+                <p className="text-gray-500 mb-4">This will create round-robin matches for all {teams.length} registered teams.</p>
+                <button onClick={handleGenerateSchedule} className="cricket-gradient text-white font-bold py-3 px-6 rounded-lg">Generate Schedule</button>
+              </div>
+            )}
+
+            {scoreModal && (
+              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                <div className="bg-white rounded-xl p-6 w-full max-w-md">
+                  <h3 className="text-xl font-bold mb-4">Update Score</h3>
+                  <p className="font-medium mb-4">{scoreModal.team1?.teamName} vs {scoreModal.team2?.teamName}</p>
+                  <div className="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <p className="text-sm font-medium mb-1">{scoreModal.team1?.teamName}</p>
+                      <div className="flex gap-2">
+                        <input type="number" placeholder="Runs" value={scoreData.t1runs} onChange={e => setScoreData({...scoreData, t1runs: e.target.value})} className="w-full p-2 border rounded" />
+                        <input type="number" placeholder="Wkts" value={scoreData.t1wickets} onChange={e => setScoreData({...scoreData, t1wickets: e.target.value})} className="w-full p-2 border rounded" />
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium mb-1">{scoreModal.team2?.teamName}</p>
+                      <div className="flex gap-2">
+                        <input type="number" placeholder="Runs" value={scoreData.t2runs} onChange={e => setScoreData({...scoreData, t2runs: e.target.value})} className="w-full p-2 border rounded" />
+                        <input type="number" placeholder="Wkts" value={scoreData.t2wickets} onChange={e => setScoreData({...scoreData, t2wickets: e.target.value})} className="w-full p-2 border rounded" />
+                      </div>
+                    </div>
+                  </div>
+                  <select value={scoreData.winnerId} onChange={e => setScoreData({...scoreData, winnerId: e.target.value})} className="w-full p-2 border rounded mb-4">
+                    <option value="">Select Winner (optional)</option>
+                    <option value={scoreModal.team1?._id}>{scoreModal.team1?.teamName}</option>
+                    <option value={scoreModal.team2?._id}>{scoreModal.team2?.teamName}</option>
+                  </select>
+                  <div className="flex gap-2">
+                    <button onClick={handleScoreUpdate} className="flex-1 cricket-gradient text-white font-bold py-2 rounded-lg">Save</button>
+                    <button onClick={() => setScoreModal(null)} className="flex-1 bg-gray-200 py-2 rounded-lg">Cancel</button>
+                  </div>
+                </div>
               </div>
             )}
           </div>
