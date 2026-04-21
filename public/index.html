@@ -119,6 +119,7 @@
                 <NavLink page="teams" current={currentPage} setCurrentPage={setCurrentPage}>Teams</NavLink>
                 <NavLink page="schedule" current={currentPage} setCurrentPage={setCurrentPage}>Schedule</NavLink>
                 <NavLink page="results" current={currentPage} setCurrentPage={setCurrentPage}>Results</NavLink>
+                <NavLink page="contact" current={currentPage} setCurrentPage={setCurrentPage}>Contact</NavLink>
               </div>
               <button onClick={() => setCurrentPage('admin')} className="text-sm bg-white/20 px-3 py-1 rounded">Admin</button>
             </div>
@@ -146,7 +147,8 @@
         { page: 'register', icon: '📝', label: 'Register' },
         { page: 'teams', icon: '👥', label: 'Teams' },
         { page: 'schedule', icon: '📅', label: 'Schedule' },
-        { page: 'results', icon: '🏆', label: 'Results' }
+        { page: 'results', icon: '🏆', label: 'Results' },
+        { page: 'contact', icon: '📞', label: 'Contact' }
       ];
       
       return (
