@@ -308,13 +308,7 @@
                   <p className="text-gray-500">No photos yet. Admin can upload photos.</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                  {gallery.map((photo, i) => (
-                    <div key={i} className="rounded-xl overflow-hidden shadow-lg aspect-square cursor-pointer" onClick={() => window.open(photo.url, '_blank')}>
-                      <img src={photo.url} alt={photo.caption || 'Gallery'} className="w-full h-full object-cover hover:scale-105 transition" />
-                    </div>
-                  ))}
-                </div>
+                <GallerySlider photos={gallery} />
               )}
             </div>
           </section>
@@ -1044,6 +1038,49 @@
       );
     }
     
+    function GallerySlider({ photos }) {
+      const [current, setCurrent] = useState(0);
+
+      useEffect(() => {
+        const timer = setInterval(() => {
+          setCurrent(prev => (prev + 1) % photos.length);
+        }, 3000);
+        return () => clearInterval(timer);
+      }, [photos.length]);
+
+      return (
+        <div className="relative rounded-2xl overflow-hidden shadow-xl" style={{height: '320px'}}>
+          {photos.map((photo, i) => (
+            <div key={i} className={`absolute inset-0 transition-opacity duration-700 ${i === current ? 'opacity-100' : 'opacity-0'}`}>
+              <img src={photo.url} alt={photo.caption || 'Gallery'} className="w-full h-full object-cover" />
+              {photo.caption && (
+                <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-center py-2 px-4">
+                  <p className="font-medium">{photo.caption}</p>
+                </div>
+              )}
+            </div>
+          ))}
+          <button onClick={() => setCurrent(prev => (prev - 1 + photos.length) % photos.length)}
+            className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/50 text-white w-10 h-10 rounded-full flex items-center justify-center text-xl hover:bg-black/70">
+            ‹
+          </button>
+          <button onClick={() => setCurrent(prev => (prev + 1) % photos.length)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/50 text-white w-10 h-10 rounded-full flex items-center justify-center text-xl hover:bg-black/70">
+            ›
+          </button>
+          <div className="absolute bottom-10 left-0 right-0 flex justify-center gap-2">
+            {photos.map((_, i) => (
+              <button key={i} onClick={() => setCurrent(i)}
+                className={`w-2 h-2 rounded-full transition ${i === current ? 'bg-white' : 'bg-white/50'}`} />
+            ))}
+          </div>
+          <div className="absolute top-3 right-3 bg-black/50 text-white text-xs px-2 py-1 rounded-full">
+            {current + 1} / {photos.length}
+          </div>
+        </div>
+      );
+    }
+
     function GalleryAdmin() {
       const [gallery, setGallery] = useState(JSON.parse(localStorage.getItem('fzGallery') || '[]'));
       const [uploading, setUploading] = useState(false);
