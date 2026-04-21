@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FZ Cricket Tournament - Odajhar Village</title>
+  <title>Firoz Shah Cricket Tournament - Odajhar Village</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script>
@@ -20,18 +20,19 @@
   <style>
     * { font-family: 'Poppins', sans-serif; }
     .cricket-gradient { background: linear-gradient(135deg, #10B981 0%, #059669 50%, #047857 100%); }
-    .hero-gradient { background: linear-gradient(180deg, #1F2937 0%, #111827 100%); }
+    .hero-gradient { background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%); }
+    .gold-gradient { background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); }
+    .prize-gradient { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+    .fee-gradient { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
     .card-shadow { box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
     .live-pulse { animation: pulse 2s infinite; }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
-    }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
     .score-animation { animation: slideIn 0.3s ease-out; }
-    @keyframes slideIn {
-      from { transform: translateY(20px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
+    @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .shimmer { background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+    @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+    .trophy-bounce { animation: bounce 2s infinite; }
+    @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
   </style>
 </head>
 <body class="bg-gray-50">
@@ -169,48 +170,87 @@
       );
     }
     
+    function RulesModal({ onClose }) {
+      return (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-lg max-h-[80vh] overflow-y-auto">
+            <div className="cricket-gradient text-white p-5 rounded-t-2xl flex justify-between items-center">
+              <h3 className="text-xl font-bold">🏏 Tournament Rules</h3>
+              <button onClick={onClose} className="text-white text-2xl font-bold">✕</button>
+            </div>
+            <div className="p-5 space-y-3 text-sm text-gray-700">
+              <div className="bg-green-50 border-l-4 border-green-500 p-3 rounded"><p className="font-bold text-green-700">1. Teams</p><p>Maximum 8 teams. Each team must have 15 players. Minimum 11 players required to play.</p></div>
+              <div className="bg-blue-50 border-l-4 border-blue-500 p-3 rounded"><p className="font-bold text-blue-700">2. Match Format</p><p>Each match will be of 8 overs. Final match will be of 10 overs.</p></div>
+              <div className="bg-yellow-50 border-l-4 border-yellow-500 p-3 rounded"><p className="font-bold text-yellow-700">3. Registration</p><p>Entry fee ₹1100 per team. Fee must be paid before the tournament starts (Cash on Arrival).</p></div>
+              <div className="bg-purple-50 border-l-4 border-purple-500 p-3 rounded"><p className="font-bold text-purple-700">4. Points System</p><p>Win = 2 points, Loss = 0 points, No Result = 1 point each.</p></div>
+              <div className="bg-red-50 border-l-4 border-red-500 p-3 rounded"><p className="font-bold text-red-700">5. Fair Play</p><p>Any misconduct or argument with umpire will result in immediate disqualification.</p></div>
+              <div className="bg-orange-50 border-l-4 border-orange-500 p-3 rounded"><p className="font-bold text-orange-700">6. Umpire Decision</p><p>Umpire's decision will be final. No arguments will be entertained.</p></div>
+              <div className="bg-teal-50 border-l-4 border-teal-500 p-3 rounded"><p className="font-bold text-teal-700">7. Toss</p><p>Toss will be done before each match. Winning team can choose to bat or bowl.</p></div>
+              <div className="bg-indigo-50 border-l-4 border-indigo-500 p-3 rounded"><p className="font-bold text-indigo-700">8. Venue</p><p>Village Odajhar, Post Naseerpur, Tahsil Biswan, Sitapur - 261202</p></div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     function Home() {
       const { teams, matches, registrationOpen, loading, setCurrentPage } = useContext(AppContext);
       const liveMatch = matches.find(m => m.status === 'in-progress');
+      const [showRules, setShowRules] = useState(false);
+      const [gallery, setGallery] = useState([]);
       
       if (loading) return <Loading />;
       
       return (
-        <div>
-          <section className="hero-gradient text-white py-16 px-4">
-            <div className="max-w-4xl mx-auto text-center">
-              <h1 className="text-4xl md:text-6xl font-bold mb-4">
-                🏏 FZ Cricket Tournament
-              </h1>
-              <p className="text-xl text-gray-300 mb-2">Odajhar Village</p>
-              <p className="text-gray-400">8 Teams • 15 Players Each • 8 Overs Matches</p>
-              <div className="mt-8 flex flex-wrap justify-center gap-4">
-                <div className="bg-white/10 rounded-lg px-6 py-3">
-                  <p className="text-3xl font-bold">{teams.length}</p>
-                  <p className="text-sm text-gray-300">Teams Registered</p>
+        <div className="pb-16">
+          {showRules && <RulesModal onClose={() => setShowRules(false)} />}
+
+          {/* Hero Section */}
+          <section className="hero-gradient text-white py-12 px-4 relative overflow-hidden">
+            <div className="absolute inset-0 opacity-10 text-9xl flex items-center justify-center">🏏</div>
+            <div className="max-w-4xl mx-auto text-center relative">
+              <div className="inline-block bg-yellow-400 text-gray-900 text-xs font-bold px-4 py-1 rounded-full mb-4 uppercase tracking-wider">🏆 Official Tournament 2026</div>
+              <h1 className="text-3xl md:text-5xl font-bold mb-2 text-white">Firoz Shah Cricket Tournament</h1>
+              <p className="text-yellow-300 font-semibold text-lg mb-1">📍 Village Odajhar, Post Naseerpur</p>
+              <p className="text-gray-300 text-sm mb-1">Tahsil Biswan, Sitapur - 261202</p>
+              <p className="text-green-300 font-bold mt-2">🗓️ Tournament Start: 21 April 2026</p>
+              <p className="text-gray-300 text-sm mt-1">8 Teams • 15 Players Each • 8 Overs Matches</p>
+
+              <div className="mt-6 flex flex-wrap justify-center gap-3">
+                <div className="bg-white/15 backdrop-blur rounded-xl px-5 py-3 border border-white/20">
+                  <p className="text-3xl font-bold text-yellow-300">{teams.length}</p>
+                  <p className="text-xs text-gray-300">Teams Registered</p>
                 </div>
-                <div className="bg-white/10 rounded-lg px-6 py-3">
-                  <p className="text-3xl font-bold">{8 - teams.length}</p>
-                  <p className="text-sm text-gray-300">Spots Left</p>
+                <div className="bg-white/15 backdrop-blur rounded-xl px-5 py-3 border border-white/20">
+                  <p className="text-3xl font-bold text-green-300">{8 - teams.length}</p>
+                  <p className="text-xs text-gray-300">Spots Left</p>
                 </div>
-                <div className="bg-white/10 rounded-lg px-6 py-3">
-                  <p className="text-3xl font-bold">{matches.filter(m => m.status === 'completed').length}</p>
-                  <p className="text-sm text-gray-300">Matches Played</p>
+                <div className="bg-white/15 backdrop-blur rounded-xl px-5 py-3 border border-white/20">
+                  <p className="text-3xl font-bold text-blue-300">{matches.filter(m => m.status === 'completed').length}</p>
+                  <p className="text-xs text-gray-300">Matches Played</p>
                 </div>
               </div>
-              {registrationOpen ? (
-                <button onClick={() => setCurrentPage('register')} 
-                  className="mt-8 bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-full text-lg transition transform hover:scale-105">
-                  Register Your Team 🚀
+
+              <div className="mt-6 flex flex-wrap justify-center gap-3">
+                {registrationOpen ? (
+                  <button onClick={() => setCurrentPage('register')}
+                    className="bg-green-400 hover:bg-green-300 text-gray-900 font-bold py-3 px-8 rounded-full text-lg transition transform hover:scale-105 shadow-lg">
+                    Register Your Team 🚀
+                  </button>
+                ) : (
+                  <div className="bg-red-500/30 border border-red-400 rounded-full px-6 py-3">
+                    <p className="text-red-300 font-bold">Registration Closed</p>
+                  </div>
+                )}
+                <button onClick={() => setShowRules(true)}
+                  className="bg-yellow-400 hover:bg-yellow-300 text-gray-900 font-bold py-3 px-8 rounded-full text-lg transition transform hover:scale-105 shadow-lg">
+                  📋 Tournament Rules
                 </button>
-              ) : (
-                <div className="mt-8 bg-red-500/20 border border-red-500 rounded-lg px-6 py-3 inline-block">
-                  <p className="text-red-400 font-bold">Registration Closed</p>
-                </div>
-              )}
+              </div>
             </div>
           </section>
-          
+
+          {/* Live Match */}
           {liveMatch && (
             <section className="bg-yellow-50 py-6 px-4 border-b-4 border-yellow-400">
               <div className="max-w-4xl mx-auto">
@@ -220,24 +260,67 @@
                 </div>
                 <div className="bg-white rounded-xl p-4 shadow-lg">
                   <div className="flex justify-between items-center text-center">
-                    <div className="flex-1">
-                      <p className="font-bold text-lg">{liveMatch.team1?.teamName || 'Team 1'}</p>
-                      <p className="text-2xl font-bold text-green-600">{liveMatch.team1Score?.runs || 0}/{liveMatch.team1Score?.wickets || 0}</p>
-                    </div>
+                    <div className="flex-1"><p className="font-bold text-lg">{liveMatch.team1?.teamName || 'Team 1'}</p><p className="text-2xl font-bold text-green-600">{liveMatch.team1Score?.runs || 0}/{liveMatch.team1Score?.wickets || 0}</p></div>
                     <span className="text-xl font-bold text-gray-400">VS</span>
-                    <div className="flex-1">
-                      <p className="font-bold text-lg">{liveMatch.team2?.teamName || 'Team 2'}</p>
-                      <p className="text-2xl font-bold text-green-600">{liveMatch.team2Score?.runs || 0}/{liveMatch.team2Score?.wickets || 0}</p>
-                    </div>
+                    <div className="flex-1"><p className="font-bold text-lg">{liveMatch.team2?.teamName || 'Team 2'}</p><p className="text-2xl font-bold text-green-600">{liveMatch.team2Score?.runs || 0}/{liveMatch.team2Score?.wickets || 0}</p></div>
                   </div>
                 </div>
               </div>
             </section>
           )}
-          
-          <section className="py-10 px-4">
+
+          {/* Entry Fee & Prize */}
+          <section className="py-8 px-4">
+            <div className="max-w-4xl mx-auto">
+              <h2 className="text-2xl font-bold text-center mb-6">💰 Entry Fee & Prize Money</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="fee-gradient text-white rounded-2xl p-6 text-center shadow-xl transform hover:scale-105 transition">
+                  <p className="text-4xl mb-2">🎟️</p>
+                  <p className="text-lg font-bold">Entry Fee</p>
+                  <p className="text-4xl font-bold mt-2">₹1,100</p>
+                  <p className="text-sm mt-2 bg-white/20 rounded-full px-3 py-1">Cash on Arrival</p>
+                </div>
+                <div className="gold-gradient text-white rounded-2xl p-6 text-center shadow-xl transform hover:scale-105 transition">
+                  <p className="text-4xl mb-2 trophy-bounce">🏆</p>
+                  <p className="text-lg font-bold">Winner Prize</p>
+                  <p className="text-4xl font-bold mt-2">₹7,000</p>
+                  <p className="text-sm mt-2 bg-white/20 rounded-full px-3 py-1">1st Place</p>
+                </div>
+                <div className="prize-gradient text-white rounded-2xl p-6 text-center shadow-xl transform hover:scale-105 transition">
+                  <p className="text-4xl mb-2">🥈</p>
+                  <p className="text-lg font-bold">Runner-up Prize</p>
+                  <p className="text-4xl font-bold mt-2">₹3,000</p>
+                  <p className="text-sm mt-2 bg-white/20 rounded-full px-3 py-1">2nd Place</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Photo Gallery */}
+          <section className="bg-gray-100 py-8 px-4">
             <div className="max-w-6xl mx-auto">
-              <h2 className="text-2xl font-bold text-center mb-8">Registered Teams</h2>
+              <h2 className="text-2xl font-bold text-center mb-6">📸 Photo Gallery</h2>
+              {gallery.length === 0 ? (
+                <div className="text-center py-12 bg-white rounded-xl shadow">
+                  <p className="text-5xl mb-3">📷</p>
+                  <p className="text-gray-500">No photos yet. Admin can upload photos.</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                  {gallery.map((photo, i) => (
+                    <div key={i} className="rounded-xl overflow-hidden shadow-lg aspect-square">
+                      <img src={photo.url} alt={photo.caption || 'Gallery'} className="w-full h-full object-cover hover:scale-105 transition" />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </section>
+
+          {/* Registered Teams */}
+          <section className="py-8 px-4">
+            <div className="max-w-6xl mx-auto">
+              <h2 className="text-2xl font-bold text-center mb-6">👥 Registered Teams ({teams.length}/8)</h2>
               {teams.length === 0 ? (
                 <p className="text-center text-gray-500">No teams registered yet</p>
               ) : (
@@ -249,10 +332,11 @@
               )}
             </div>
           </section>
-          
-          <section className="bg-gray-100 py-10 px-4">
+
+          {/* Upcoming Matches */}
+          <section className="bg-gray-100 py-8 px-4">
             <div className="max-w-6xl mx-auto">
-              <h2 className="text-2xl font-bold text-center mb-8">Upcoming Matches</h2>
+              <h2 className="text-2xl font-bold text-center mb-6">📅 Upcoming Matches</h2>
               {matches.filter(m => m.status === 'scheduled').length === 0 ? (
                 <p className="text-center text-gray-500">No matches scheduled yet</p>
               ) : (
