@@ -19,7 +19,7 @@ const io = socketIo(server, {
 });
 
 app.use(cors({
-  origin: ['https://fzcricket-tournament.netlify.app', 'http://localhost:5000'],
+  origin: ['https://fzcricket-tournament.netlify.app', 'https://fz-cricket-tournament.vercel.app', 'http://localhost:5000'],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 }));
