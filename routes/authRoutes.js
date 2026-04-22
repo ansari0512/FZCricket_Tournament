@@ -81,6 +81,22 @@ router.post('/admin/login', async (req, res) => {
   }
 });
 
+// User change password
+router.put('/change-password/:userId', async (req, res) => {
+  try {
+    const { oldPassword, newPassword } = req.body;
+    const user = await User.findById(req.params.userId);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    const match = await bcrypt.compare(oldPassword, user.password);
+    if (!match) return res.status(401).json({ message: 'Old password is incorrect' });
+    user.password = await bcrypt.hash(newPassword, 10);
+    await user.save();
+    res.json({ message: 'Password changed successfully' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Admin - Get all users
 router.get('/admin/users', async (req, res) => {
   try {

@@ -775,6 +775,7 @@
       const [scoreData, setScoreData] = useState({ t1runs: '', t1wickets: '', t2runs: '', t2wickets: '', winnerId: '' });
       const [rejectModal, setRejectModal] = useState(null);
       const [rejectReason, setRejectReason] = useState('');
+      const [showPass, setShowPass] = useState(false);
       const [users, setUsers] = useState([]);
       const [selectedTeamPlayers, setSelectedTeamPlayers] = useState([]);
       const [playersTeamId, setPlayersTeamId] = useState(null);
@@ -887,9 +888,12 @@
             <div className="max-w-md mx-auto bg-white rounded-xl shadow-lg p-6">
               <h2 className="text-2xl font-bold text-center mb-6">Admin Login</h2>
               <form onSubmit={handleLogin} className="space-y-4">
-                <input type="password" placeholder="Admin Password" value={password}
-                  onChange={e => setPassword(e.target.value)}
-                  className="w-full p-3 border border-gray-300 rounded-lg" />
+                <div className="relative">
+                  <input type={showPass ? 'text' : 'password'} placeholder="Admin Password" value={password}
+                    onChange={e => setPassword(e.target.value)}
+                    className="w-full p-3 border border-gray-300 rounded-lg pr-12" />
+                  <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-3 top-3 text-gray-500">{showPass ? '🙈' : '👁️'}</button>
+                </div>
                 <button type="submit" className="w-full cricket-gradient text-white font-bold py-3 rounded-lg">Login</button>
               </form>
               <button onClick={() => setCurrentPage('home')} className="w-full mt-4 text-gray-500">Back to Home</button>
@@ -1137,6 +1141,7 @@
       const [form, setForm] = useState({ username: '', password: '' });
       const [error, setError] = useState('');
       const [loading, setLoading] = useState(false);
+      const [showPass, setShowPass] = useState(false);
       const handleLogin = async (e) => {
         e.preventDefault(); setLoading(true); setError('');
         try {
@@ -1153,7 +1158,10 @@
             {error && <div className="bg-red-100 text-red-700 px-4 py-2 rounded mb-4">{error}</div>}
             <form onSubmit={handleLogin} className="space-y-4">
               <input type="text" placeholder="Username or Mobile" value={form.username} onChange={e => setForm({...form, username: e.target.value})} className="w-full p-3 border rounded-lg" required />
-              <input type="password" placeholder="Password" value={form.password} onChange={e => setForm({...form, password: e.target.value})} className="w-full p-3 border rounded-lg" required />
+              <div className="relative">
+                <input type={showPass ? 'text' : 'password'} placeholder="Password" value={form.password} onChange={e => setForm({...form, password: e.target.value})} className="w-full p-3 border rounded-lg pr-12" required />
+                <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-3 top-3 text-gray-500">{showPass ? '🙈' : '👁️'}</button>
+              </div>
               <button type="submit" disabled={loading} className="w-full cricket-gradient text-white font-bold py-3 rounded-lg disabled:opacity-50">{loading ? 'Logging in...' : 'Login'}</button>
             </form>
             <p className="text-center mt-4 text-gray-500">New user? <button onClick={() => setCurrentPage('user-register')} className="text-green-600 font-bold">Create Account</button></p>
@@ -1168,6 +1176,7 @@
       const [form, setForm] = useState({ mobile: '', username: '', password: '', confirm: '' });
       const [error, setError] = useState('');
       const [loading, setLoading] = useState(false);
+      const [showPass, setShowPass] = useState(false);
       const handleRegister = async (e) => {
         e.preventDefault(); setError('');
         if (form.password !== form.confirm) return setError('Passwords do not match');
@@ -1188,8 +1197,13 @@
             <form onSubmit={handleRegister} className="space-y-4">
               <input type="tel" placeholder="Mobile Number *" value={form.mobile} onChange={e => setForm({...form, mobile: e.target.value})} className="w-full p-3 border rounded-lg" required />
               <input type="text" placeholder="Username *" value={form.username} onChange={e => setForm({...form, username: e.target.value})} className="w-full p-3 border rounded-lg" required />
-              <input type="password" placeholder="Password *" value={form.password} onChange={e => setForm({...form, password: e.target.value})} className="w-full p-3 border rounded-lg" required />
-              <input type="password" placeholder="Confirm Password *" value={form.confirm} onChange={e => setForm({...form, confirm: e.target.value})} className="w-full p-3 border rounded-lg" required />
+              <div className="relative">
+                <input type={showPass ? 'text' : 'password'} placeholder="Password *" value={form.password} onChange={e => setForm({...form, password: e.target.value})} className="w-full p-3 border rounded-lg pr-12" required />
+                <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-3 top-3 text-gray-500">{showPass ? '🙈' : '👁️'}</button>
+              </div>
+              <div className="relative">
+                <input type={showPass ? 'text' : 'password'} placeholder="Confirm Password *" value={form.confirm} onChange={e => setForm({...form, confirm: e.target.value})} className="w-full p-3 border rounded-lg pr-12" required />
+              </div>
               <button type="submit" disabled={loading} className="w-full cricket-gradient text-white font-bold py-3 rounded-lg disabled:opacity-50">{loading ? 'Creating...' : 'Create Account'}</button>
             </form>
             <p className="text-center mt-4 text-gray-500">Already have account? <button onClick={() => setCurrentPage('user-login')} className="text-green-600 font-bold">Login</button></p>
@@ -1325,6 +1339,8 @@
               )}
             </div>
 
+            <ChangePassword userId={currentUser._id} />
+
             {team && team.status === 'pending' && (
               <div className="bg-white rounded-xl shadow-lg p-6">
                 <h3 className="text-lg font-bold mb-2">👥 Players ({players.length}/15)</h3>
@@ -1379,6 +1395,50 @@
               </div>
             )}
           </div>
+        </div>
+      );
+    }
+
+    function ChangePassword({ userId }) {
+      const [form, setForm] = useState({ oldPassword: '', newPassword: '', confirm: '' });
+      const [showPass, setShowPass] = useState(false);
+      const [error, setError] = useState('');
+      const [success, setSuccess] = useState('');
+      const [loading, setLoading] = useState(false);
+      const [open, setOpen] = useState(false);
+
+      const handleChange = async (e) => {
+        e.preventDefault(); setError(''); setSuccess('');
+        if (form.newPassword !== form.confirm) return setError('New passwords do not match');
+        if (form.newPassword.length < 6) return setError('Password must be at least 6 characters');
+        setLoading(true);
+        try {
+          await axios.put(`${API_URL}/auth/change-password/${userId}`, { oldPassword: form.oldPassword, newPassword: form.newPassword });
+          setSuccess('Password changed successfully!');
+          setForm({ oldPassword: '', newPassword: '', confirm: '' });
+        } catch (err) { setError(err.response?.data?.message || 'Failed to change password'); }
+        setLoading(false);
+      };
+
+      return (
+        <div className="bg-white rounded-xl shadow-lg p-6 mb-4">
+          <div className="flex justify-between items-center">
+            <h3 className="text-lg font-bold">🔒 Change Password</h3>
+            <button onClick={() => setOpen(!open)} className="text-sm text-blue-600">{open ? 'Cancel' : 'Change'}</button>
+          </div>
+          {open && (
+            <form onSubmit={handleChange} className="mt-4 space-y-3">
+              {error && <div className="bg-red-100 text-red-700 px-3 py-2 rounded text-sm">{error}</div>}
+              {success && <div className="bg-green-100 text-green-700 px-3 py-2 rounded text-sm">{success}</div>}
+              <div className="relative">
+                <input type={showPass ? 'text' : 'password'} placeholder="Old Password *" value={form.oldPassword} onChange={e => setForm({...form, oldPassword: e.target.value})} className="w-full p-3 border rounded-lg pr-12" required />
+                <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-3 top-3 text-gray-500">{showPass ? '🙈' : '👁️'}</button>
+              </div>
+              <input type={showPass ? 'text' : 'password'} placeholder="New Password *" value={form.newPassword} onChange={e => setForm({...form, newPassword: e.target.value})} className="w-full p-3 border rounded-lg" required />
+              <input type={showPass ? 'text' : 'password'} placeholder="Confirm New Password *" value={form.confirm} onChange={e => setForm({...form, confirm: e.target.value})} className="w-full p-3 border rounded-lg" required />
+              <button type="submit" disabled={loading} className="w-full cricket-gradient text-white font-bold py-2 rounded-lg disabled:opacity-50">{loading ? 'Changing...' : 'Change Password'}</button>
+            </form>
+          )}
         </div>
       );
     }
