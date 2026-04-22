@@ -8,32 +8,15 @@ const MAX_PLAYERS = 15;
 router.post('/register/:teamId', async (req, res) => {
   try {
     const { teamId } = req.params;
-    const { name, age, jerseyNumber, role, phone } = req.body;
+    const { name, age, jerseyNumber, role, phone, photo, address } = req.body;
 
     const team = await Team.findById(teamId);
-    if (!team) {
-      return res.status(404).json({ message: 'Team not found' });
-    }
+    if (!team) return res.status(404).json({ message: 'Team not found' });
 
     const playerCount = await Player.countDocuments({ teamId });
-    if (playerCount >= MAX_PLAYERS) {
-      return res.status(400).json({ message: 'Team already has 15 players' });
-    }
+    if (playerCount >= MAX_PLAYERS) return res.status(400).json({ message: 'Team already has 15 players' });
 
-    const existingPlayer = await Player.findOne({ teamId, jerseyNumber });
-    if (existingPlayer) {
-      return res.status(400).json({ message: 'Jersey number already taken in this team' });
-    }
-
-    const player = new Player({
-      teamId,
-      name,
-      age,
-      jerseyNumber,
-      role,
-      phone
-    });
-
+    const player = new Player({ teamId, name, age: age || 18, jerseyNumber, role, phone: phone || '', photo: photo || '', address: address || '' });
     await player.save();
     res.status(201).json({ message: 'Player registered successfully', player });
   } catch (err) {

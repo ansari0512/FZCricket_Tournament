@@ -33,7 +33,7 @@ const playerSchema = new mongoose.Schema({
   },
   photo: {
     type: String,
-    required: true
+    default: ''
   },
   runsScored: {
     type: Number,
