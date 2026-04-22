@@ -451,7 +451,7 @@
     }
 
     function TeamRegistrationForm() {
-      const { setCurrentPage, currentUser } = useContext(AppContext);
+      const { setCurrentPage, currentUser, loginUser } = useContext(AppContext);
       const [teamData, setTeamData] = useState({ teamName: '', captainName: '', captainPhone: '', city: 'Odajhar' });
       const [loading, setLoading] = useState(false);
       const [error, setError] = useState('');
@@ -461,7 +461,9 @@
         e.preventDefault();
         setLoading(true); setError('');
         try {
-          await axios.post(`${API_URL}/teams/register`, { ...teamData, userId: currentUser._id });
+          const res = await axios.post(`${API_URL}/teams/register`, { ...teamData, userId: currentUser._id });
+          const updatedUser = { ...currentUser, teamId: res.data.team._id };
+          loginUser(updatedUser, localStorage.getItem('fzToken'));
           setSuccess(true);
         } catch (err) { setError(err.response?.data?.message || 'Registration failed'); }
         setLoading(false);
