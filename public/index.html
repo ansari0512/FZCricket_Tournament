@@ -1119,6 +1119,159 @@
       );
     }
 
+    function UserLogin() {
+      const { setCurrentPage, loginUser } = useContext(AppContext);
+      const [form, setForm] = useState({ username: '', password: '' });
+      const [error, setError] = useState('');
+      const [loading, setLoading] = useState(false);
+      const handleLogin = async (e) => {
+        e.preventDefault(); setLoading(true); setError('');
+        try {
+          const res = await axios.post(`${API_URL}/auth/login`, form);
+          loginUser(res.data.user, res.data.token);
+          setCurrentPage('dashboard');
+        } catch (err) { setError(err.response?.data?.message || 'Login failed'); }
+        setLoading(false);
+      };
+      return (
+        <div className="py-16 px-4">
+          <div className="max-w-md mx-auto bg-white rounded-xl shadow-lg p-6">
+            <h2 className="text-2xl font-bold text-center mb-6">👤 User Login</h2>
+            {error && <div className="bg-red-100 text-red-700 px-4 py-2 rounded mb-4">{error}</div>}
+            <form onSubmit={handleLogin} className="space-y-4">
+              <input type="text" placeholder="Username or Mobile" value={form.username} onChange={e => setForm({...form, username: e.target.value})} className="w-full p-3 border rounded-lg" required />
+              <input type="password" placeholder="Password" value={form.password} onChange={e => setForm({...form, password: e.target.value})} className="w-full p-3 border rounded-lg" required />
+              <button type="submit" disabled={loading} className="w-full cricket-gradient text-white font-bold py-3 rounded-lg disabled:opacity-50">{loading ? 'Logging in...' : 'Login'}</button>
+            </form>
+            <p className="text-center mt-4 text-gray-500">New user? <button onClick={() => setCurrentPage('user-register')} className="text-green-600 font-bold">Create Account</button></p>
+            <button onClick={() => setCurrentPage('home')} className="w-full mt-2 text-gray-400 text-sm">Back to Home</button>
+          </div>
+        </div>
+      );
+    }
+
+    function UserRegister() {
+      const { setCurrentPage, loginUser } = useContext(AppContext);
+      const [form, setForm] = useState({ mobile: '', username: '', password: '', confirm: '' });
+      const [error, setError] = useState('');
+      const [loading, setLoading] = useState(false);
+      const handleRegister = async (e) => {
+        e.preventDefault(); setError('');
+        if (form.password !== form.confirm) return setError('Passwords do not match');
+        if (form.password.length < 6) return setError('Password must be at least 6 characters');
+        setLoading(true);
+        try {
+          const res = await axios.post(`${API_URL}/auth/register`, { mobile: form.mobile, username: form.username, password: form.password });
+          loginUser(res.data.user, res.data.token);
+          setCurrentPage('dashboard');
+        } catch (err) { setError(err.response?.data?.message || 'Registration failed'); }
+        setLoading(false);
+      };
+      return (
+        <div className="py-16 px-4">
+          <div className="max-w-md mx-auto bg-white rounded-xl shadow-lg p-6">
+            <h2 className="text-2xl font-bold text-center mb-6">🌟 Create Account</h2>
+            {error && <div className="bg-red-100 text-red-700 px-4 py-2 rounded mb-4">{error}</div>}
+            <form onSubmit={handleRegister} className="space-y-4">
+              <input type="tel" placeholder="Mobile Number *" value={form.mobile} onChange={e => setForm({...form, mobile: e.target.value})} className="w-full p-3 border rounded-lg" required />
+              <input type="text" placeholder="Username *" value={form.username} onChange={e => setForm({...form, username: e.target.value})} className="w-full p-3 border rounded-lg" required />
+              <input type="password" placeholder="Password *" value={form.password} onChange={e => setForm({...form, password: e.target.value})} className="w-full p-3 border rounded-lg" required />
+              <input type="password" placeholder="Confirm Password *" value={form.confirm} onChange={e => setForm({...form, confirm: e.target.value})} className="w-full p-3 border rounded-lg" required />
+              <button type="submit" disabled={loading} className="w-full cricket-gradient text-white font-bold py-3 rounded-lg disabled:opacity-50">{loading ? 'Creating...' : 'Create Account'}</button>
+            </form>
+            <p className="text-center mt-4 text-gray-500">Already have account? <button onClick={() => setCurrentPage('user-login')} className="text-green-600 font-bold">Login</button></p>
+          </div>
+        </div>
+      );
+    }
+
+    function UserDashboard() {
+      const { setCurrentPage, currentUser, logoutUser, registrationOpen } = useContext(AppContext);
+      const [notifications, setNotifications] = useState([]);
+      const [team, setTeam] = useState(null);
+      const [loading, setLoading] = useState(true);
+      useEffect(() => {
+        const fetchUserData = async () => {
+          try {
+            const notifRes = await axios.get(`${API_URL}/auth/notifications/${currentUser._id}`);
+            setNotifications(notifRes.data);
+            if (currentUser.teamId) {
+              const teamRes = await axios.get(`${API_URL}/teams/${currentUser.teamId}`);
+              setTeam(teamRes.data.team);
+            }
+          } catch (err) {}
+          setLoading(false);
+        };
+        fetchUserData();
+      }, []);
+      const markRead = async () => {
+        try {
+          await axios.put(`${API_URL}/auth/notifications/${currentUser._id}/read`);
+          setNotifications(notifications.map(n => ({...n, read: true})));
+        } catch (err) {}
+      };
+      const unread = notifications.filter(n => !n.read).length;
+      return (
+        <div className="py-8 px-4">
+          <div className="max-w-2xl mx-auto">
+            <div className="bg-white rounded-xl shadow-lg p-6 mb-4">
+              <div className="flex justify-between items-center">
+                <div><h2 className="text-2xl font-bold">👋 {currentUser.username}</h2><p className="text-gray-500">{currentUser.mobile}</p></div>
+                <button onClick={logoutUser} className="text-red-500 font-medium">Logout</button>
+              </div>
+            </div>
+            <div className="bg-white rounded-xl shadow-lg p-6 mb-4">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-bold">🔔 Notifications {unread > 0 && <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full ml-2">{unread}</span>}</h3>
+                {unread > 0 && <button onClick={markRead} className="text-sm text-blue-600">Mark all read</button>}
+              </div>
+              {notifications.length === 0 ? <p className="text-gray-500 text-center">No notifications yet</p> : (
+                <div className="space-y-3">
+                  {notifications.map((n, i) => (
+                    <div key={i} className={`p-3 rounded-lg border-l-4 ${
+                      n.type === 'success' ? 'bg-green-50 border-green-500' : n.type === 'error' ? 'bg-red-50 border-red-500' : 'bg-blue-50 border-blue-500'
+                    } ${!n.read ? 'font-medium' : 'opacity-70'}`}>
+                      <p className="text-sm">{n.message}</p>
+                      <p className="text-xs text-gray-400 mt-1">{new Date(n.createdAt).toLocaleDateString('en-IN')}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className="bg-white rounded-xl shadow-lg p-6">
+              <h3 className="text-lg font-bold mb-4">🏏 My Team</h3>
+              {loading ? <p className="text-gray-500">Loading...</p> : team ? (
+                <div>
+                  <div className="flex justify-between items-center">
+                    <div><p className="font-bold text-xl">{team.teamName}</p><p className="text-gray-500">Captain: {team.captainName}</p></div>
+                    <span className={`px-3 py-1 rounded-full text-sm font-bold ${
+                      team.status === 'approved' ? 'bg-green-100 text-green-700' : team.status === 'rejected' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'
+                    }`}>{team.status === 'approved' ? '✅ Approved' : team.status === 'rejected' ? '❌ Rejected' : '⏳ Pending'}</span>
+                  </div>
+                  {team.status === 'rejected' && team.rejectReason && (
+                    <div className="mt-3 bg-red-50 border border-red-200 rounded-lg p-3">
+                      <p className="text-sm text-red-700"><span className="font-bold">Reason:</span> {team.rejectReason}</p>
+                    </div>
+                  )}
+                  {team.status === 'approved' && !team.paymentDone && (
+                    <div className="mt-3 bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                      <p className="text-sm text-yellow-700 font-bold">💰 Please pay ₹1,100 registration fee to confirm your spot!</p>
+                      <p className="text-xs text-gray-500 mt-1">Contact admin after payment for confirmation.</p>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="text-center">
+                  <p className="text-gray-500 mb-4">You haven't registered a team yet.</p>
+                  {registrationOpen && <button onClick={() => setCurrentPage('register')} className="cricket-gradient text-white font-bold py-2 px-6 rounded-lg">Register Team</button>}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     function GallerySlider({ photos }) {
       const [current, setCurrent] = useState(0);
 
