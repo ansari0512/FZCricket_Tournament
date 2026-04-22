@@ -73,7 +73,7 @@ router.post('/register', async (req, res) => {
     await team.save();
 
     if (userId) {
-      await User.findByIdAndUpdate(userId, { teamId: team._id });
+      await User.findByIdAndUpdate(userId, { teamId: team._id, expiresAt: null });
     }
 
     res.status(201).json({ message: 'Team registered successfully', team });

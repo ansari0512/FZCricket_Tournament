@@ -81,4 +81,30 @@ router.post('/admin/login', async (req, res) => {
   }
 });
 
+// Admin - Get all users
+router.get('/admin/users', async (req, res) => {
+  try {
+    const users = await User.find().select('-password').sort({ createdAt: -1 });
+    res.json(users);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Admin - Delete user
+router.delete('/admin/users/:userId', async (req, res) => {
+  try {
+    const user = await User.findById(req.params.userId);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    if (user.teamId) {
+      await require('../models/Player').deleteMany({ teamId: user.teamId });
+      await require('../models/Team').findByIdAndDelete(user.teamId);
+    }
+    await User.findByIdAndDelete(req.params.userId);
+    res.json({ message: 'User and associated data deleted' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;

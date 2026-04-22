@@ -871,7 +871,17 @@
       const [scoreData, setScoreData] = useState({ t1runs: '', t1wickets: '', t2runs: '', t2wickets: '', winnerId: '' });
       const [rejectModal, setRejectModal] = useState(null);
       const [rejectReason, setRejectReason] = useState('');
+      const [users, setUsers] = useState([]);
+      const [selectedTeamPlayers, setSelectedTeamPlayers] = useState([]);
+      const [playersTeamId, setPlayersTeamId] = useState(null);
       const token = localStorage.getItem('adminToken');
+
+      useEffect(() => {
+        if (loggedIn) {
+          axios.get(`${API_URL}/auth/admin/users`, { headers: { Authorization: `Bearer ${localStorage.getItem('adminToken')}` } })
+            .then(res => setUsers(res.data)).catch(() => {});
+        }
+      }, [loggedIn]);
 
       const handleLogin = async (e) => {
         e.preventDefault();
@@ -918,6 +928,23 @@
           await axios.put(`${API_URL}/teams/${teamId}`, { paymentDone: true }, { headers: { Authorization: `Bearer ${token}` } });
           await fetchData();
         } catch (err) { alert('Error confirming payment'); }
+      };
+
+      const handleDeleteUser = async (userId) => {
+        if (!window.confirm('Delete this user and all their data?')) return;
+        try {
+          await axios.delete(`${API_URL}/auth/admin/users/${userId}`, { headers: { Authorization: `Bearer ${token}` } });
+          await fetchData();
+          setUsers(users.filter(u => u._id !== userId));
+        } catch (err) { alert('Error deleting user'); }
+      };
+
+      const handleDeletePlayer = async (playerId) => {
+        if (!window.confirm('Delete this player?')) return;
+        try {
+          await axios.delete(`${API_URL}/players/${playerId}`, { headers: { Authorization: `Bearer ${token}` } });
+          setSelectedTeamPlayers(selectedTeamPlayers.filter(p => p._id !== playerId));
+        } catch (err) { alert('Error deleting player'); }
       };
 
       const handleMatchStatus = async (matchId, status) => {
@@ -976,13 +1003,44 @@
             </div>
 
             <div className="flex space-x-2 mb-6 overflow-x-auto">
-              {['teams', 'matches', 'create-schedule', 'gallery'].map(tab => (
+              {['teams', 'users', 'matches', 'create-schedule', 'gallery'].map(tab => (
                 <button key={tab} onClick={() => setActiveTab(tab)}
                   className={`px-4 py-2 rounded-lg font-medium whitespace-nowrap ${activeTab === tab ? 'cricket-gradient text-white' : 'bg-gray-200'}`}>
-                  {tab === 'teams' ? 'Manage Teams' : tab === 'matches' ? 'Manage Matches' : tab === 'create-schedule' ? 'Create Schedule' : '📸 Gallery'}
+                  {tab === 'teams' ? 'Manage Teams' : tab === 'users' ? '👥 Users' : tab === 'matches' ? 'Manage Matches' : tab === 'create-schedule' ? 'Create Schedule' : '📸 Gallery'}
                 </button>
               ))}
             </div>
+
+            {activeTab === 'users' && (
+              <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+                <table className="w-full">
+                  <thead className="bg-gray-800 text-white">
+                    <tr>
+                      <th className="p-3 text-left">Username</th>
+                      <th className="p-3 text-left">Mobile</th>
+                      <th className="p-3 text-center">Team</th>
+                      <th className="p-3 text-center">Joined</th>
+                      <th className="p-3 text-center">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {users.length === 0 ? (
+                      <tr><td colSpan={5} className="p-4 text-center text-gray-500">No users yet</td></tr>
+                    ) : users.map(user => (
+                      <tr key={user._id} className="border-b border-gray-100">
+                        <td className="p-3 font-medium">{user.username}</td>
+                        <td className="p-3">{user.mobile}</td>
+                        <td className="p-3 text-center">{user.teamId ? <span className="text-green-600">✅ Registered</span> : <span className="text-yellow-600">⏳ Pending</span>}</td>
+                        <td className="p-3 text-center text-sm text-gray-500">{new Date(user.createdAt).toLocaleDateString('en-IN')}</td>
+                        <td className="p-3 text-center">
+                          <button onClick={() => handleDeleteUser(user._id)} className="text-red-600 hover:text-red-800">Delete</button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
 
             {activeTab === 'teams' && (
               <div className="bg-white rounded-xl shadow-lg overflow-hidden">
@@ -1021,12 +1079,40 @@
                             <button onClick={() => handlePaymentConfirm(team._id)} className="text-blue-600 hover:text-blue-800 mr-2">₹ Confirm Payment</button>
                           )}
                           {team.paymentDone && <span className="text-green-600 mr-2 text-xs">✅ Paid</span>}
-                          <button onClick={() => handleDelete(team._id)} className="text-red-600 hover:text-red-800">Delete</button>
+                          <button onClick={() => handleDelete(team._id)} className="text-red-600 hover:text-red-800 mr-2">Delete</button>
+                          <button onClick={() => {
+                            setPlayersTeamId(team._id);
+                            axios.get(`${API_URL}/teams/${team._id}/players`).then(res => setSelectedTeamPlayers(res.data));
+                            setActiveTab('players');
+                          }} className="text-blue-600 hover:text-blue-800">Players</button>
                         </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
+              </div>
+            )}
+
+            {activeTab === 'players' && (
+              <div className="bg-white rounded-xl shadow-lg p-4">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-bold">👥 Team Players</h3>
+                  <button onClick={() => setActiveTab('teams')} className="text-sm text-blue-600">← Back to Teams</button>
+                </div>
+                {selectedTeamPlayers.length === 0 ? <p className="text-center text-gray-500">No players found</p> : (
+                  <div className="space-y-2">
+                    {selectedTeamPlayers.map(p => (
+                      <div key={p._id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                        {p.photo && <img src={p.photo} className="w-10 h-10 rounded-full object-cover" />}
+                        <div className="flex-1">
+                          <p className="font-medium">{p.name}</p>
+                          <p className="text-sm text-gray-500">{p.role} • #{p.jerseyNumber}</p>
+                        </div>
+                        <button onClick={() => handleDeletePlayer(p._id)} className="text-red-600 hover:text-red-800 text-sm">Delete</button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 
