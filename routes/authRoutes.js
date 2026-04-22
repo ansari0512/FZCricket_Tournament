@@ -97,6 +97,28 @@ router.put('/change-password/:userId', async (req, res) => {
   }
 });
 
+// Admin - Reset user credentials
+router.put('/admin/users/:userId/reset', async (req, res) => {
+  try {
+    const { newUsername, newPassword } = req.body;
+    const user = await User.findById(req.params.userId);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    if (newUsername) {
+      const existing = await User.findOne({ username: newUsername, _id: { $ne: req.params.userId } });
+      if (existing) return res.status(400).json({ message: 'Username already taken' });
+      user.username = newUsername;
+    }
+    if (newPassword) {
+      user.password = await bcrypt.hash(newPassword, 10);
+    }
+    await user.save();
+    res.json({ message: 'Credentials reset successfully' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Admin - Get all users
 router.get('/admin/users', async (req, res) => {
   try {
