@@ -1279,6 +1279,14 @@
       const [uploading, setUploading] = useState(false);
       const [error, setError] = useState('');
       const [submitting, setSubmitting] = useState(false);
+      const [editTeam, setEditTeam] = useState(false);
+      const [editTeamData, setEditTeamData] = useState({ teamName: '', captainName: '', captainPhone: '', city: '' });
+      const [teamUpdating, setTeamUpdating] = useState(false);
+      const [teamError, setTeamError] = useState('');
+      const [teamSuccess, setTeamSuccess] = useState('');
+      const [editingPlayer, setEditingPlayer] = useState(null);
+      const [editPlayerData, setEditPlayerData] = useState({ name: '', role: 'batsman', address: '', newPhoto: null, photoPreview: '' });
+      const [playerUpdating, setPlayerUpdating] = useState(false);
 
       useEffect(() => {
         const fetchUserData = async () => {
@@ -1288,6 +1296,7 @@
             if (currentUser.teamId) {
               const teamRes = await axios.get(`${API_URL}/teams/${currentUser.teamId}`);
               setTeam(teamRes.data.team);
+              setEditTeamData({ teamName: teamRes.data.team.teamName, captainName: teamRes.data.team.captainName, captainPhone: teamRes.data.team.captainPhone, city: teamRes.data.team.city });
               const playersRes = await axios.get(`${API_URL}/teams/${currentUser.teamId}/players`);
               setPlayers(playersRes.data);
             }
@@ -1302,6 +1311,34 @@
           await axios.put(`${API_URL}/auth/notifications/${currentUser._id}/read`);
           setNotifications(notifications.map(n => ({...n, read: true})));
         } catch (err) {}
+      };
+
+      const handleUpdateTeam = async (e) => {
+        e.preventDefault(); setTeamError(''); setTeamSuccess('');
+        setTeamUpdating(true);
+        try {
+          const res = await axios.put(`${API_URL}/teams/${currentUser.teamId}`, editTeamData);
+          setTeam(res.data);
+          setTeamSuccess('Team updated successfully!');
+          setEditTeam(false);
+        } catch (err) { setTeamError(err.response?.data?.message || 'Update failed'); }
+        setTeamUpdating(false);
+      };
+
+      const handleUpdatePlayer = async (playerId) => {
+        setPlayerUpdating(true);
+        try {
+          let photoUrl = null;
+          if (editPlayerData.newPhoto) {
+            photoUrl = await uploadImage(editPlayerData.newPhoto);
+          }
+          const updateData = { name: editPlayerData.name, role: editPlayerData.role, address: editPlayerData.address };
+          if (photoUrl) updateData.photo = photoUrl;
+          const res = await axios.put(`${API_URL}/players/${playerId}`, updateData);
+          setPlayers(players.map(p => p._id === playerId ? res.data : p));
+          setEditingPlayer(null);
+        } catch (err) { alert('Update failed'); }
+        setPlayerUpdating(false);
       };
 
       const handleAddPlayer = async () => {
@@ -1398,6 +1435,26 @@
 
             <ChangePassword userId={currentUser._id} />
 
+            {team && (team.status === 'pending' || team.status === 'rejected') && (
+              <div className="bg-white rounded-xl shadow-lg p-6 mb-4">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-bold">✏️ Edit Team</h3>
+                  <button onClick={() => setEditTeam(!editTeam)} className="text-sm text-blue-600">{editTeam ? 'Cancel' : 'Edit'}</button>
+                </div>
+                {editTeam && (
+                  <form onSubmit={handleUpdateTeam} className="space-y-3">
+                    {teamError && <div className="bg-red-100 text-red-700 px-3 py-2 rounded text-sm">{teamError}</div>}
+                    {teamSuccess && <div className="bg-green-100 text-green-700 px-3 py-2 rounded text-sm">{teamSuccess}</div>}
+                    <input type="text" placeholder="Team Name *" value={editTeamData.teamName} onChange={e => setEditTeamData({...editTeamData, teamName: e.target.value})} className="w-full p-3 border rounded-lg" required />
+                    <input type="text" placeholder="Captain Name *" value={editTeamData.captainName} onChange={e => setEditTeamData({...editTeamData, captainName: e.target.value})} className="w-full p-3 border rounded-lg" required />
+                    <input type="tel" placeholder="Captain Phone *" value={editTeamData.captainPhone} onChange={e => setEditTeamData({...editTeamData, captainPhone: e.target.value})} className="w-full p-3 border rounded-lg" required />
+                    <input type="text" placeholder="City/Village" value={editTeamData.city} onChange={e => setEditTeamData({...editTeamData, city: e.target.value})} className="w-full p-3 border rounded-lg" />
+                    <button type="submit" disabled={teamUpdating} className="w-full cricket-gradient text-white font-bold py-2 rounded-lg disabled:opacity-50">{teamUpdating ? 'Saving...' : 'Save Changes'}</button>
+                  </form>
+                )}
+              </div>
+            )}
+
             {team && team.status === 'pending' && (
               <div className="bg-white rounded-xl shadow-lg p-6">
                 <h3 className="text-lg font-bold mb-2">👥 Players ({players.length}/15)</h3>
@@ -1432,13 +1489,40 @@
                 {players.length > 0 && (
                   <div className="space-y-2 mb-4 max-h-64 overflow-y-auto">
                     {players.map((p, i) => (
-                      <div key={i} className="flex items-center gap-3 p-2 bg-gray-50 rounded-lg">
-                        {p.photo ? <img src={p.photo} className="w-10 h-10 rounded-full object-cover" /> : <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">{i+1}</div>}
-                        <div>
-                          <p className="font-medium text-sm">{p.name}</p>
-                          <p className="text-xs text-gray-500">{p.role} • #{p.jerseyNumber}</p>
-                        </div>
-                        <span className="ml-auto text-green-500">✓</span>
+                      <div key={i} className="bg-gray-50 rounded-lg p-2">
+                        {editingPlayer === p._id ? (
+                          <div className="space-y-2">
+                            <input type="text" value={editPlayerData.name} onChange={e => setEditPlayerData({...editPlayerData, name: e.target.value})} className="w-full p-2 border rounded text-sm" placeholder="Name" />
+                            <select value={editPlayerData.role} onChange={e => setEditPlayerData({...editPlayerData, role: e.target.value})} className="w-full p-2 border rounded text-sm">
+                              <option value="batsman">Batsman</option>
+                              <option value="bowler">Bowler</option>
+                              <option value="all-rounder">All-Rounder</option>
+                              <option value="wicket-keeper">Wicket Keeper</option>
+                            </select>
+                            <input type="text" value={editPlayerData.address} onChange={e => setEditPlayerData({...editPlayerData, address: e.target.value})} className="w-full p-2 border rounded text-sm" placeholder="Address" />
+                            <div>
+                              <label className="text-xs text-gray-500">Change Photo (optional)</label>
+                              <input type="file" accept="image/*" onChange={e => {
+                                const file = e.target.files[0];
+                                if (file) setEditPlayerData({...editPlayerData, newPhoto: file, photoPreview: URL.createObjectURL(file)});
+                              }} className="w-full p-1 border rounded text-sm" />
+                              {editPlayerData.photoPreview && <img src={editPlayerData.photoPreview} className="mt-1 w-12 h-12 object-cover rounded" />}
+                            </div>
+                            <div className="flex gap-2">
+                              <button onClick={() => handleUpdatePlayer(p._id)} disabled={playerUpdating} className="flex-1 cricket-gradient text-white text-sm py-1 rounded disabled:opacity-50">{playerUpdating ? 'Saving...' : 'Save'}</button>
+                              <button onClick={() => setEditingPlayer(null)} className="flex-1 bg-gray-200 text-sm py-1 rounded">Cancel</button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-3">
+                            {p.photo ? <img src={p.photo} className="w-10 h-10 rounded-full object-cover" /> : <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">{i+1}</div>}
+                            <div className="flex-1">
+                              <p className="font-medium text-sm">{p.name}</p>
+                              <p className="text-xs text-gray-500">{p.role} • #{p.jerseyNumber}</p>
+                            </div>
+                            <button onClick={() => { setEditingPlayer(p._id); setEditPlayerData({ name: p.name, role: p.role, address: p.address || '', newPhoto: null, photoPreview: '' }); }} className="text-blue-600 text-xs">✏️ Edit</button>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
