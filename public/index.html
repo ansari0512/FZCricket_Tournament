@@ -20,7 +20,7 @@
   <style>
     * { font-family: 'Poppins', sans-serif; }
     input, textarea { text-transform: uppercase; }
-    input[type='password'], input[type='tel'], input[type='number'], input[type='file'], input.no-upper { text-transform: none; }
+    input[type='password'], input[type='tel'], input[type='number'], input[type='file'], input.no-upper, select { text-transform: none; }
     input::placeholder, textarea::placeholder { text-transform: none; }
     .cricket-gradient { background: linear-gradient(135deg, #10B981 0%, #059669 50%, #047857 100%); }
     .hero-gradient { background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%); }
@@ -892,7 +892,7 @@
                 <div className="relative">
                   <input type={showPass ? 'text' : 'password'} placeholder="Admin Password" value={password}
                     onChange={e => setPassword(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-lg pr-12" />
+                    className="w-full p-3 border border-gray-300 rounded-lg pr-12 no-upper" />
                   <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-3 top-3 text-gray-500">{showPass ? '🙈' : '👁️'}</button>
                 </div>
                 <button type="submit" className="w-full cricket-gradient text-white font-bold py-3 rounded-lg">Login</button>
@@ -1160,7 +1160,7 @@
             <form onSubmit={handleLogin} className="space-y-4">
               <input type="text" placeholder="Username or Mobile" value={form.username} onChange={e => setForm({...form, username: e.target.value})} className="w-full p-3 border rounded-lg no-upper" required />
               <div className="relative">
-                <input type={showPass ? 'text' : 'password'} placeholder="Password" value={form.password} onChange={e => setForm({...form, password: e.target.value})} className="w-full p-3 border rounded-lg pr-12" required />
+                <input type={showPass ? 'text' : 'password'} placeholder="Password" value={form.password} onChange={e => setForm({...form, password: e.target.value})} className="w-full p-3 border rounded-lg pr-12 no-upper" required />
                 <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-3 top-3 text-gray-500">{showPass ? '🙈' : '👁️'}</button>
               </div>
               <button type="submit" disabled={loading} className="w-full cricket-gradient text-white font-bold py-3 rounded-lg disabled:opacity-50">{loading ? 'Logging in...' : 'Login'}</button>
@@ -1199,11 +1199,11 @@
               <input type="tel" placeholder="Mobile Number *" value={form.mobile} onChange={e => setForm({...form, mobile: e.target.value})} className="w-full p-3 border rounded-lg" required />
               <input type="text" placeholder="Username *" value={form.username} onChange={e => setForm({...form, username: e.target.value})} className="w-full p-3 border rounded-lg no-upper" required />
               <div className="relative">
-                <input type={showPass ? 'text' : 'password'} placeholder="Password *" value={form.password} onChange={e => setForm({...form, password: e.target.value})} className="w-full p-3 border rounded-lg pr-12" required />
+                <input type={showPass ? 'text' : 'password'} placeholder="Password *" value={form.password} onChange={e => setForm({...form, password: e.target.value})} className="w-full p-3 border rounded-lg pr-12 no-upper" required />
                 <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-3 top-3 text-gray-500">{showPass ? '🙈' : '👁️'}</button>
               </div>
               <div className="relative">
-                <input type={showPass ? 'text' : 'password'} placeholder="Confirm Password *" value={form.confirm} onChange={e => setForm({...form, confirm: e.target.value})} className="w-full p-3 border rounded-lg pr-12" required />
+                <input type={showPass ? 'text' : 'password'} placeholder="Confirm Password *" value={form.confirm} onChange={e => setForm({...form, confirm: e.target.value})} className="w-full p-3 border rounded-lg pr-12 no-upper" required />
               </div>
               <button type="submit" disabled={loading} className="w-full cricket-gradient text-white font-bold py-3 rounded-lg disabled:opacity-50">{loading ? 'Creating...' : 'Create Account'}</button>
             </form>
@@ -1432,11 +1432,11 @@
               {error && <div className="bg-red-100 text-red-700 px-3 py-2 rounded text-sm">{error}</div>}
               {success && <div className="bg-green-100 text-green-700 px-3 py-2 rounded text-sm">{success}</div>}
               <div className="relative">
-                <input type={showPass ? 'text' : 'password'} placeholder="Old Password *" value={form.oldPassword} onChange={e => setForm({...form, oldPassword: e.target.value})} className="w-full p-3 border rounded-lg pr-12" required />
+                <input type={showPass ? 'text' : 'password'} placeholder="Old Password *" value={form.oldPassword} onChange={e => setForm({...form, oldPassword: e.target.value})} className="w-full p-3 border rounded-lg pr-12 no-upper" required />
                 <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-3 top-3 text-gray-500">{showPass ? '🙈' : '👁️'}</button>
               </div>
-              <input type={showPass ? 'text' : 'password'} placeholder="New Password *" value={form.newPassword} onChange={e => setForm({...form, newPassword: e.target.value})} className="w-full p-3 border rounded-lg" required />
-              <input type={showPass ? 'text' : 'password'} placeholder="Confirm New Password *" value={form.confirm} onChange={e => setForm({...form, confirm: e.target.value})} className="w-full p-3 border rounded-lg" required />
+              <input type={showPass ? 'text' : 'password'} placeholder="New Password *" value={form.newPassword} onChange={e => setForm({...form, newPassword: e.target.value})} className="w-full p-3 border rounded-lg no-upper" required />
+              <input type={showPass ? 'text' : 'password'} placeholder="Confirm New Password *" value={form.confirm} onChange={e => setForm({...form, confirm: e.target.value})} className="w-full p-3 border rounded-lg no-upper" required />
               <button type="submit" disabled={loading} className="w-full cricket-gradient text-white font-bold py-2 rounded-lg disabled:opacity-50">{loading ? 'Changing...' : 'Change Password'}</button>
             </form>
           )}
