@@ -434,6 +434,19 @@
         );
       }
 
+      if (currentUser.teamId) {
+        return (
+          <div className="py-16 px-4 text-center">
+            <div className="max-w-md mx-auto bg-white rounded-xl shadow-lg p-8">
+              <span className="text-6xl">🏏</span>
+              <h2 className="text-2xl font-bold mt-4">Team Already Registered!</h2>
+              <p className="text-gray-500 mt-2">You have already registered a team. Go to dashboard to manage it.</p>
+              <button onClick={() => setCurrentPage('dashboard')} className="mt-6 cricket-gradient text-white px-6 py-2 rounded-lg">Go to Dashboard</button>
+            </div>
+          </div>
+        );
+      }
+
       if (!registrationOpen) {
         return (
           <div className="py-16 px-4 text-center">
