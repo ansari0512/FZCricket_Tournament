@@ -19,7 +19,7 @@
   </script>
   <style>
     * { font-family: 'Poppins', sans-serif; }
-    input, textarea, select { text-transform: uppercase; }
+    input:not([type='password']):not([type='tel']):not([type='number']):not([type='file']), textarea { text-transform: uppercase; }
     input::placeholder, textarea::placeholder { text-transform: none; }
     .cricket-gradient { background: linear-gradient(135deg, #10B981 0%, #059669 50%, #047857 100%); }
     .hero-gradient { background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%); }
