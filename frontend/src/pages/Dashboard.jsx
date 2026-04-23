@@ -5,6 +5,44 @@ import { getNotifications, markNotificationsRead, getTeam, getTeamPlayers, regis
 import { uploadImage } from '../services/api'
 import toast from 'react-hot-toast'
 
+function ChangePasswordPanel({ userId }) {
+  const [open, setOpen] = useState(false)
+  const [form, setForm] = useState({ oldPassword: '', newPassword: '', confirm: '' })
+  const [showPass, setShowPass] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    if (form.newPassword !== form.confirm) return toast.error('Passwords do not match')
+    setLoading(true)
+    try {
+      await changePassword(userId, { oldPassword: form.oldPassword, newPassword: form.newPassword })
+      toast.success('Password changed!')
+      setOpen(false)
+      setForm({ oldPassword: '', newPassword: '', confirm: '' })
+    } catch (err) { toast.error(err.response?.data?.message || 'Failed') }
+    setLoading(false)
+  }
+  return (
+    <div className="border-t pt-3 mt-2">
+      <div className="flex justify-between items-center">
+        <p className="text-sm font-medium text-gray-500">🔒 Change Password</p>
+        <button onClick={() => setOpen(!open)} className="text-xs text-primary">{open ? 'Cancel' : 'Change'}</button>
+      </div>
+      {open && (
+        <form onSubmit={handleSubmit} className="mt-3 space-y-3">
+          <div className="relative">
+            <input type={showPass ? 'text' : 'password'} placeholder="Old Password *" value={form.oldPassword} onChange={e => setForm({ ...form, oldPassword: e.target.value })} className="input no-upper pr-12" required />
+            <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-3 top-3 text-gray-400">{showPass ? '🙈' : '👁️'}</button>
+          </div>
+          <input type={showPass ? 'text' : 'password'} placeholder="New Password *" value={form.newPassword} onChange={e => setForm({ ...form, newPassword: e.target.value })} className="input no-upper" required />
+          <input type={showPass ? 'text' : 'password'} placeholder="Confirm New Password *" value={form.confirm} onChange={e => setForm({ ...form, confirm: e.target.value })} className="input no-upper" required />
+          <button type="submit" disabled={loading} className="btn-primary w-full">{loading ? 'Saving...' : 'Change Password'}</button>
+        </form>
+      )}
+    </div>
+  )
+}
+
 function NotificationsPanel({ userId }) {
   const [notifs, setNotifs] = useState([])
   useEffect(() => {
@@ -35,44 +73,6 @@ function NotificationsPanel({ userId }) {
   )
 }
 
-function ChangePasswordPanel({ userId }) {
-  const [open, setOpen] = useState(false)
-  const [form, setForm] = useState({ oldPassword: '', newPassword: '', confirm: '' })
-  const [showPass, setShowPass] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    if (form.newPassword !== form.confirm) return toast.error('Passwords do not match')
-    setLoading(true)
-    try {
-      await changePassword(userId, { oldPassword: form.oldPassword, newPassword: form.newPassword })
-      toast.success('Password changed!')
-      setOpen(false)
-      setForm({ oldPassword: '', newPassword: '', confirm: '' })
-    } catch (err) { toast.error(err.response?.data?.message || 'Failed') }
-    setLoading(false)
-  }
-  return (
-    <div className="border-t pt-3 mt-1">
-      <div className="flex justify-between items-center">
-        <p className="text-sm font-medium text-gray-500">🔒 Change Password</p>
-        <button onClick={() => setOpen(!open)} className="text-xs text-primary">{open ? 'Cancel' : 'Change'}</button>
-      </div>
-      {open && (
-        <form onSubmit={handleSubmit} className="mt-3 space-y-3">
-          <div className="relative">
-            <input type={showPass ? 'text' : 'password'} placeholder="Old Password *" value={form.oldPassword} onChange={e => setForm({ ...form, oldPassword: e.target.value })} className="input no-upper pr-12" required />
-            <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-3 top-3 text-gray-400">{showPass ? '🙈' : '👁️'}</button>
-          </div>
-          <input type={showPass ? 'text' : 'password'} placeholder="New Password *" value={form.newPassword} onChange={e => setForm({ ...form, newPassword: e.target.value })} className="input no-upper" required />
-          <input type={showPass ? 'text' : 'password'} placeholder="Confirm New Password *" value={form.confirm} onChange={e => setForm({ ...form, confirm: e.target.value })} className="input no-upper" required />
-          <button type="submit" disabled={loading} className="btn-primary w-full">{loading ? 'Saving...' : 'Change Password'}</button>
-        </form>
-      )}
-    </div>
-  )
-}
-
 function PlayerRow({ p, onEdit, canEdit }) {
   return (
     <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-xl">
@@ -81,7 +81,7 @@ function PlayerRow({ p, onEdit, canEdit }) {
       <span className="font-medium text-sm flex-1 truncate">{p.name}</span>
       <span className="text-xs bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded">{p.role === 'all-rounder' ? 'AR' : p.role === 'wicket-keeper' ? 'WK' : p.role === 'batsman' ? 'Bat' : 'Bowl'}</span>
       <span className="text-xs text-gray-400 w-20 truncate hidden sm:block">{p.address}</span>
-                      <button onClick={() => onEdit(p)} className="text-primary text-xs font-medium">{canEdit ? 'Edit' : ''}</button>
+      {canEdit && <button onClick={() => onEdit(p)} className="text-primary text-xs font-medium">Edit</button>}
     </div>
   )
 }
@@ -203,6 +203,8 @@ export default function Dashboard() {
     setSubmitting(false)
   }
 
+  const canEdit = team && (team.status === 'pending' || team.status === 'rejected')
+
   if (!currentUser) return null
   if (loading) return <div className="flex justify-center py-20"><div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" /></div>
 
@@ -212,7 +214,7 @@ export default function Dashboard() {
 
         {/* Profile */}
         <div className="card">
-          <div className="flex justify-between items-center mb-3">
+          <div className="flex justify-between items-center mb-1">
             <div>
               <h2 className="text-xl font-bold">👋 {currentUser.username}</h2>
               <p className="text-gray-500 text-sm">{currentUser.mobile}</p>
@@ -223,6 +225,8 @@ export default function Dashboard() {
         </div>
 
         <NotificationsPanel userId={currentUser._id} />
+
+        {/* My Team */}
         <div className="card">
           <h3 className="font-bold text-lg mb-4">🏏 My Team</h3>
           {team ? (
@@ -237,19 +241,20 @@ export default function Dashboard() {
                   <span className={team.status === 'approved' ? 'badge-approved' : team.status === 'rejected' ? 'badge-rejected' : 'badge-pending'}>
                     {team.status === 'approved' ? '✅ Approved' : team.status === 'rejected' ? '❌ Rejected' : '⏳ Pending'}
                   </span>
-                  {(team.status === 'pending' || team.status === 'rejected') && (
+                  {canEdit && (
                     <button onClick={() => setEditTeam(!editTeam)} className="text-xs text-primary font-medium">
                       {editTeam ? 'Cancel Edit' : '✏️ Edit Team'}
                     </button>
                   )}
+                </div>
               </div>
 
-              {editTeam && (
+              {canEdit && editTeam && (
                 <form onSubmit={handleUpdateTeam} className="space-y-3 mb-4 bg-gray-50 p-4 rounded-xl">
                   <input type="text" placeholder="Team Name *" value={editTeamData.teamName} onChange={e => setEditTeamData({ ...editTeamData, teamName: e.target.value })} className="input" required />
                   <input type="text" placeholder="Captain Name *" value={editTeamData.captainName} onChange={e => setEditTeamData({ ...editTeamData, captainName: e.target.value })} className="input" required />
                   <input type="tel" placeholder="Captain Phone *" value={editTeamData.captainPhone} onChange={e => setEditTeamData({ ...editTeamData, captainPhone: e.target.value })} className="input" required />
-                  <input type="text" placeholder="City/Village" value={editTeamData.city} onChange={e => setEditTeamData({ ...editTeamData, city: e.target.value })} className="input" />
+                  <input type="text" placeholder="Village" value={editTeamData.city} onChange={e => setEditTeamData({ ...editTeamData, city: e.target.value })} className="input" />
                   <button type="submit" className="btn-primary w-full">Save Changes</button>
                 </form>
               )}
@@ -266,7 +271,6 @@ export default function Dashboard() {
                 </div>
               )}
 
-              {/* Players List */}
               {players.length > 0 && (
                 <div className="mt-4 border-t pt-4">
                   <p className="font-bold text-sm mb-3">Players ({players.length}/15)</p>
@@ -274,9 +278,13 @@ export default function Dashboard() {
                     {players.map(p => (
                       <div key={p._id}>
                         {editingPlayer?._id === p._id ? (
-                          <EditPlayerForm player={p} onSave={(updated) => { setPlayers(players.map(pl => pl._id === p._id ? updated : pl)); setEditingPlayer(null) }} onCancel={() => setEditingPlayer(null)} />
+                          <EditPlayerForm
+                            player={p}
+                            onSave={(updated) => { setPlayers(players.map(pl => pl._id === p._id ? updated : pl)); setEditingPlayer(null) }}
+                            onCancel={() => setEditingPlayer(null)}
+                          />
                         ) : (
-                          <PlayerRow p={p} onEdit={setEditingPlayer} canEdit={team.status === 'pending' || team.status === 'rejected'} />
+                          <PlayerRow p={p} onEdit={setEditingPlayer} canEdit={canEdit} />
                         )}
                       </div>
                     ))}
@@ -291,7 +299,9 @@ export default function Dashboard() {
             </div>
           )}
         </div>
-        {team && (team.status === 'pending' || team.status === 'rejected') && (
+
+        {/* Add Players */}
+        {canEdit && (
           <div className="card">
             <h3 className="font-bold mb-2">➕ Add Players ({players.length}/15)</h3>
             <p className="text-sm text-gray-500 mb-4">Minimum 11 players required to submit.</p>
