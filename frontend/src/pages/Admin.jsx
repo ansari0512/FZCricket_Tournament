@@ -176,13 +176,21 @@ export default function Admin() {
             <div className="space-y-2">
               {selectedPlayers.length === 0 ? <p className="text-center text-gray-400 py-10">No players</p> :
               selectedPlayers.map(p => (
-                <div key={p._id} className="card flex items-center gap-3">
-                  {p.photo && <img src={p.photo} className="w-10 h-10 rounded-full object-cover" />}
-                  <div className="flex-1">
-                    <p className="font-medium text-sm">{p.name}</p>
-                    <p className="text-xs text-gray-500">{p.role} • #{p.jerseyNumber}</p>
+                <div key={p._id} className="card">
+                  <div className="flex items-center gap-3">
+                    {p.photo ? (
+                      <img src={p.photo} className="w-16 h-20 object-cover rounded-lg flex-shrink-0" alt={p.name} />
+                    ) : (
+                      <div className="w-16 h-20 bg-gray-200 rounded-lg flex items-center justify-center text-xl font-bold text-gray-400 flex-shrink-0">{p.name?.charAt(0)}</div>
+                    )}
+                    <div className="flex-1">
+                      <p className="font-bold">{p.name}</p>
+                      <p className="text-sm text-primary">{p.role === 'all-rounder' ? '⭐ All-Rounder' : p.role === 'wicket-keeper' ? '🧤 Wicket Keeper' : p.role === 'batsman' ? '🏏 Batsman' : '🎯 Bowler'}</p>
+                      <p className="text-xs text-gray-500">Jersey #{p.jerseyNumber}</p>
+                      {p.address && <p className="text-xs text-gray-400">📍 {p.address}</p>}
+                    </div>
+                    <button onClick={() => handleDeletePlayer(p._id)} className="text-red-500 text-sm bg-red-50 px-3 py-1.5 rounded-lg">Delete</button>
                   </div>
-                  <button onClick={() => handleDeletePlayer(p._id)} className="text-red-500 text-sm">Delete</button>
                 </div>
               ))}
             </div>
