@@ -5,6 +5,56 @@ import { getNotifications, markNotificationsRead, getTeam, getTeamPlayers, regis
 import { uploadImage } from '../services/api'
 import toast from 'react-hot-toast'
 
+function PaymentSection({ team, onScreenshotUploaded }) {
+  const [uploading, setUploading] = useState(false)
+  const [uploaded, setUploaded] = useState(!!team.paymentScreenshot)
+
+  const handleUpload = async (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+    setUploading(true)
+    try {
+      const url = await uploadImage(file)
+      await updateTeam(team._id, { paymentScreenshot: url })
+      onScreenshotUploaded(url)
+      setUploaded(true)
+      toast.success('Screenshot uploaded! Waiting for admin confirmation.')
+    } catch { toast.error('Upload failed') }
+    setUploading(false)
+  }
+
+  return (
+    <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-3">
+      <p className="font-bold text-yellow-800 mb-3">💰 Pay Registration Fee: ₹1,100</p>
+      <div className="bg-white rounded-xl p-4 text-center mb-3 shadow-sm">
+        <img
+          src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=shahidansari0512@oksbi%26pn=Shahid%20Ansari%26am=1100%26cu=INR%26tn=FZCricket%20Registration"
+          alt="UPI QR Code"
+          className="w-48 h-48 mx-auto"
+        />
+        <p className="text-sm font-bold mt-2">UPI ID: shahidansari0512@oksbi</p>
+        <p className="text-xs text-gray-500">Scan with any UPI app (GPay, PhonePe, Paytm)</p>
+        <p className="text-sm font-bold text-primary mt-1">Amount: ₹1,100</p>
+      </div>
+
+      {uploaded ? (
+        <div className="bg-green-50 border border-green-200 rounded-xl p-3 text-center">
+          <p className="text-green-700 font-bold text-sm">✅ Screenshot uploaded!</p>
+          <p className="text-xs text-gray-500 mt-1">Waiting for admin confirmation...</p>
+        </div>
+      ) : (
+        <div>
+          <p className="text-sm text-yellow-700 mb-2">After payment, upload screenshot for confirmation:</p>
+          <label className={`btn-primary w-full text-center cursor-pointer block ${uploading ? 'opacity-50' : ''}`}>
+            {uploading ? 'Uploading...' : '📸 Upload Payment Screenshot'}
+            <input type="file" accept="image/*" onChange={handleUpload} disabled={uploading} className="hidden" />
+          </label>
+        </div>
+      )}
+    </div>
+  )
+}
+
 function ChangePasswordPanel({ userId }) {
   const [open, setOpen] = useState(false)
   const [form, setForm] = useState({ oldPassword: '', newPassword: '', confirm: '' })
@@ -265,10 +315,7 @@ export default function Dashboard() {
                 </div>
               )}
               {team.status === 'approved' && !team.paymentDone && (
-                <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-3 mb-3">
-                  <p className="text-sm text-yellow-700 font-bold">💰 Please pay ₹1,100 to confirm your spot!</p>
-                  <p className="text-xs text-gray-500 mt-1">Contact admin after payment.</p>
-                </div>
+                <PaymentSection team={team} onScreenshotUploaded={(url) => setTeam({...team, paymentScreenshot: url})} />
               )}
 
               {players.length > 0 && (

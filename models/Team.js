@@ -23,6 +23,10 @@ const teamSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  paymentScreenshot: {
+    type: String,
+    default: ''
+  },
   captainName: {
     type: String,
     required: true
