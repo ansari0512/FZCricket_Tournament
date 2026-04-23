@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Match = require('../models/Match');
 const Team = require('../models/Team');
+const { verifyAdmin } = require('../middleware/auth');
 
 router.get('/', async (req, res) => {
   try {
@@ -70,7 +71,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-router.post('/create', async (req, res) => {
+router.post('/create', verifyAdmin, async (req, res) => {
   try {
     const { team1Id, team2Id, matchDate, matchType, overs, venue } = req.body;
 
@@ -100,7 +101,7 @@ router.post('/create', async (req, res) => {
   }
 });
 
-router.put('/:id/status', async (req, res) => {
+router.put('/:id/status', verifyAdmin, async (req, res) => {
   try {
     const { status, winnerId } = req.body;
     const match = await Match.findByIdAndUpdate(
@@ -114,7 +115,7 @@ router.put('/:id/status', async (req, res) => {
   }
 });
 
-router.put('/:id/score', async (req, res) => {
+router.put('/:id/score', verifyAdmin, async (req, res) => {
   try {
     const { team1Score, team2Score } = req.body;
     const match = await Match.findByIdAndUpdate(
@@ -128,7 +129,7 @@ router.put('/:id/score', async (req, res) => {
   }
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', verifyAdmin, async (req, res) => {
   try {
     await Match.findByIdAndDelete(req.params.id);
     res.json({ message: 'Match deleted successfully' });
@@ -137,7 +138,7 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
-router.post('/generate-schedule', async (req, res) => {
+router.post('/generate-schedule', verifyAdmin, async (req, res) => {
   try {
     const teams = await Team.find({ status: 'approved' });
     if (teams.length < 2) {

@@ -4,6 +4,7 @@ const Team = require('../models/Team');
 const Player = require('../models/Player');
 const Payment = require('../models/Payment');
 const User = require('../models/User');
+const { verifyAdmin, verifyUser } = require('../middleware/auth');
 
 const MAX_TEAMS = 8;
 const REGISTRATION_FEE = 300;
@@ -82,7 +83,7 @@ router.post('/register', async (req, res) => {
   }
 });
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', verifyUser, async (req, res) => {
   try {
     const { status, rejectReason, paymentDone } = req.body;
     const team = await Team.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -111,7 +112,7 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', verifyAdmin, async (req, res) => {
   try {
     await Team.findByIdAndDelete(req.params.id);
     await Player.deleteMany({ teamId: req.params.id });

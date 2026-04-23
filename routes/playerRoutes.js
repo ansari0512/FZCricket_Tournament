@@ -2,10 +2,11 @@ const express = require('express');
 const router = express.Router();
 const Player = require('../models/Player');
 const Team = require('../models/Team');
+const { verifyUser, verifyAdmin } = require('../middleware/auth');
 
 const MAX_PLAYERS = 15;
 
-router.post('/register/:teamId', async (req, res) => {
+router.post('/register/:teamId', verifyUser, async (req, res) => {
   try {
     const { teamId } = req.params;
     const { name, age, jerseyNumber, role, phone, photo, address } = req.body;
@@ -43,7 +44,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', verifyUser, async (req, res) => {
   try {
     const player = await Player.findByIdAndUpdate(req.params.id, req.body, { new: true });
     res.json(player);
@@ -52,7 +53,7 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', verifyAdmin, async (req, res) => {
   try {
     await Player.findByIdAndDelete(req.params.id);
     res.json({ message: 'Player deleted successfully' });

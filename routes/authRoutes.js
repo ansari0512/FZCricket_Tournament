@@ -3,8 +3,8 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const { verifyAdmin, verifyUser } = require('../middleware/auth');
 
-// Secrets now from env only
 const ADMIN_SECRET = process.env.ADMIN_SECRET;
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -48,7 +48,7 @@ router.post('/login', async (req, res) => {
 });
 
 // Get Notifications
-router.get('/notifications/:userId', async (req, res) => {
+router.get('/notifications/:userId', verifyUser, async (req, res) => {
   try {
     const user = await User.findById(req.params.userId);
     if (!user) return res.status(404).json({ message: 'User not found' });
@@ -59,7 +59,7 @@ router.get('/notifications/:userId', async (req, res) => {
 });
 
 // Mark notifications read
-router.put('/notifications/:userId/read', async (req, res) => {
+router.put('/notifications/:userId/read', verifyUser, async (req, res) => {
   try {
     await User.findByIdAndUpdate(req.params.userId, { $set: { 'notifications.$[].read': true } });
     res.json({ message: 'Marked as read' });
@@ -83,7 +83,7 @@ router.post('/admin/login', async (req, res) => {
 });
 
 // User change password
-router.put('/change-password/:userId', async (req, res) => {
+router.put('/change-password/:userId', verifyUser, async (req, res) => {
   try {
     const { oldPassword, newPassword } = req.body;
     const user = await User.findById(req.params.userId);
@@ -99,7 +99,7 @@ router.put('/change-password/:userId', async (req, res) => {
 });
 
 // Admin - Reset user credentials
-router.put('/admin/users/:userId/reset', async (req, res) => {
+router.put('/admin/users/:userId/reset', verifyAdmin, async (req, res) => {
   try {
     const { newUsername, newPassword } = req.body;
     const user = await User.findById(req.params.userId);
@@ -121,7 +121,7 @@ router.put('/admin/users/:userId/reset', async (req, res) => {
 });
 
 // Admin - Get all users
-router.get('/admin/users', async (req, res) => {
+router.get('/admin/users', verifyAdmin, async (req, res) => {
   try {
     const users = await User.find().select('-password').sort({ createdAt: -1 });
     res.json(users);
@@ -131,7 +131,7 @@ router.get('/admin/users', async (req, res) => {
 });
 
 // Admin - Delete user
-router.delete('/admin/users/:userId', async (req, res) => {
+router.delete('/admin/users/:userId', verifyAdmin, async (req, res) => {
   try {
     const user = await User.findById(req.params.userId);
     if (!user) return res.status(404).json({ message: 'User not found' });
