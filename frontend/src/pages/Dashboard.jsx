@@ -220,10 +220,27 @@ export default function Dashboard() {
                   <p className="text-gray-500 text-sm">Captain: {team.captainName} • {team.captainPhone}</p>
                   <p className="text-gray-400 text-xs">{team.city}</p>
                 </div>
-                <span className={team.status === 'approved' ? 'badge-approved' : team.status === 'rejected' ? 'badge-rejected' : 'badge-pending'}>
-                  {team.status === 'approved' ? '✅ Approved' : team.status === 'rejected' ? '❌ Rejected' : '⏳ Pending'}
-                </span>
+                <div className="flex flex-col items-end gap-2">
+                  <span className={team.status === 'approved' ? 'badge-approved' : team.status === 'rejected' ? 'badge-rejected' : 'badge-pending'}>
+                    {team.status === 'approved' ? '✅ Approved' : team.status === 'rejected' ? '❌ Rejected' : '⏳ Pending'}
+                  </span>
+                  {(team.status === 'pending' || team.status === 'rejected') && (
+                    <button onClick={() => setEditTeam(!editTeam)} className="text-xs text-primary font-medium">
+                      {editTeam ? 'Cancel Edit' : '✏️ Edit Team'}
+                    </button>
+                  )}
+                </div>
               </div>
+
+              {editTeam && (
+                <form onSubmit={handleUpdateTeam} className="space-y-3 mb-4 bg-gray-50 p-4 rounded-xl">
+                  <input type="text" placeholder="Team Name *" value={editTeamData.teamName} onChange={e => setEditTeamData({ ...editTeamData, teamName: e.target.value })} className="input" required />
+                  <input type="text" placeholder="Captain Name *" value={editTeamData.captainName} onChange={e => setEditTeamData({ ...editTeamData, captainName: e.target.value })} className="input" required />
+                  <input type="tel" placeholder="Captain Phone *" value={editTeamData.captainPhone} onChange={e => setEditTeamData({ ...editTeamData, captainPhone: e.target.value })} className="input" required />
+                  <input type="text" placeholder="City/Village" value={editTeamData.city} onChange={e => setEditTeamData({ ...editTeamData, city: e.target.value })} className="input" />
+                  <button type="submit" className="btn-primary w-full">Save Changes</button>
+                </form>
+              )}
 
               {team.status === 'rejected' && team.rejectReason && (
                 <div className="bg-red-50 border border-red-200 rounded-xl p-3 mb-3">
@@ -264,25 +281,6 @@ export default function Dashboard() {
         </div>
 
         <ChangePasswordPanel userId={currentUser._id} />
-
-        {/* Edit Team */}
-        {team && (team.status === 'pending' || team.status === 'rejected') && (
-          <div className="card">
-            <div className="flex justify-between items-center mb-3">
-              <h3 className="font-bold">✏️ Edit Team</h3>
-              <button onClick={() => setEditTeam(!editTeam)} className="text-sm text-primary">{editTeam ? 'Cancel' : 'Edit'}</button>
-            </div>
-            {editTeam && (
-              <form onSubmit={handleUpdateTeam} className="space-y-3">
-                <input type="text" placeholder="Team Name *" value={editTeamData.teamName} onChange={e => setEditTeamData({ ...editTeamData, teamName: e.target.value })} className="input" required />
-                <input type="text" placeholder="Captain Name *" value={editTeamData.captainName} onChange={e => setEditTeamData({ ...editTeamData, captainName: e.target.value })} className="input" required />
-                <input type="tel" placeholder="Captain Phone *" value={editTeamData.captainPhone} onChange={e => setEditTeamData({ ...editTeamData, captainPhone: e.target.value })} className="input" required />
-                <input type="text" placeholder="City/Village" value={editTeamData.city} onChange={e => setEditTeamData({ ...editTeamData, city: e.target.value })} className="input" />
-                <button type="submit" className="btn-primary w-full">Save Changes</button>
-              </form>
-            )}
-          </div>
-        )}
 
         {/* Add Players */}
         {team && team.status === 'pending' && (
