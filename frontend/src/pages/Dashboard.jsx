@@ -35,7 +35,7 @@ function NotificationsPanel({ userId }) {
   )
 }
 
-function ChangePasswordPanel({ userId }) {
+function PlayerRow({ userId }) {
   const [open, setOpen] = useState(false)
   const [form, setForm] = useState({ oldPassword: '', newPassword: '', confirm: '' })
   const [showPass, setShowPass] = useState(false)
@@ -53,10 +53,10 @@ function ChangePasswordPanel({ userId }) {
     setLoading(false)
   }
   return (
-    <div className="card mb-4">
+    <div className="border-t pt-3 mt-1">
       <div className="flex justify-between items-center">
-        <h3 className="font-bold">🔒 Change Password</h3>
-        <button onClick={() => setOpen(!open)} className="text-sm text-primary">{open ? 'Cancel' : 'Change'}</button>
+        <p className="text-sm font-medium text-gray-500">🔒 Change Password</p>
+        <button onClick={() => setOpen(!open)} className="text-xs text-primary">{open ? 'Cancel' : 'Change'}</button>
       </div>
       {open && (
         <form onSubmit={handleSubmit} className="mt-4 space-y-3">
@@ -199,15 +199,16 @@ export default function Dashboard() {
       <div className="max-w-2xl mx-auto space-y-4">
 
         {/* Profile */}
-        <div className="card flex justify-between items-center">
-          <div>
-            <h2 className="text-xl font-bold">👋 {currentUser.username}</h2>
-            <p className="text-gray-500 text-sm">{currentUser.mobile}</p>
+        <div className="card">
+          <div className="flex justify-between items-center mb-3">
+            <div>
+              <h2 className="text-xl font-bold">👋 {currentUser.username}</h2>
+              <p className="text-gray-500 text-sm">{currentUser.mobile}</p>
+            </div>
+            <button onClick={logout} className="text-red-500 font-medium text-sm">Logout</button>
           </div>
-          <button onClick={logout} className="text-red-500 font-medium text-sm">Logout</button>
+          <ChangePasswordPanel userId={currentUser._id} />
         </div>
-
-        <ChangePasswordPanel userId={currentUser._id} />
 
         <NotificationsPanel userId={currentUser._id} />
         <div className="card">
