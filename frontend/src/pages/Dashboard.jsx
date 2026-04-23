@@ -207,9 +207,9 @@ export default function Dashboard() {
           <button onClick={logout} className="text-red-500 font-medium text-sm">Logout</button>
         </div>
 
-        <NotificationsPanel userId={currentUser._id} />
+        <ChangePasswordPanel userId={currentUser._id} />
 
-        {/* My Team */}
+        <NotificationsPanel userId={currentUser._id} />
         <div className="card">
           <h3 className="font-bold text-lg mb-4">🏏 My Team</h3>
           {team ? (
@@ -279,9 +279,6 @@ export default function Dashboard() {
             </div>
           )}
         </div>
-
-        <ChangePasswordPanel userId={currentUser._id} />
-
         {/* Add Players */}
         {team && team.status === 'pending' && (
           <div className="card">
