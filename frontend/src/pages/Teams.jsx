@@ -3,15 +3,96 @@ import { useApp } from '../context/AppContext'
 import { getTeamPlayers } from '../services/api'
 
 const COLORS = ['from-green-500', 'from-blue-500', 'from-purple-500', 'from-orange-500', 'from-pink-500', 'from-indigo-500', 'from-teal-500', 'from-red-500']
+const ROLE_LABELS = { batsman: '🏏 Batsman', bowler: '🎯 Bowler', 'all-rounder': '⭐ All-Rounder', 'wicket-keeper': '🧤 Wicket Keeper' }
+
+function PlayerModal({ player, onClose }) {
+  return (
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={onClose}>
+      <div className="bg-white rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl" onClick={e => e.stopPropagation()}>
+        <div className="relative">
+          {player.photo ? (
+            <img src={player.photo} className="w-full h-64 object-cover" alt={player.name} />
+          ) : (
+            <div className="w-full h-64 bg-gray-200 flex items-center justify-center text-6xl font-bold text-gray-400">
+              {player.name?.charAt(0)}
+            </div>
+          )}
+          <button onClick={onClose} className="absolute top-3 right-3 bg-black/50 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">✕</button>
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
+            <p className="text-white font-bold text-xl">{player.name}</p>
+            <p className="text-gray-300 text-sm">#{player.jerseyNumber}</p>
+          </div>
+        </div>
+        <div className="p-5 space-y-3">
+          <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
+            <span className="text-2xl">🎽</span>
+            <div>
+              <p className="text-xs text-gray-500">Role</p>
+              <p className="font-bold">{ROLE_LABELS[player.role] || player.role}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
+            <span className="text-2xl">🔢</span>
+            <div>
+              <p className="text-xs text-gray-500">Jersey Number</p>
+              <p className="font-bold">#{player.jerseyNumber}</p>
+            </div>
+          </div>
+          {player.address && (
+            <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
+              <span className="text-2xl">📍</span>
+              <div>
+                <p className="text-xs text-gray-500">Address</p>
+                <p className="font-bold">{player.address}</p>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function PlayerCard({ player }) {
+  const [showModal, setShowModal] = useState(false)
+
+  return (
+    <>
+      <div
+        onClick={() => setShowModal(true)}
+        className="flex items-center gap-3 p-2 bg-gray-50 hover:bg-gray-100 rounded-xl cursor-pointer transition"
+      >
+        {player.photo ? (
+          <img src={player.photo} className="w-16 h-20 object-cover rounded-lg flex-shrink-0" alt={player.name} />
+        ) : (
+          <div className="w-16 h-20 bg-gray-200 rounded-lg flex items-center justify-center text-xl font-bold text-gray-400 flex-shrink-0">
+            {player.name?.charAt(0)}
+          </div>
+        )}
+        <div className="flex-1 min-w-0">
+          <p className="font-bold text-sm truncate">{player.name}</p>
+          <p className="text-xs text-primary font-medium">{ROLE_LABELS[player.role] || player.role}</p>
+          <p className="text-xs text-gray-400">Jersey #{player.jerseyNumber}</p>
+          {player.address && <p className="text-xs text-gray-400 truncate">📍 {player.address}</p>}
+        </div>
+        <span className="text-gray-300 text-lg flex-shrink-0">›</span>
+      </div>
+      {showModal && <PlayerModal player={player} onClose={() => setShowModal(false)} />}
+    </>
+  )
+}
 
 function TeamCard({ team, index }) {
   const [showPlayers, setShowPlayers] = useState(false)
   const [players, setPlayers] = useState([])
+  const [loadingPlayers, setLoadingPlayers] = useState(false)
 
   const togglePlayers = async () => {
     if (!showPlayers && !players.length) {
+      setLoadingPlayers(true)
       const res = await getTeamPlayers(team._id)
       setPlayers(res.data)
+      setLoadingPlayers(false)
     }
     setShowPlayers(!showPlayers)
   }
@@ -27,10 +108,10 @@ function TeamCard({ team, index }) {
           <div>
             <h3 className="font-bold text-lg">{team.teamName}</h3>
             <p className="text-gray-500 text-sm">Capt: {team.captainName}</p>
-            <p className="text-gray-400 text-xs">{team.city}</p>
+            <p className="text-gray-400 text-xs">📍 {team.city}</p>
           </div>
         </div>
-        <span className="badge-approved">Approved</span>
+        <span className="badge-approved">✅ Approved</span>
       </div>
 
       <div className="mt-4 grid grid-cols-4 gap-2 text-center text-sm">
@@ -43,18 +124,12 @@ function TeamCard({ team, index }) {
       </div>
 
       <button onClick={togglePlayers} className="w-full mt-4 bg-gray-50 hover:bg-gray-100 py-2 rounded-xl text-sm font-medium transition">
-        {showPlayers ? 'Hide Players ▲' : `View Players (${players.length || '...'}) ▼`}
+        {loadingPlayers ? 'Loading...' : showPlayers ? 'Hide Players ▲' : `View Players ▼`}
       </button>
 
       {showPlayers && players.length > 0 && (
-        <div className="mt-3 grid grid-cols-3 gap-2">
-          {players.map(p => (
-            <div key={p._id} className="text-center p-2 bg-gray-50 rounded-xl">
-              {p.photo && <img src={p.photo} className="w-10 h-10 rounded-full object-cover mx-auto mb-1" />}
-              <p className="text-xs font-medium truncate">{p.name}</p>
-              <p className="text-xs text-gray-400">#{p.jerseyNumber}</p>
-            </div>
-          ))}
+        <div className="mt-3 space-y-2">
+          {players.map(p => <PlayerCard key={p._id} player={p} />)}
         </div>
       )}
     </div>
