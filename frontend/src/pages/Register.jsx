@@ -7,7 +7,7 @@ import toast from 'react-hot-toast'
 export default function Register() {
   const { currentUser, registrationOpen, login } = useApp()
   const navigate = useNavigate()
-  const [form, setForm] = useState({ teamName: '', captainName: '', captainPhone: '', city: 'Odajhar' })
+  const [form, setForm] = useState({ teamName: '', captainName: '', captainPhone: '', city: '' })
   const [loading, setLoading] = useState(false)
 
   if (!currentUser) return (
@@ -48,7 +48,13 @@ export default function Register() {
     e.preventDefault()
     setLoading(true)
     try {
-      const res = await registerTeam({ ...form, userId: currentUser._id })
+      const res = await registerTeam({
+        teamName: form.teamName.toUpperCase(),
+        captainName: form.captainName.toUpperCase(),
+        captainPhone: form.captainPhone,
+        city: form.city.toUpperCase(),
+        userId: currentUser._id
+      })
       const updatedUser = { ...currentUser, teamId: res.data.team._id }
       login(updatedUser, localStorage.getItem('fzToken'))
       toast.success('Team registered! Now add players from dashboard.')
@@ -75,7 +81,7 @@ export default function Register() {
               onChange={e => setForm({ ...form, captainName: e.target.value })} className="input" required />
             <input type="tel" placeholder="Captain Phone *" value={form.captainPhone}
               onChange={e => setForm({ ...form, captainPhone: e.target.value })} className="input" required />
-            <input type="text" placeholder="City/Village" value={form.city}
+            <input type="text" placeholder="Village *" value={form.city}
               onChange={e => setForm({ ...form, city: e.target.value })} className="input" />
             <button type="submit" disabled={loading} className="btn-primary w-full">
               {loading ? 'Registering...' : 'Register Team →'}

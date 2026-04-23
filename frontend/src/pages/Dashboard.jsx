@@ -94,7 +94,7 @@ function EditPlayerForm({ player, onSave, onCancel }) {
     try {
       let photoUrl = null
       if (form.newPhoto) photoUrl = await uploadImage(form.newPhoto)
-      const data = { name: form.name, role: form.role, address: form.address }
+      const data = { name: form.name.toUpperCase(), role: form.role, address: form.address.toUpperCase() }
       if (photoUrl) data.photo = photoUrl
       const res = await updatePlayer(player._id, data)
       onSave(res.data)
@@ -156,7 +156,12 @@ export default function Dashboard() {
   const handleUpdateTeam = async (e) => {
     e.preventDefault()
     try {
-      const res = await updateTeam(currentUser.teamId, editTeamData)
+      const res = await updateTeam(currentUser.teamId, {
+        teamName: editTeamData.teamName.toUpperCase(),
+        captainName: editTeamData.captainName.toUpperCase(),
+        captainPhone: editTeamData.captainPhone,
+        city: editTeamData.city.toUpperCase()
+      })
       setTeam(res.data)
       setEditTeam(false)
       toast.success('Team updated!')
@@ -171,7 +176,14 @@ export default function Dashboard() {
     setUploading(true); setError('')
     try {
       const photoUrl = await uploadImage(playerForm.photo)
-      const res = await registerPlayer(currentUser.teamId, { name: playerForm.name, role: playerForm.role, address: playerForm.address, photo: photoUrl, jerseyNumber: players.length + 1, age: 18 })
+      const res = await registerPlayer(currentUser.teamId, {
+        name: playerForm.name.toUpperCase(),
+        role: playerForm.role,
+        address: playerForm.address.toUpperCase(),
+        photo: photoUrl,
+        jerseyNumber: players.length + 1,
+        age: 18
+      })
       setPlayers([...players, res.data.player])
       setPlayerForm({ name: '', role: 'batsman', address: '', photo: null, preview: '' })
       toast.success('Player added!')
