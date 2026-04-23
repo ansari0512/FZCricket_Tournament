@@ -1424,6 +1424,50 @@
                       <p className="text-xs text-gray-500 mt-1">Contact admin after payment for confirmation.</p>
                     </div>
                   )}
+                  {players.length > 0 && (
+                    <div className="mt-4 border-t pt-3">
+                      <p className="font-bold text-sm mb-2">Players ({players.length}/15)</p>
+                      <div className="space-y-2">
+                        {players.map((p, i) => (
+                          <div key={i} className="bg-gray-50 rounded-lg p-2">
+                            {editingPlayer === p._id ? (
+                              <div className="space-y-2">
+                                <input type="text" value={editPlayerData.name} onChange={e => setEditPlayerData({...editPlayerData, name: e.target.value})} className="w-full p-2 border rounded text-sm no-upper" placeholder="Name" />
+                                <select value={editPlayerData.role} onChange={e => setEditPlayerData({...editPlayerData, role: e.target.value})} className="w-full p-2 border rounded text-sm">
+                                  <option value="batsman">Batsman</option>
+                                  <option value="bowler">Bowler</option>
+                                  <option value="all-rounder">All-Rounder</option>
+                                  <option value="wicket-keeper">Wicket Keeper</option>
+                                </select>
+                                <input type="text" value={editPlayerData.address} onChange={e => setEditPlayerData({...editPlayerData, address: e.target.value})} className="w-full p-2 border rounded text-sm" placeholder="Address" />
+                                <div>
+                                  <label className="text-xs text-gray-500">Change Photo (optional)</label>
+                                  <input type="file" accept="image/*" onChange={e => {
+                                    const file = e.target.files[0];
+                                    if (file) setEditPlayerData({...editPlayerData, newPhoto: file, photoPreview: URL.createObjectURL(file)});
+                                  }} className="w-full p-1 border rounded text-sm" />
+                                  {editPlayerData.photoPreview && <img src={editPlayerData.photoPreview} className="mt-1 w-12 h-12 object-cover rounded" />}
+                                </div>
+                                <div className="flex gap-2">
+                                  <button onClick={() => handleUpdatePlayer(p._id)} disabled={playerUpdating} className="flex-1 cricket-gradient text-white text-sm py-1 rounded disabled:opacity-50">{playerUpdating ? 'Saving...' : 'Save'}</button>
+                                  <button onClick={() => setEditingPlayer(null)} className="flex-1 bg-gray-200 text-sm py-1 rounded">Cancel</button>
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="flex items-center gap-2">
+                                {p.photo ? <img src={p.photo} className="w-10 h-10 rounded-full object-cover flex-shrink-0" /> : <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-xs font-bold flex-shrink-0">{i+1}</div>}
+                                <span className="text-xs text-gray-400 font-bold w-5">#{p.jerseyNumber}</span>
+                                <span className="font-medium text-sm flex-1 truncate">{p.name}</span>
+                                <span className="text-xs bg-blue-100 text-blue-700 px-1 rounded">{p.role === 'all-rounder' ? 'AR' : p.role === 'wicket-keeper' ? 'WK' : p.role === 'batsman' ? 'Bat' : 'Bowl'}</span>
+                                <span className="text-xs text-gray-400 w-20 truncate hidden sm:block">{p.address}</span>
+                                <button onClick={() => { setEditingPlayer(p._id); setEditPlayerData({ name: p.name, role: p.role, address: p.address || '', newPhoto: null, photoPreview: '' }); }} className="text-blue-600 text-xs">Edit</button>
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="text-center">
@@ -1434,7 +1478,6 @@
             </div>
 
             <ChangePassword userId={currentUser._id} />
-
             {team && (team.status === 'pending' || team.status === 'rejected') && (
               <div className="bg-white rounded-xl shadow-lg p-6 mb-4">
                 <div className="flex justify-between items-center mb-4">
@@ -1483,48 +1526,6 @@
                     <button onClick={handleAddPlayer} disabled={uploading} className="w-full cricket-gradient text-white font-bold py-2 rounded-lg disabled:opacity-50">
                       {uploading ? 'Uploading...' : '+ Add Player'}
                     </button>
-                  </div>
-                )}
-
-                {players.length > 0 && (
-                  <div className="space-y-2 mb-4 max-h-64 overflow-y-auto">
-                    {players.map((p, i) => (
-                      <div key={i} className="bg-gray-50 rounded-lg p-2">
-                        {editingPlayer === p._id ? (
-                          <div className="space-y-2">
-                            <input type="text" value={editPlayerData.name} onChange={e => setEditPlayerData({...editPlayerData, name: e.target.value})} className="w-full p-2 border rounded text-sm" placeholder="Name" />
-                            <select value={editPlayerData.role} onChange={e => setEditPlayerData({...editPlayerData, role: e.target.value})} className="w-full p-2 border rounded text-sm">
-                              <option value="batsman">Batsman</option>
-                              <option value="bowler">Bowler</option>
-                              <option value="all-rounder">All-Rounder</option>
-                              <option value="wicket-keeper">Wicket Keeper</option>
-                            </select>
-                            <input type="text" value={editPlayerData.address} onChange={e => setEditPlayerData({...editPlayerData, address: e.target.value})} className="w-full p-2 border rounded text-sm" placeholder="Address" />
-                            <div>
-                              <label className="text-xs text-gray-500">Change Photo (optional)</label>
-                              <input type="file" accept="image/*" onChange={e => {
-                                const file = e.target.files[0];
-                                if (file) setEditPlayerData({...editPlayerData, newPhoto: file, photoPreview: URL.createObjectURL(file)});
-                              }} className="w-full p-1 border rounded text-sm" />
-                              {editPlayerData.photoPreview && <img src={editPlayerData.photoPreview} className="mt-1 w-12 h-12 object-cover rounded" />}
-                            </div>
-                            <div className="flex gap-2">
-                              <button onClick={() => handleUpdatePlayer(p._id)} disabled={playerUpdating} className="flex-1 cricket-gradient text-white text-sm py-1 rounded disabled:opacity-50">{playerUpdating ? 'Saving...' : 'Save'}</button>
-                              <button onClick={() => setEditingPlayer(null)} className="flex-1 bg-gray-200 text-sm py-1 rounded">Cancel</button>
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="flex items-center gap-3">
-                            {p.photo ? <img src={p.photo} className="w-10 h-10 rounded-full object-cover" /> : <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">{i+1}</div>}
-                            <div className="flex-1">
-                              <p className="font-medium text-sm">{p.name}</p>
-                              <p className="text-xs text-gray-500">{p.role} • #{p.jerseyNumber}</p>
-                            </div>
-                            <button onClick={() => { setEditingPlayer(p._id); setEditPlayerData({ name: p.name, role: p.role, address: p.address || '', newPhoto: null, photoPreview: '' }); }} className="text-blue-600 text-xs">✏️ Edit</button>
-                          </div>
-                        )}
-                      </div>
-                    ))}
                   </div>
                 )}
 

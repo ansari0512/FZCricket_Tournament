@@ -1,0 +1,27 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * { font-family: 'Poppins', sans-serif; }
+  input:not([type='password']):not([type='tel']):not([type='number']):not([type='file']):not(.no-upper),
+  textarea:not(.no-upper) { text-transform: uppercase; }
+  input::placeholder, textarea::placeholder { text-transform: none; }
+}
+
+@layer components {
+  .cricket-gradient { @apply bg-gradient-to-r from-primary to-primary-dark; }
+  .btn-primary { @apply bg-primary hover:bg-primary-dark text-white font-bold py-3 px-6 rounded-xl transition-all duration-200 disabled:opacity-50; }
+  .btn-secondary { @apply bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold py-3 px-6 rounded-xl transition-all duration-200; }
+  .card { @apply bg-white rounded-2xl shadow-md p-5; }
+  .input { @apply w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all; }
+  .badge-pending { @apply bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-bold; }
+  .badge-approved { @apply bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold; }
+  .badge-rejected { @apply bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-bold; }
+}
+
+@layer utilities {
+  .live-pulse { animation: pulse 2s infinite; }
+  .trophy-bounce { animation: bounce 2s infinite; }
+}
