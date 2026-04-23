@@ -9,11 +9,11 @@ function PlayerModal({ player, onClose }) {
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={onClose}>
       <div className="bg-white rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl" onClick={e => e.stopPropagation()}>
-        <div className="relative">
+        <div className="relative bg-gray-900">
           {player.photo ? (
-            <img src={player.photo} className="w-full h-64 object-cover" alt={player.name} />
+            <img src={player.photo} className="w-full h-72 object-contain" alt={player.name} />
           ) : (
-            <div className="w-full h-64 bg-gray-200 flex items-center justify-center text-6xl font-bold text-gray-400">
+            <div className="w-full h-72 bg-gray-200 flex items-center justify-center text-6xl font-bold text-gray-400">
               {player.name?.charAt(0)}
             </div>
           )}

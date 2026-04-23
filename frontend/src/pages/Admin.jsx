@@ -2,6 +2,72 @@ import { useState, useEffect } from 'react'
 import { adminLogin, getAdminUsers, deleteAdminUser, resetUserCredentials, getAllTeams, updateTeam, deleteTeam, getTeamPlayers, deletePlayer, getMatches, updateMatchStatus, updateMatchScore, generateSchedule } from '../services/api'
 import toast from 'react-hot-toast'
 
+const ROLE_LABELS = { batsman: '🏏 Batsman', bowler: '🎯 Bowler', 'all-rounder': '⭐ All-Rounder', 'wicket-keeper': '🧤 Wicket Keeper' }
+
+function PlayerModal({ player, onClose }) {
+  return (
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={onClose}>
+      <div className="bg-white rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl" onClick={e => e.stopPropagation()}>
+        <div className="relative bg-gray-900">
+          {player.photo ? (
+            <img src={player.photo} className="w-full h-72 object-contain" alt={player.name} />
+          ) : (
+            <div className="w-full h-72 bg-gray-200 flex items-center justify-center text-6xl font-bold text-gray-400">{player.name?.charAt(0)}</div>
+          )}
+          <button onClick={onClose} className="absolute top-3 right-3 bg-black/50 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">✕</button>
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
+            <p className="text-white font-bold text-xl">{player.name}</p>
+            <p className="text-gray-300 text-sm">#{player.jerseyNumber}</p>
+          </div>
+        </div>
+        <div className="p-5 space-y-3">
+          <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
+            <span className="text-2xl">🌿</span>
+            <div><p className="text-xs text-gray-500">Role</p><p className="font-bold">{ROLE_LABELS[player.role] || player.role}</p></div>
+          </div>
+          <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
+            <span className="text-2xl">🔢</span>
+            <div><p className="text-xs text-gray-500">Jersey Number</p><p className="font-bold">#{player.jerseyNumber}</p></div>
+          </div>
+          {player.address && (
+            <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
+              <span className="text-2xl">📍</span>
+              <div><p className="text-xs text-gray-500">Address</p><p className="font-bold">{player.address}</p></div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function AdminPlayerCard({ player, onDelete }) {
+  const [showModal, setShowModal] = useState(false)
+  return (
+    <>
+      <div className="card">
+        <div className="flex items-center gap-3">
+          <div onClick={() => setShowModal(true)} className="cursor-pointer flex-shrink-0">
+            {player.photo ? (
+              <img src={player.photo} className="w-16 h-20 object-contain bg-gray-100 rounded-lg" alt={player.name} />
+            ) : (
+              <div className="w-16 h-20 bg-gray-200 rounded-lg flex items-center justify-center text-xl font-bold text-gray-400">{player.name?.charAt(0)}</div>
+            )}
+          </div>
+          <div className="flex-1" onClick={() => setShowModal(true)}>
+            <p className="font-bold cursor-pointer hover:text-primary">{player.name}</p>
+            <p className="text-sm text-primary">{ROLE_LABELS[player.role] || player.role}</p>
+            <p className="text-xs text-gray-500">Jersey #{player.jerseyNumber}</p>
+            {player.address && <p className="text-xs text-gray-400">📍 {player.address}</p>}
+          </div>
+          <button onClick={() => onDelete(player._id)} className="text-red-500 text-sm bg-red-50 px-3 py-1.5 rounded-lg flex-shrink-0">Delete</button>
+        </div>
+      </div>
+      {showModal && <PlayerModal player={player} onClose={() => setShowModal(false)} />}
+    </>
+  )
+}
+
 const TABS = ['Users', 'Teams', 'Matches', 'Schedule', 'Gallery']
 
 export default function Admin() {
@@ -176,22 +242,7 @@ export default function Admin() {
             <div className="space-y-2">
               {selectedPlayers.length === 0 ? <p className="text-center text-gray-400 py-10">No players</p> :
               selectedPlayers.map(p => (
-                <div key={p._id} className="card">
-                  <div className="flex items-center gap-3">
-                    {p.photo ? (
-                      <img src={p.photo} className="w-16 h-20 object-cover rounded-lg flex-shrink-0" alt={p.name} />
-                    ) : (
-                      <div className="w-16 h-20 bg-gray-200 rounded-lg flex items-center justify-center text-xl font-bold text-gray-400 flex-shrink-0">{p.name?.charAt(0)}</div>
-                    )}
-                    <div className="flex-1">
-                      <p className="font-bold">{p.name}</p>
-                      <p className="text-sm text-primary">{p.role === 'all-rounder' ? '⭐ All-Rounder' : p.role === 'wicket-keeper' ? '🧤 Wicket Keeper' : p.role === 'batsman' ? '🏏 Batsman' : '🎯 Bowler'}</p>
-                      <p className="text-xs text-gray-500">Jersey #{p.jerseyNumber}</p>
-                      {p.address && <p className="text-xs text-gray-400">📍 {p.address}</p>}
-                    </div>
-                    <button onClick={() => handleDeletePlayer(p._id)} className="text-red-500 text-sm bg-red-50 px-3 py-1.5 rounded-lg">Delete</button>
-                  </div>
-                </div>
+                <AdminPlayerCard key={p._id} player={p} onDelete={handleDeletePlayer} />
               ))}
             </div>
           </div>
