@@ -73,7 +73,7 @@ function ChangePasswordPanel({ userId }) {
   )
 }
 
-function PlayerRow({ p, onEdit }) {
+function PlayerRow({ p, onEdit, canEdit }) {
   return (
     <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-xl">
       {p.photo ? <img src={p.photo} className="w-10 h-10 rounded-full object-cover flex-shrink-0" /> : <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-xs font-bold flex-shrink-0">{p.jerseyNumber}</div>}
@@ -81,7 +81,7 @@ function PlayerRow({ p, onEdit }) {
       <span className="font-medium text-sm flex-1 truncate">{p.name}</span>
       <span className="text-xs bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded">{p.role === 'all-rounder' ? 'AR' : p.role === 'wicket-keeper' ? 'WK' : p.role === 'batsman' ? 'Bat' : 'Bowl'}</span>
       <span className="text-xs text-gray-400 w-20 truncate hidden sm:block">{p.address}</span>
-      <button onClick={() => onEdit(p)} className="text-primary text-xs font-medium">Edit</button>
+                      <button onClick={() => onEdit(p)} className="text-primary text-xs font-medium">{canEdit ? 'Edit' : ''}</button>
     </div>
   )
 }
@@ -242,7 +242,6 @@ export default function Dashboard() {
                       {editTeam ? 'Cancel Edit' : '✏️ Edit Team'}
                     </button>
                   )}
-                </div>
               </div>
 
               {editTeam && (
@@ -277,7 +276,7 @@ export default function Dashboard() {
                         {editingPlayer?._id === p._id ? (
                           <EditPlayerForm player={p} onSave={(updated) => { setPlayers(players.map(pl => pl._id === p._id ? updated : pl)); setEditingPlayer(null) }} onCancel={() => setEditingPlayer(null)} />
                         ) : (
-                          <PlayerRow p={p} onEdit={setEditingPlayer} />
+                          <PlayerRow p={p} onEdit={setEditingPlayer} canEdit={team.status === 'pending' || team.status === 'rejected'} />
                         )}
                       </div>
                     ))}
@@ -292,8 +291,7 @@ export default function Dashboard() {
             </div>
           )}
         </div>
-        {/* Add Players */}
-        {team && team.status === 'pending' && (
+        {team && (team.status === 'pending' || team.status === 'rejected') && (
           <div className="card">
             <h3 className="font-bold mb-2">➕ Add Players ({players.length}/15)</h3>
             <p className="text-sm text-gray-500 mb-4">Minimum 11 players required to submit.</p>
