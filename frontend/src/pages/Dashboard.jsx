@@ -35,44 +35,6 @@ function NotificationsPanel({ userId }) {
   )
 }
 
-function PlayerRow({ userId }) {
-  const [open, setOpen] = useState(false)
-  const [form, setForm] = useState({ oldPassword: '', newPassword: '', confirm: '' })
-  const [showPass, setShowPass] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    if (form.newPassword !== form.confirm) return toast.error('Passwords do not match')
-    setLoading(true)
-    try {
-      await changePassword(userId, { oldPassword: form.oldPassword, newPassword: form.newPassword })
-      toast.success('Password changed!')
-      setOpen(false)
-      setForm({ oldPassword: '', newPassword: '', confirm: '' })
-    } catch (err) { toast.error(err.response?.data?.message || 'Failed') }
-    setLoading(false)
-  }
-  return (
-    <div className="border-t pt-3 mt-1">
-      <div className="flex justify-between items-center">
-        <p className="text-sm font-medium text-gray-500">🔒 Change Password</p>
-        <button onClick={() => setOpen(!open)} className="text-xs text-primary">{open ? 'Cancel' : 'Change'}</button>
-      </div>
-      {open && (
-        <form onSubmit={handleSubmit} className="mt-4 space-y-3">
-          <div className="relative">
-            <input type={showPass ? 'text' : 'password'} placeholder="Old Password *" value={form.oldPassword} onChange={e => setForm({ ...form, oldPassword: e.target.value })} className="input no-upper pr-12" required />
-            <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-3 top-3 text-gray-400">{showPass ? '🙈' : '👁️'}</button>
-          </div>
-          <input type={showPass ? 'text' : 'password'} placeholder="New Password *" value={form.newPassword} onChange={e => setForm({ ...form, newPassword: e.target.value })} className="input no-upper" required />
-          <input type={showPass ? 'text' : 'password'} placeholder="Confirm New Password *" value={form.confirm} onChange={e => setForm({ ...form, confirm: e.target.value })} className="input no-upper" required />
-          <button type="submit" disabled={loading} className="btn-primary w-full">{loading ? 'Saving...' : 'Change Password'}</button>
-        </form>
-      )}
-    </div>
-  )
-}
-
 function PlayerRow({ p, onEdit }) {
   return (
     <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-xl">
