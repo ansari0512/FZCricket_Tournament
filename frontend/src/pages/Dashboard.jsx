@@ -25,16 +25,33 @@ function PaymentSection({ team, onScreenshotUploaded }) {
 
   return (
     <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-3">
-      <p className="font-bold text-yellow-800 mb-3">💰 Pay Registration Fee: ₹1,100</p>
+      <p className="font-bold text-yellow-800 mb-1">💰 Registration Fee Payment</p>
+      <div className="bg-white rounded-xl p-3 mb-3 text-sm space-y-1">
+        <div className="flex justify-between">
+          <span className="text-gray-600">Registration Fee (Now):</span>
+          <span className="font-bold text-primary">₹300</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-gray-600">Remaining (Match Day Cash):</span>
+          <span className="font-bold text-orange-500">₹800</span>
+        </div>
+        <div className="flex justify-between border-t pt-1">
+          <span className="font-bold">Total:</span>
+          <span className="font-bold">₹1,100</span>
+        </div>
+      </div>
       <div className="bg-white rounded-xl p-4 text-center mb-3 shadow-sm">
         <img
-          src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=shahidansari0512@oksbi%26pn=Shahid%20Ansari%26am=1100%26cu=INR%26tn=FZCricket%20Registration"
+          src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=shahidansari0512@oksbi%26pn=Shahid%20Ansari%26am=300%26cu=INR%26tn=FZCricket%20Registration"
           alt="UPI QR Code"
           className="w-48 h-48 mx-auto"
         />
         <p className="text-sm font-bold mt-2">UPI ID: shahidansari0512@oksbi</p>
-        <p className="text-xs text-gray-500">Scan with any UPI app (GPay, PhonePe, Paytm)</p>
-        <p className="text-sm font-bold text-primary mt-1">Amount: ₹1,100</p>
+        <p className="text-xs text-gray-500">Scan with GPay, PhonePe, Paytm</p>
+        <p className="text-sm font-bold text-primary mt-1">Pay Now: ₹300</p>
+      </div>
+      <div className="bg-orange-50 border border-orange-200 rounded-xl p-3 mb-3 text-xs text-orange-700">
+        ⚠️ Remaining ₹800 will be collected in cash on your first match day.
       </div>
 
       {uploaded ? (
