@@ -29,7 +29,7 @@ router.get('/', async (req, res) => {
 });
 
 // Get all teams for admin
-router.get('/all', async (req, res) => {
+router.get('/all', verifyAdmin, async (req, res) => {
   try {
     const teams = await Team.find().sort({ registrationDate: -1 });
     res.json(teams);

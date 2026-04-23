@@ -5,7 +5,9 @@ const API = axios.create({
 })
 
 API.interceptors.request.use((config) => {
-  const token = localStorage.getItem('fzToken') || localStorage.getItem('adminToken')
+  const adminToken = localStorage.getItem('adminToken')
+  const userToken = localStorage.getItem('fzToken')
+  const token = adminToken || userToken
   if (token) config.headers.Authorization = `Bearer ${token}`
   return config
 })
