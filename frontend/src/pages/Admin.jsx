@@ -2,13 +2,13 @@ import { useState, useEffect } from 'react'
 import { adminLogin, getAdminUsers, deleteAdminUser, resetUserCredentials, getAllTeams, updateTeam, deleteTeam, getTeamPlayers, deletePlayer, getMatches, updateMatchStatus, updateMatchScore, generateSchedule } from '../services/api'
 import toast from 'react-hot-toast'
 
-const TABS = ['Teams', 'Users', 'Matches', 'Schedule', 'Gallery']
+const TABS = ['Users', 'Teams', 'Matches', 'Schedule', 'Gallery']
 
 export default function Admin() {
   const [loggedIn, setLoggedIn] = useState(!!localStorage.getItem('adminToken'))
   const [password, setPassword] = useState('')
   const [showPass, setShowPass] = useState(false)
-  const [activeTab, setActiveTab] = useState('Teams')
+  const [activeTab, setActiveTab] = useState('Users')
   const [teams, setTeams] = useState([])
   const [users, setUsers] = useState([])
   const [matches, setMatches] = useState([])
@@ -142,8 +142,8 @@ export default function Admin() {
         {/* Teams Tab */}
         {activeTab === 'Teams' && (
           <div className="space-y-3">
-            {teams.length === 0 ? <p className="text-center text-gray-400 py-10">No teams yet</p> :
-            teams.map(team => (
+            {teams.filter(t => t.submitted).length === 0 ? <p className="text-center text-gray-400 py-10">No submitted teams yet</p> :
+            teams.filter(t => t.submitted).map(team => (
               <div key={team._id} className="card">
                 <div className="flex justify-between items-start mb-2">
                   <div>

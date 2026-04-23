@@ -19,6 +19,10 @@ const teamSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  submitted: {
+    type: Boolean,
+    default: false
+  },
   captainName: {
     type: String,
     required: true
