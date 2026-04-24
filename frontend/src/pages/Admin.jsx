@@ -68,13 +68,11 @@ function AdminPlayerCard({ player, onDelete }) {
   )
 }
 
-const TABS = ['Users', 'Teams', 'Matches', 'Schedule', 'Gallery']
-
 export default function Admin() {
   const [loggedIn, setLoggedIn] = useState(!!localStorage.getItem('adminToken'))
   const [password, setPassword] = useState('')
   const [showPass, setShowPass] = useState(false)
-  const [activeTab, setActiveTab] = useState('Users')
+  const [activeTab, setActiveTab] = useState('')
   const [teams, setTeams] = useState([])
   const [users, setUsers] = useState([])
   const [matches, setMatches] = useState([])
@@ -98,9 +96,9 @@ export default function Admin() {
     }
   }
 
-  useEffect(() => {
-    if (loggedIn) loadData()
-  }, [loggedIn])
+  useEffect(() => { if (loggedIn) loadData() }, [loggedIn])
+
+  const toggle = (tab) => setActiveTab(activeTab === tab ? '' : tab)
 
   const handleLogin = async (e) => {
     e.preventDefault()
@@ -112,17 +110,13 @@ export default function Admin() {
     } catch { toast.error('Invalid password') }
   }
 
-  const handleApprove = async (id) => {
-    await updateTeam(id, { status: 'approved' }); loadData(); toast.success('Team approved!')
-  }
+  const handleApprove = async (id) => { await updateTeam(id, { status: 'approved' }); loadData(); toast.success('Team approved!') }
   const handleReject = (team) => { setRejectModal(team); setRejectReason('') }
   const confirmReject = async () => {
     await updateTeam(rejectModal._id, { status: 'rejected', rejectReason })
     setRejectModal(null); loadData(); toast.success('Team rejected')
   }
-  const handlePayment = async (id) => {
-    await updateTeam(id, { paymentDone: true }); loadData(); toast.success('Payment confirmed!')
-  }
+  const handlePayment = async (id) => { await updateTeam(id, { paymentDone: true }); loadData(); toast.success('Payment confirmed!') }
   const handleDeleteTeam = async (id) => {
     if (!confirm('Delete this team?')) return
     await deleteTeam(id); loadData(); toast.success('Team deleted')
@@ -142,9 +136,7 @@ export default function Admin() {
     await resetUserCredentials(resetModal._id, resetForm)
     setResetModal(null); loadData(); toast.success('Credentials reset!')
   }
-  const handleMatchStatus = async (id, status) => {
-    await updateMatchStatus(id, { status }); loadData()
-  }
+  const handleMatchStatus = async (id, status) => { await updateMatchStatus(id, { status }); loadData() }
   const handleScoreUpdate = async () => {
     await updateMatchScore(scoreModal._id, { team1Score: { runs: +scoreData.t1runs, wickets: +scoreData.t1wickets }, team2Score: { runs: +scoreData.t2runs, wickets: +scoreData.t2wickets } })
     if (scoreData.winnerId) await updateMatchStatus(scoreModal._id, { status: 'completed', winnerId: scoreData.winnerId })
@@ -186,6 +178,15 @@ export default function Admin() {
     </div>
   )
 
+  const tabBtn = (tab, label) => (
+    <div className="rounded-xl overflow-hidden border border-gray-200">
+      <button onClick={() => toggle(tab)}
+        className={`w-full text-left px-4 py-3 font-medium text-sm flex justify-between items-center transition ${activeTab === tab ? 'cricket-gradient text-white' : 'bg-gray-100 hover:bg-gray-200'}`}>
+        {label} <span>{activeTab === tab ? '▲' : '▼'}</span>
+      </button>
+    </div>
+  )
+
   return (
     <div className="py-6 px-4 pb-20">
       <div className="max-w-6xl mx-auto">
@@ -194,15 +195,160 @@ export default function Admin() {
           <button onClick={() => { localStorage.removeItem('adminToken'); setLoggedIn(false) }} className="text-red-500 font-medium text-sm">Logout</button>
         </div>
 
-        {/* Tabs */}
-        <div className="grid grid-cols-3 gap-2 mb-6">
-          {TABS.map(tab => (
-            <button key={tab} onClick={() => setActiveTab(tab)}
-              className={`px-4 py-2 rounded-xl font-medium text-sm transition ${activeTab === tab ? 'cricket-gradient text-white' : 'bg-gray-100 hover:bg-gray-200'}`}>
-              {tab}
+        <div className="space-y-2">
+
+          {/* Users */}
+          <div className="rounded-xl overflow-hidden border border-gray-200">
+            <button onClick={() => toggle('Users')}
+              className={`w-full text-left px-4 py-3 font-medium text-sm flex justify-between items-center transition ${activeTab === 'Users' ? 'cricket-gradient text-white' : 'bg-gray-100 hover:bg-gray-200'}`}>
+              👥 Users <span>{activeTab === 'Users' ? '▲' : '▼'}</span>
             </button>
-          ))}
-          {activeTab === 'Players' && <button className="px-4 py-2 rounded-xl font-medium text-sm cricket-gradient text-white">Players</button>}
+            {activeTab === 'Users' && (
+              <div className="p-3 space-y-3">
+                {users.length === 0 ? <p className="text-center text-gray-400 py-10">No users yet</p> :
+                users.map(user => (
+                  <div key={user._id} className="card flex justify-between items-center">
+                    <div>
+                      <p className="font-bold">{user.username}</p>
+                      <p className="text-sm text-gray-500">{user.mobile}</p>
+                      <p className="text-xs mt-1">{user.teamId ? <span className="text-green-600">✅ Team Registered</span> : <span className="text-yellow-600">⏳ No Team</span>}</p>
+                    </div>
+                    <div className="flex gap-2">
+                      <button onClick={() => { setResetModal(user); setResetForm({ newUsername: user.username, newPassword: '' }) }} className="text-xs bg-blue-100 text-blue-700 px-3 py-1.5 rounded-lg">Reset</button>
+                      <button onClick={() => handleDeleteUser(user._id)} className="text-xs bg-red-100 text-red-700 px-3 py-1.5 rounded-lg">Delete</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Teams */}
+          <div className="rounded-xl overflow-hidden border border-gray-200">
+            <button onClick={() => toggle('Teams')}
+              className={`w-full text-left px-4 py-3 font-medium text-sm flex justify-between items-center transition ${activeTab === 'Teams' ? 'cricket-gradient text-white' : 'bg-gray-100 hover:bg-gray-200'}`}>
+              🏏 Teams <span>{activeTab === 'Teams' ? '▲' : '▼'}</span>
+            </button>
+            {activeTab === 'Teams' && (
+              <div className="p-3 space-y-3">
+                {teams.length === 0 ? <p className="text-center text-gray-400 py-10">No teams yet</p> :
+                teams.map(team => (
+                  <div key={team._id} className="card">
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <p className="font-bold">{team.teamName}</p>
+                        <p className="text-sm text-gray-500">{team.captainName} • {team.captainPhone}</p>
+                      </div>
+                      <span className={team.status === 'approved' ? 'badge-approved' : team.status === 'rejected' ? 'badge-rejected' : 'badge-pending'}>{team.status}</span>
+                    </div>
+                    <div className="flex flex-wrap gap-2 mt-3">
+                      {team.status === 'pending' && <button onClick={() => handleApprove(team._id)} className="text-xs bg-green-100 text-green-700 px-3 py-1.5 rounded-lg font-medium">✅ Approve</button>}
+                      {team.status === 'pending' && <button onClick={() => handleReject(team)} className="text-xs bg-orange-100 text-orange-700 px-3 py-1.5 rounded-lg font-medium">❌ Reject</button>}
+                      {team.status === 'rejected' && <button onClick={() => handleApprove(team._id)} className="text-xs bg-green-100 text-green-700 px-3 py-1.5 rounded-lg font-medium">✅ Approve</button>}
+                      {team.status === 'approved' && !team.paymentDone && <button onClick={() => handlePayment(team._id)} className="text-xs bg-blue-100 text-blue-700 px-3 py-1.5 rounded-lg font-medium">₹ Confirm Payment</button>}
+                      {team.paymentDone && <span className="text-xs bg-green-100 text-green-700 px-3 py-1.5 rounded-lg font-medium">✅ Paid</span>}
+                      {team.paymentScreenshot && !team.paymentDone && (
+                        <a href={team.paymentScreenshot} target="_blank" rel="noreferrer" className="text-xs bg-purple-100 text-purple-700 px-3 py-1.5 rounded-lg font-medium">📸 View Screenshot</a>
+                      )}
+                      <button onClick={() => loadPlayers(team._id)} className="text-xs bg-purple-100 text-purple-700 px-3 py-1.5 rounded-lg font-medium">👥 Players</button>
+                      <button onClick={() => handleDeleteTeam(team._id)} className="text-xs bg-red-100 text-red-700 px-3 py-1.5 rounded-lg font-medium">🗑️ Delete</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Players */}
+          {activeTab === 'Players' && (
+            <div className="rounded-xl overflow-hidden border border-gray-200">
+              <div className="cricket-gradient text-white px-4 py-3 text-sm font-medium flex justify-between items-center">
+                👤 Players
+                <button onClick={() => setActiveTab('Teams')} className="text-white text-xs">← Back</button>
+              </div>
+              <div className="p-3 space-y-2">
+                {selectedPlayers.length === 0 ? <p className="text-center text-gray-400 py-10">No players</p> :
+                selectedPlayers.map(p => (
+                  <AdminPlayerCard key={p._id} player={p} onDelete={handleDeletePlayer} />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Matches */}
+          <div className="rounded-xl overflow-hidden border border-gray-200">
+            <button onClick={() => toggle('Matches')}
+              className={`w-full text-left px-4 py-3 font-medium text-sm flex justify-between items-center transition ${activeTab === 'Matches' ? 'cricket-gradient text-white' : 'bg-gray-100 hover:bg-gray-200'}`}>
+              🏆 Matches <span>{activeTab === 'Matches' ? '▲' : '▼'}</span>
+            </button>
+            {activeTab === 'Matches' && (
+              <div className="p-3 space-y-3">
+                {matches.length === 0 ? <p className="text-center text-gray-400 py-10">No matches. Generate schedule first.</p> :
+                matches.map(match => (
+                  <div key={match._id} className="card">
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <p className="font-bold">{match.team1?.teamName} vs {match.team2?.teamName}</p>
+                        <p className="text-xs text-gray-500">{match.status} {match.team1Score ? `• ${match.team1Score.runs}/${match.team1Score.wickets} - ${match.team2Score.runs}/${match.team2Score.wickets}` : ''}</p>
+                      </div>
+                      <span className={`text-xs px-2 py-1 rounded-full ${match.status === 'in-progress' ? 'bg-red-100 text-red-700' : match.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>{match.status}</span>
+                    </div>
+                    <div className="flex gap-2 flex-wrap">
+                      {match.status === 'scheduled' && <button onClick={() => handleMatchStatus(match._id, 'in-progress')} className="text-xs bg-blue-100 text-blue-700 px-3 py-1.5 rounded-lg">▶ Start</button>}
+                      {match.status === 'in-progress' && <button onClick={() => { setScoreModal(match); setScoreData({ t1runs: match.team1Score?.runs || '', t1wickets: match.team1Score?.wickets || '', t2runs: match.team2Score?.runs || '', t2wickets: match.team2Score?.wickets || '', winnerId: '' }) }} className="text-xs bg-green-100 text-green-700 px-3 py-1.5 rounded-lg">📊 Update Score</button>}
+                      {match.status === 'in-progress' && <button onClick={() => handleMatchStatus(match._id, 'completed')} className="text-xs bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg">⏹ End</button>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Schedule */}
+          <div className="rounded-xl overflow-hidden border border-gray-200">
+            <button onClick={() => toggle('Schedule')}
+              className={`w-full text-left px-4 py-3 font-medium text-sm flex justify-between items-center transition ${activeTab === 'Schedule' ? 'cricket-gradient text-white' : 'bg-gray-100 hover:bg-gray-200'}`}>
+              📅 Schedule <span>{activeTab === 'Schedule' ? '▲' : '▼'}</span>
+            </button>
+            {activeTab === 'Schedule' && (
+              <div className="p-4">
+                <p className="text-gray-500 text-sm mb-4">Creates round-robin matches for all {teams.filter(t => t.status === 'approved').length} approved teams.</p>
+                <button onClick={handleGenerateSchedule} className="btn-primary">Generate Schedule</button>
+              </div>
+            )}
+          </div>
+
+          {/* Gallery */}
+          <div className="rounded-xl overflow-hidden border border-gray-200">
+            <button onClick={() => toggle('Gallery')}
+              className={`w-full text-left px-4 py-3 font-medium text-sm flex justify-between items-center transition ${activeTab === 'Gallery' ? 'cricket-gradient text-white' : 'bg-gray-100 hover:bg-gray-200'}`}>
+              📸 Gallery <span>{activeTab === 'Gallery' ? '▲' : '▼'}</span>
+            </button>
+            {activeTab === 'Gallery' && (
+              <div className="p-3">
+                <div className="card mb-4">
+                  <h3 className="font-bold mb-3">📸 Upload Photo</h3>
+                  <input type="text" placeholder="Caption (optional)" value={caption} onChange={e => setCaption(e.target.value)} className="input mb-3" />
+                  <label className={`btn-primary w-full text-center cursor-pointer block ${uploading ? 'opacity-50' : ''}`}>
+                    {uploading ? 'Uploading...' : '📤 Choose & Upload'}
+                    <input type="file" accept="image/*" onChange={handleGalleryUpload} disabled={uploading} className="hidden" />
+                  </label>
+                </div>
+                {gallery.length === 0 ? <p className="text-center text-gray-400 py-10">No photos yet</p> : (
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    {gallery.map((p, i) => (
+                      <div key={i} className="relative rounded-2xl overflow-hidden aspect-square shadow">
+                        <img src={p.url} className="w-full h-full object-cover" />
+                        {p.caption && <p className="absolute bottom-0 inset-x-0 bg-black/50 text-white text-xs p-1 text-center">{p.caption}</p>}
+                        <button onClick={() => handleDeleteGallery(i)} className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 text-xs flex items-center justify-center">✕</button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
         </div>
 
         {/* Reject Modal */}
