@@ -16,11 +16,19 @@ A complete cricket tournament management website for village-level tournaments.
 
 ```
 FZCricket_Tournament/
-├── public/
-│   └── index.html      # Frontend (Static Website)
-├── index.js          # Backend Server
-├── models/           # Database Models
+├── frontend/         # React Frontend (Vite + TailwindCSS)
+│   ├── src/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   ├── services/
+│   │   └── context/
+│   ├── package.json
+│   └── vite.config.js
+├── index.js          # Backend Server (Express + Socket.io)
+├── models/           # Database Models (Mongoose)
 ├── routes/           # API Routes
+├── middleware/       # Auth Middleware
+├── src/              # Old/unused frontend copy (can be removed)
 ├── .env              # Environment Variables
 └── package.json      # Dependencies
 ```
@@ -29,14 +37,14 @@ FZCricket_Tournament/
 
 ### Option 1: Frontend Only (GitHub Pages / Netlify)
 
-Upload the `public/` folder contents to any static hosting:
+Upload the `frontend/` folder contents to any static hosting:
 - GitHub Pages
 - Netlify (Recommended)
 - Vercel
 
 ### Option 2: Full Stack Deployment
 
-**Frontend:** Upload `public/index.html` to Netlify/Vercel
+**Frontend:** Upload `frontend/` folder to Netlify/Vercel
 
 **Backend:** Deploy the root folder to:
 - Render.com (Free)
@@ -68,7 +76,7 @@ JWT_SECRET=your_jwt_secret
 
 ## Tech Stack
 
-- Frontend: React + TailwindCSS (via CDN)
+- Frontend: React + TailwindCSS + Vite
 - Backend: Node.js + Express
 - Database: MongoDB
 - Real-time: Socket.io

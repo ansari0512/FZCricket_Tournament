@@ -218,7 +218,7 @@ export default function Dashboard() {
       setLoading(false)
     }
     load()
-  }, [currentUser])
+  }, [currentUser]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleUpdateTeam = async (e) => {
     e.preventDefault()

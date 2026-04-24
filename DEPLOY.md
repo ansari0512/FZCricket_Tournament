@@ -13,26 +13,30 @@
 4. Environment Variables add karein:
    - `MONGODB_URI` = aapka MongoDB Atlas connection string
    - `PORT` = 5000
+   - `ADMIN_SECRET` = koi strong password
+   - `JWT_SECRET` = koi random string
 5. Deploy karein
 
 ### Step 2: Frontend Deploy Karein
 
 **Option A: Netlify (Recommend)**
 1. Netlify.com par jayein
-2. Drag & drop `public` folder upload karein
-3. Website live ho jayegi
+2. `frontend` folder ko upload karein (या GitHub repo connect karein)
+3. Build command: `npm run build`
+4. Publish directory: `dist`
+5. Deploy karein
 
 **Option B: Vercel**
 1. Vercel.com par jayein
-2. Upload public folder
+2. `frontend` folder upload karein
+3. Auto-detect karega Vite settings
 
-### Step 3: API URL Update Karein
+### Step 3: Environment Variables Set Karein
 
-Jab backend deploy ho jaye, to `public/index.html` mein line 52 par:
-```javascript
-const API_URL = 'https://your-backend.onrender.com/api';
+Frontend ke liye `.env` file banayein:
 ```
-isme apni deployed URL daal dein.
+VITE_API_URL=https://your-backend.onrender.com/api
+```
 
 ### Step 4: MongoDB Setup (Free)
 
@@ -40,7 +44,7 @@ isme apni deployed URL daal dein.
 2. Free account create karein
 3. New Cluster create karein
 4. Connection string copy karein
-5. .env file mein daal dein
+5. Backend environment variables mein daal dein
 
 ---
 

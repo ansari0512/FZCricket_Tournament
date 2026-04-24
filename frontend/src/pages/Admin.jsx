@@ -89,16 +89,18 @@ export default function Admin() {
   const [uploading, setUploading] = useState(false)
   const [caption, setCaption] = useState('')
 
-  useEffect(() => {
-    if (loggedIn) loadData()
-  }, [loggedIn])
-
   const loadData = async () => {
     try {
       const [t, u, m] = await Promise.all([getAllTeams(), getAdminUsers(), getMatches()])
       setTeams(t.data); setUsers(u.data); setMatches(m.data)
-    } catch {}
+    } catch (error) {
+      console.error('Failed to load admin data:', error)
+    }
   }
+
+  useEffect(() => {
+    if (loggedIn) loadData()
+  }, [loggedIn])
 
   const handleLogin = async (e) => {
     e.preventDefault()
@@ -183,8 +185,6 @@ export default function Admin() {
       </div>
     </div>
   )
-
-  const allTabs = [...TABS, ...(activeTab === 'Players' ? ['Players'] : [])]
 
   return (
     <div className="py-6 px-4 pb-20">

@@ -197,7 +197,7 @@ export default function Home() {
           <div className="max-w-4xl mx-auto">
             <h2 className="text-2xl font-bold text-center mb-6">📅 Upcoming Matches</h2>
             <div className="space-y-3">
-              {matches.filter(m => m.status === 'scheduled').slice(0, 5).map((match, i) => (
+              {matches.filter(m => m.status === 'scheduled').slice(0, 5).map((match) => (
                 <div key={match._id} className="card flex justify-between items-center">
                   <div>
                     <p className="font-semibold text-sm">{match.team1?.teamName} vs {match.team2?.teamName}</p>

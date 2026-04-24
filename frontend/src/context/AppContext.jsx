@@ -9,19 +9,19 @@ export const AppProvider = ({ children }) => {
   const [loading, setLoading] = useState(true)
   const [currentUser, setCurrentUser] = useState(JSON.parse(localStorage.getItem('fzUser') || 'null'))
 
-  useEffect(() => { fetchData() }, [])
-
   const fetchData = async () => {
     try {
       const [teamsRes, matchesRes] = await Promise.all([getTeams(), getMatches()])
       setTeams(teamsRes.data)
       setMatches(matchesRes.data)
-    } catch (err) {
+    } catch {
       setTeams([]); setMatches([])
     } finally {
       setLoading(false)
     }
   }
+
+  useEffect(() => { fetchData() }, [])
 
   const login = (user, token) => {
     localStorage.setItem('fzUser', JSON.stringify(user))
