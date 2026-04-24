@@ -4,14 +4,21 @@ import { useApp } from '../context/AppContext'
 
 function RulesModal({ onClose }) {
   const rules = [
-    { color: 'green', title: '1. Teams', text: 'Maximum 8 teams. Each team must have minimum 11 players (max 15).' },
-    { color: 'blue', title: '2. Match Format', text: 'Group matches: 8 overs. Final: 10 overs.' },
-    { color: 'yellow', title: '3. Registration Fee', text: '₹1,100 per team. Cash on Arrival.' },
-    { color: 'purple', title: '4. Points System', text: 'Win = 2 pts, Loss = 0 pts, No Result = 1 pt each.' },
-    { color: 'red', title: '5. Fair Play', text: 'Misconduct or argument with umpire = immediate disqualification.' },
-    { color: 'orange', title: '6. Umpire Decision', text: "Umpire's decision is final. No arguments entertained." },
-    { color: 'teal', title: '7. Toss', text: 'Toss before each match. Winner chooses bat or bowl.' },
-    { color: 'indigo', title: '8. Venue', text: 'Village Odajhar, Post Naseerpur, Tahsil Biswan, Sitapur - 261202' },
+    { color: 'green', title: '1. टीमें', text: 'इस टूर्नामेंट में अधिकतम 8 टीमें ही भाग ले सकती हैं।' },
+    { color: 'blue', title: '2. मैच फॉर्मेट', text: 'सभी मैच 8-8 ओवर के होंगे, जबकि सेमीफाइनल और फाइनल 10-10 ओवर के होंगे।' },
+    { color: 'yellow', title: '3. पावर प्ले', text: 'शुरुआती 2 ओवर पावर प्ले होंगे, जिसमें सर्कल के बाहर केवल 2 खिलाड़ी ही फील्डिंग कर सकते हैं।' },
+    { color: 'orange', title: '4. बॉलिंग नियम', text: 'प्रत्येक बॉलर अधिकतम 2 ओवर ही गेंदबाजी कर सकता है। टीम द्वारा दिए गए बॉलर्स ही गेंदबाजी कर सकते हैं।' },
+    { color: 'purple', title: '5. बॉल', text: 'सभी मैच Sixit टेनिस बॉल से खेले जाएंगे।' },
+    { color: 'teal', title: '6. खिलाड़ी पात्रता', text: 'केवल गांव स्तर (Village Level) के खिलाड़ी ही इस टूर्नामेंट में भाग ले सकते हैं।' },
+    { color: 'indigo', title: '7. ग्रुप स्टेज', text: '8 टीमों को 2 ग्रुप (प्रत्येक में 4 टीम) में बांटा जाएगा। हर टीम अपने ग्रुप की अन्य 3 टीमों के साथ एक-एक मैच खेलेगी।' },
+    { color: 'blue', title: '8. सेमीफाइनल', text: 'दोनों ग्रुप की टॉप 2 टीमों के बीच सेमीफाइनल खेला जाएगा।' },
+    { color: 'green', title: '9. फाइनल', text: 'सेमीफाइनल जीतने वाली टीमों के बीच फाइनल मैच होगा।' },
+    { color: 'yellow', title: '10. इनाम', text: 'फाइनल जीतने वाली टीम को ₹7000 और ट्रॉफी, हारने वाली टीम को ₹3000 और ट्रॉफी दी जाएगी।' },
+    { color: 'pink', title: '11. मैन ऑफ द मैच', text: 'प्रत्येक मैच में "मैन ऑफ द मैच" दिया जाएगा।' },
+    { color: 'orange', title: '12. शेड्यूल', text: 'सभी टीमों को निर्धारित तारीख पर ही मैच खेलना होगा। मैच का पूरा शेड्यूल WhatsApp के माध्यम से भेजा जाएगा।' },
+    { color: 'blue', title: '13. लाइव स्कोर', text: 'सभी मैचों का स्कोर लाइव अपडेट किया जाएगा, जिसे वेबसाइट पर देखा जा सकता है।' },
+    { color: 'red', title: '14. अंपायर निर्णय', text: 'अंपायर का फैसला अंतिम होगा, विवाद की स्थिति में टूर्नामेंट कमेटी का निर्णय मान्य होगा।' },
+    { color: 'gray', title: '15. रजिस्ट्रेशन', text: 'सभी नियमों को ध्यान से पढ़कर ही टीम रजिस्टर करें।' },
   ]
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
