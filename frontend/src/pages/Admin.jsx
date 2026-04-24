@@ -208,8 +208,8 @@ export default function Admin() {
         {/* Teams Tab */}
         {activeTab === 'Teams' && (
           <div className="space-y-3">
-            {teams.filter(t => t.submitted).length === 0 ? <p className="text-center text-gray-400 py-10">No submitted teams yet</p> :
-            teams.filter(t => t.submitted).map(team => (
+            {teams.length === 0 ? <p className="text-center text-gray-400 py-10">No teams yet</p> :
+            teams.map(team => (
               <div key={team._id} className="card">
                 <div className="flex justify-between items-start mb-2">
                   <div>

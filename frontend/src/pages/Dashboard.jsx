@@ -262,7 +262,7 @@ export default function Dashboard() {
     if (players.length < 11) return setError('Minimum 11 players required')
     setSubmitting(true)
     try {
-      await updateTeam(currentUser.teamId, { submitted: true })
+      await updateTeam(currentUser.teamId, { status: 'pending' })
       const res = await getTeam(currentUser.teamId)
       setTeam(res.data.team)
       toast.success('Team submitted for review!')
