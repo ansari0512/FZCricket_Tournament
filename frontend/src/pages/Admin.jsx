@@ -4,7 +4,7 @@ import toast from 'react-hot-toast'
 
 const ROLE_LABELS = { batsman: '🏏 Batsman', bowler: '🎯 Bowler', 'all-rounder': '⭐ All-Rounder', 'wicket-keeper': '🧤 Wicket Keeper' }
 
-function PlayerModal({ player, onClose }) {
+function PlayerModal({ player, onClose, onPrev, onNext }) {
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={onClose}>
       <div className="bg-white rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl" onClick={e => e.stopPropagation()}>
@@ -15,6 +15,8 @@ function PlayerModal({ player, onClose }) {
             <div className="w-full h-72 bg-gray-200 flex items-center justify-center text-6xl font-bold text-gray-400">{player.name?.charAt(0)}</div>
           )}
           <button onClick={onClose} className="absolute top-3 right-3 bg-black/50 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">✕</button>
+          <button onClick={(e) => { e.stopPropagation(); onPrev() }} className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 text-white w-9 h-9 rounded-full flex items-center justify-center text-xl">‹</button>
+          <button onClick={(e) => { e.stopPropagation(); onNext() }} className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 text-white w-9 h-9 rounded-full flex items-center justify-center text-xl">›</button>
           <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
             <p className="text-white font-bold text-xl">{player.name}</p>
             <p className="text-gray-300 text-sm">#{player.jerseyNumber}</p>
@@ -41,20 +43,19 @@ function PlayerModal({ player, onClose }) {
   )
 }
 
-function AdminPlayerCard({ player, onDelete }) {
-  const [showModal, setShowModal] = useState(false)
+function AdminPlayerCard({ player, onDelete, onPreview }) {
   return (
     <>
       <div className="card">
         <div className="flex items-center gap-3">
-          <div onClick={() => setShowModal(true)} className="cursor-pointer flex-shrink-0">
+          <div onClick={() => onPreview()} className="cursor-pointer flex-shrink-0">
             {player.photo ? (
               <img src={player.photo} className="w-16 h-20 object-contain bg-gray-100 rounded-lg" alt={player.name} />
             ) : (
               <div className="w-16 h-20 bg-gray-200 rounded-lg flex items-center justify-center text-xl font-bold text-gray-400">{player.name?.charAt(0)}</div>
             )}
           </div>
-          <div className="flex-1" onClick={() => setShowModal(true)}>
+          <div className="flex-1" onClick={() => onPreview()}>
             <p className="font-bold cursor-pointer hover:text-primary">{player.name}</p>
             <p className="text-sm text-primary">{ROLE_LABELS[player.role] || player.role}</p>
             <p className="text-xs text-gray-500">Jersey #{player.jerseyNumber}</p>
@@ -63,7 +64,6 @@ function AdminPlayerCard({ player, onDelete }) {
           <button onClick={() => onDelete(player._id)} className="text-red-500 text-sm bg-red-50 px-3 py-1.5 rounded-lg flex-shrink-0">Delete</button>
         </div>
       </div>
-      {showModal && <PlayerModal player={player} onClose={() => setShowModal(false)} />}
     </>
   )
 }
@@ -86,6 +86,7 @@ export default function Admin() {
   const [gallery, setGallery] = useState(JSON.parse(localStorage.getItem('fzGallery') || '[]'))
   const [uploading, setUploading] = useState(false)
   const [caption, setCaption] = useState('')
+  const [previewIndex, setPreviewIndex] = useState(null)
 
   const loadData = async () => {
     try {
@@ -263,16 +264,25 @@ export default function Admin() {
           {activeTab === 'Players' && (
             <div className="rounded-xl overflow-hidden border border-gray-200">
               <div className="cricket-gradient text-white px-4 py-3 text-sm font-medium flex justify-between items-center">
-                👤 Players
+                👤 Players ({selectedPlayers.length})
                 <button onClick={() => setActiveTab('Teams')} className="text-white text-xs">← Back</button>
               </div>
               <div className="p-3 space-y-2">
                 {selectedPlayers.length === 0 ? <p className="text-center text-gray-400 py-10">No players</p> :
-                selectedPlayers.map(p => (
-                  <AdminPlayerCard key={p._id} player={p} onDelete={handleDeletePlayer} />
+                selectedPlayers.map((p, i) => (
+                  <AdminPlayerCard key={p._id} player={p} onDelete={handleDeletePlayer}
+                    onPreview={() => setPreviewIndex(i)} />
                 ))}
               </div>
             </div>
+          )}
+          {previewIndex !== null && selectedPlayers[previewIndex] && (
+            <PlayerModal
+              player={selectedPlayers[previewIndex]}
+              onClose={() => setPreviewIndex(null)}
+              onPrev={() => setPreviewIndex((previewIndex - 1 + selectedPlayers.length) % selectedPlayers.length)}
+              onNext={() => setPreviewIndex((previewIndex + 1) % selectedPlayers.length)}
+            />
           )}
 
           {/* Matches */}
