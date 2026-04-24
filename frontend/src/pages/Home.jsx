@@ -79,7 +79,7 @@ export default function Home() {
           </div>
         </div>
         <div className="absolute inset-0 opacity-5 text-[150px] md:text-[200px] flex items-center justify-center select-none">🏏</div>
-        <div className="max-w-4xl mx-auto text-center relative py-14">
+        <div className="max-w-4xl mx-auto text-center relative pt-6 pb-14">
           <h1 className="text-3xl md:text-5xl font-bold mb-2">Firoz Shah Cricket Tournament</h1>
           <p className="text-yellow-300 font-semibold mb-1">📍 Village Odajhar, Post Naseerpur</p>
           <p className="text-gray-400 text-sm mb-1">Tahsil Biswan, Sitapur - 261202</p>
