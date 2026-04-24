@@ -12,8 +12,8 @@ API.interceptors.request.use((config) => {
   return config
 })
 
-export const CLOUDINARY_CLOUD = 'dujdkhzyk'
-export const CLOUDINARY_PRESET = 'ml_default'
+export const CLOUDINARY_CLOUD = import.meta.env.VITE_CLOUDINARY_CLOUD || ''
+export const CLOUDINARY_PRESET = import.meta.env.VITE_CLOUDINARY_PRESET || ''
 
 export const uploadImage = async (file) => {
   const fd = new FormData()
