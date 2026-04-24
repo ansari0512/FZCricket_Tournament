@@ -31,11 +31,14 @@ export default function Navbar() {
 
         <div className="flex items-center gap-2">
           {currentUser ? (
-            <Link to="/dashboard" className="text-sm bg-yellow-400 text-gray-900 font-bold px-3 py-1.5 rounded-full">
-              👤 {currentUser.username}
-            </Link>
+            <>
+              <Link to="/dashboard" className="text-sm bg-yellow-400 text-gray-900 font-bold px-3 py-1.5 rounded-full">
+                👤 {currentUser.username}
+              </Link>
+              <Link to="/admin" className="text-sm bg-white/20 px-3 py-1.5 rounded-lg">Admin</Link>
+            </>
           ) : (
-            <Link to="/login" className="text-sm bg-white/20 px-3 py-1.5 rounded-lg">Login</Link>
+            <Link to="/login" className="text-sm bg-white/20 px-3 py-1.5 rounded-lg">User Login</Link>
           )}
         </div>
       </div>
