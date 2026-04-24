@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
+import './App.css'
 import { AppProvider } from './context/AppContext'
 import Navbar from './components/Navbar'
 import BottomNav from './components/BottomNav'
