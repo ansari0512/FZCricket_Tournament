@@ -20,7 +20,7 @@
   border: 2px solid #fff;
   text-shadow: 0 0 4px rgba(255,215,0,0.8);
   box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-  animation: marquee-bounce 6s linear infinite, blink-banner 1s step-end infinite;
+  animation: marquee-bounce 6s linear infinite;
 }
 
 @keyframes marquee-bounce {
@@ -29,7 +29,3 @@
   100% { transform: translateX(60vw); }
 }
 
-@keyframes blink-banner {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0; }
-}
