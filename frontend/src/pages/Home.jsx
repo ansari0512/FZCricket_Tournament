@@ -112,6 +112,7 @@ export default function Home() {
             <button onClick={() => setShowRules(true)} className="bg-yellow-400 hover:bg-yellow-300 text-gray-900 font-bold py-3 px-8 rounded-full text-lg transition transform hover:scale-105 shadow-lg">
               📋 Tournament Rules
             </button>
+          </div>
         </div>
       </section>
 
