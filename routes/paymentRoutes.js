@@ -1,20 +1,22 @@
 const express = require('express');
 const router = express.Router();
 const crypto = require('crypto');
-const Razorpay = require('razorpay');
 const Payment = require('../models/Payment');
 const { verifyAdmin } = require('../middleware/auth');
 
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID,
-  key_secret: process.env.RAZORPAY_KEY_SECRET
-});
+let razorpay = null;
+if (process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET) {
+  const Razorpay = require('razorpay');
+  razorpay = new Razorpay({
+    key_id: process.env.RAZORPAY_KEY_ID,
+    key_secret: process.env.RAZORPAY_KEY_SECRET
+  });
+}
 
 router.post('/create-order', async (req, res) => {
   try {
+    if (!razorpay) return res.status(503).json({ message: 'Payment service not configured' });
     const { amount } = req.body;
-    if (!amount || amount <= 0)
-      return res.status(400).json({ message: 'Valid amount required hai' });
 
     const options = {
       amount: amount * 100,
@@ -30,6 +32,7 @@ router.post('/create-order', async (req, res) => {
 
 router.post('/verify', async (req, res) => {
   try {
+    if (!razorpay) return res.status(503).json({ message: 'Payment service not configured' });
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature, teamId } = req.body;
 
     if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature || !teamId)
