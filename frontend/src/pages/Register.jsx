@@ -70,11 +70,16 @@ export default function Register() {
       <div className="w-full max-w-md">
 <div className="card shadow-xl">
            <div className="text-center mb-4">
-             <div className="mt-4 overflow-hidden rounded-full bg-black/10 py-2 mx-4">
-               <div className="marquee-banner inline-flex items-center justify-center whitespace-nowrap rounded-full bg-yellow-400 text-gray-900 font-bold px-6 py-2 text-sm">
-                 Team Registration Date : 10 Apr 2026 to 20 Apr 2026
-               </div>
-             </div>
+<div className="mt-4 overflow-hidden rounded-full bg-black/10 py-2 mx-4">
+                <div className="inline-flex animate-[marquee-slide_12s_linear_infinite] whitespace-nowrap">
+                  <div className="marquee-banner inline-flex items-center justify-center whitespace-nowrap rounded-full bg-yellow-400 text-gray-900 font-bold px-8 py-2 text-sm animate-[glow-blink_1.4s_step-end_infinite] min-w-max">
+                    Team Registration Date : 10 Apr 2026 to 20 Apr 2026
+                  </div>
+                  <div className="marquee-banner inline-flex items-center justify-center whitespace-nowrap rounded-full bg-yellow-400 text-gray-900 font-bold px-8 py-2 text-sm animate-[glow-blink_1.4s_step-end_infinite] min-w-max">
+                    Team Registration Date : 10 Apr 2026 to 20 Apr 2026
+                  </div>
+                </div>
+              </div>
            </div>
            <div className="text-center mb-6">
              <span className="text-5xl">🏏</span>
