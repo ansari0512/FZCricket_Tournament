@@ -68,6 +68,11 @@
     padding: 32px 20px 24px;
     gap: 18px;
   }
+  
+  @media (max-width: 768px) {
+    padding: 20px 15px 15px;
+    gap: 15px;
+  }
 }
 
 #next-steps {
@@ -163,17 +168,58 @@
 
 .marquee-banner {
   display: inline-block;
-  animation: marquee-slide 12s linear infinite, blink 1.4s step-end infinite;
+  animation: marquee-slide 12s linear infinite, glow-blink 1.4s step-end infinite;
+  white-space: nowrap;
+  font-size: 14px;
+  font-weight: 900;
+  text-shadow: 0 0 10px rgba(255, 255, 0, 0.8), 0 0 20px rgba(255, 255, 0, 0.6), 0 0 30px rgba(255, 215, 0, 0.4);
+  letter-spacing: 0.5px;
 }
 
 @keyframes marquee-slide {
-  0% { transform: translateX(100%); }
+  0% { transform: translateX(100vw); }
   100% { transform: translateX(-100%); }
 }
 
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.2; }
+@keyframes glow-blink {
+  0%, 100% { 
+    opacity: 1; 
+    text-shadow: 0 0 10px rgba(255, 255, 0, 0.8), 0 0 20px rgba(255, 255, 0, 0.6), 0 0 30px rgba(255, 215, 0, 0.4);
+  }
+  50% { 
+    opacity: 0.7; 
+    text-shadow: 0 0 5px rgba(255, 255, 0, 0.5), 0 0 10px rgba(255, 255, 0, 0.3), 0 0 15px rgba(255, 215, 0, 0.2);
+  }
+}
+
+@media (max-width: 768px) {
+  .marquee-banner {
+    font-size: 13px;
+    padding: 0 10px;
+    white-space: nowrap;
+    text-shadow: 0 0 8px rgba(255, 255, 0, 0.9), 0 0 15px rgba(255, 255, 0, 0.7), 0 0 25px rgba(255, 215, 0, 0.5);
+    animation: marquee-slide 10s linear infinite, glow-blink 1.4s step-end infinite;
+  }
+  
+  .marquee-banner br {
+    display: none;
+  }
+  
+  @keyframes marquee-slide {
+    0% { transform: translateX(100vw); }
+    100% { transform: translateX(-100%); }
+  }
+  
+  @keyframes glow-blink {
+    0%, 100% { 
+      opacity: 1; 
+      text-shadow: 0 0 8px rgba(255, 255, 0, 0.9), 0 0 15px rgba(255, 255, 0, 0.7), 0 0 25px rgba(255, 215, 0, 0.5);
+    }
+    50% { 
+      opacity: 0.7; 
+      text-shadow: 0 0 4px rgba(255, 255, 0, 0.6), 0 0 8px rgba(255, 255, 0, 0.4), 0 0 12px rgba(255, 215, 0, 0.3);
+    }
+  }
 }
 
 .ticks {
