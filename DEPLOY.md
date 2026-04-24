@@ -51,5 +51,5 @@ VITE_API_URL=https://your-backend.onrender.com/api
 **Ab aapki website live ho jayegi!**
 
 Admin Login:
-- URL: yourwebsite.com → Admin button
-- Password: fzadmin2026
+- URL: yourwebsite.com/admin
+- Password: Jo tumne Render.com ke ADMIN_SECRET mein set kiya hai
