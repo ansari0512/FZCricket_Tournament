@@ -73,14 +73,14 @@ export default function Home() {
 
       {/* Hero */}
       <section className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white px-4 relative overflow-hidden">
-        <div className="marquee-container py-2 border-b border-white/10">
-          <div className="marquee-banner">
-            Team Registration Date : 10 Apr 2026 to 20 Apr 2026
-          </div>
-        </div>
         <div className="absolute inset-0 opacity-5 text-[150px] md:text-[200px] flex items-center justify-center select-none">🏏</div>
         <div className="max-w-4xl mx-auto text-center relative pt-6 pb-14">
-          <h1 className="text-3xl md:text-5xl font-bold mb-2">Firoz Shah Cricket Tournament</h1>
+          <h1 className="text-3xl md:text-5xl font-bold mb-4">Firoz Shah Cricket Tournament</h1>
+          <div className="marquee-container py-2 mb-4">
+            <div className="marquee-banner">
+              Team Registration Date : 10 Apr 2026 to 20 Apr 2026
+            </div>
+          </div>
           <p className="text-yellow-300 font-semibold mb-1">📍 Village Odajhar, Post Naseerpur</p>
           <p className="text-gray-400 text-sm mb-1">Tahsil Biswan, Sitapur - 261202</p>
           <p className="text-green-400 font-bold mt-2">🗓️ Tournament Start: 21 April 2026</p>
