@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+
 export default function Contact() {
   const info = [
     { icon: '👤', label: 'Contact Person', value: 'Shahid Ansari' },
@@ -20,6 +22,9 @@ export default function Contact() {
               </div>
             </div>
           ))}
+        </div>
+        <div className="text-center mt-8">
+          <Link to="/admin" className="text-xs text-gray-400 hover:text-gray-600">🔐 Admin Panel</Link>
         </div>
       </div>
     </div>
