@@ -1,19 +1,27 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 import './App.css'
+import { lazy, Suspense } from 'react'
 import { AppProvider, useApp } from './context/AppContext'
 import Navbar from './components/Navbar'
 import BottomNav from './components/BottomNav'
-import Home from './pages/Home'
-import Login from './pages/Login'
-import RegisterAccount from './pages/RegisterAccount'
-import Register from './pages/Register'
-import Teams from './pages/Teams'
-import Schedule from './pages/Schedule'
-import Results from './pages/Results'
-import Contact from './pages/Contact'
-import Dashboard from './pages/Dashboard'
-import Admin from './pages/Admin'
+
+const Home = lazy(() => import('./pages/Home'))
+const Login = lazy(() => import('./pages/Login'))
+const RegisterAccount = lazy(() => import('./pages/RegisterAccount'))
+const Register = lazy(() => import('./pages/Register'))
+const Teams = lazy(() => import('./pages/Teams'))
+const Schedule = lazy(() => import('./pages/Schedule'))
+const Results = lazy(() => import('./pages/Results'))
+const Contact = lazy(() => import('./pages/Contact'))
+const Dashboard = lazy(() => import('./pages/Dashboard'))
+const Admin = lazy(() => import('./pages/Admin'))
+
+const PageLoader = () => (
+  <div className="flex justify-center py-20">
+    <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+  </div>
+)
 
 function AppContent() {
   const { loading } = useApp()
@@ -31,7 +39,8 @@ function AppContent() {
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <Navbar />
       <main className="flex-1">
-        <Routes>
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register-account" element={<RegisterAccount />} />
@@ -51,6 +60,7 @@ function AppContent() {
             </div>
           } />
         </Routes>
+        </Suspense>
       </main>
       <BottomNav />
     </div>
