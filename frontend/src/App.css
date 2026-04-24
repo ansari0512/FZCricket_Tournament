@@ -161,6 +161,21 @@
   }
 }
 
+.marquee-banner {
+  display: inline-block;
+  animation: marquee-slide 12s linear infinite, blink 1.4s step-end infinite;
+}
+
+@keyframes marquee-slide {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.2; }
+}
+
 .ticks {
   position: relative;
   width: 100%;
