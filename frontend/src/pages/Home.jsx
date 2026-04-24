@@ -72,8 +72,8 @@ export default function Home() {
       <section className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white py-14 px-4 relative overflow-hidden">
         <div className="absolute inset-0 opacity-5 text-[150px] md:text-[200px] flex items-center justify-center select-none">🏏</div>
         <div className="max-w-4xl mx-auto text-center relative">
-<div className="mt-4 overflow-hidden rounded-full bg-black/10 py-2">
-            <div className="marquee-container inline-flex whitespace-nowrap">
+<div className="mt-4 overflow-hidden bg-black/20 py-2 rounded-lg">
+            <div className="marquee-container">
               <div className="marquee-banner">
                 Team Registration Date : 10 Apr 2026 to 20 Apr 2026
               </div>
