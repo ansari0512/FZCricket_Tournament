@@ -68,12 +68,19 @@ export default function Register() {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-16">
       <div className="w-full max-w-md">
-        <div className="card shadow-xl">
-          <div className="text-center mb-6">
-            <span className="text-5xl">🏏</span>
-            <h2 className="text-2xl font-bold mt-3">Team Registration</h2>
-            <p className="text-gray-500 text-sm mt-1">Registration Fee: <span className="font-bold text-primary">₹1,100 (Cash on Arrival)</span></p>
-          </div>
+<div className="card shadow-xl">
+           <div className="text-center mb-4">
+             <div className="mt-4 overflow-hidden rounded-full bg-black/10 py-2 mx-4">
+               <div className="marquee-banner inline-flex items-center justify-center whitespace-nowrap rounded-full bg-yellow-400 text-gray-900 font-bold px-6 py-2 text-sm">
+                 Team Registration Date : 10 Apr 2026 to 20 Apr 2026
+               </div>
+             </div>
+           </div>
+           <div className="text-center mb-6">
+             <span className="text-5xl">🏏</span>
+             <h2 className="text-2xl font-bold mt-3">Team Registration</h2>
+             <p className="text-gray-500 text-sm mt-1">Registration Fee: <span className="font-bold text-primary">₹1,100 (Cash on Arrival)</span></p>
+           </div>
           <form onSubmit={handleSubmit} className="space-y-4">
             <input type="text" placeholder="Team Name *" value={form.teamName}
               onChange={e => setForm({ ...form, teamName: e.target.value })} className="input" required />
