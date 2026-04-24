@@ -61,6 +61,7 @@ function GallerySlider({ photos }) {
 export default function Home() {
   const { teams, matches, loading, registrationOpen } = useApp()
   const [showRules, setShowRules] = useState(false)
+  const [showRegRules, setShowRegRules] = useState(false)
   const [gallery, setGallery] = useState([])
   const liveMatch = matches.find(m => m.status === 'in-progress')
 
@@ -77,6 +78,40 @@ export default function Home() {
   return (
     <div className="pb-20">
       {showRules && <RulesModal onClose={() => setShowRules(false)} />}
+      {showRegRules && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-lg max-h-[80vh] overflow-y-auto">
+            <div className="cricket-gradient text-white p-5 rounded-t-2xl flex justify-between items-center">
+              <h3 className="text-xl font-bold">📝 टीम रजिस्ट्रेशन के नियम</h3>
+              <button onClick={() => setShowRegRules(false)} className="text-2xl font-bold">✕</button>
+            </div>
+            <div className="p-5 space-y-3 text-sm">
+              {[
+                'इस टूर्नामेंट में भाग लेने के लिए टीम को वेबसाइट पर जाकर रजिस्टर करना अनिवार्य है।',
+                'टीम रजिस्टर करने के लिए पहले यूजर आईडी और पासवर्ड बनाना होगा।',
+                'यूजर आईडी बनाने के 24 घंटे के अंदर टीम को रजिस्टर करना अनिवार्य है, अन्यथा आईडी हटा दी जाएगी।',
+                'टीम रजिस्टर करते समय सभी जानकारी सही-सही भरनी होगी, गलत जानकारी पर टीम रिजेक्ट कर दी जाएगी।',
+                'प्रत्येक टीम में कुल 15 खिलाड़ियों को रजिस्टर करना अनिवार्य है और उन्हीं खिलाड़ियों को खेलने की अनुमति होगी।',
+                'टीम में 8 खिलाड़ी एक ही गांव के और अधिकतम 3 खिलाड़ी अन्य गांव के हो सकते हैं।',
+                'टीम को अपने सभी बॉलर्स की जानकारी रजिस्ट्रेशन के समय ही देनी होगी।',
+                'टीम का रजिस्ट्रेशन पहले कमेटी द्वारा चेक किया जाएगा, उसके बाद ही अप्रूवल मिलेगा।',
+                'अप्रूवल मिलने के बाद ₹300 रजिस्ट्रेशन फीस जमा करना अनिवार्य है।',
+                'मैच शुरू होने से पहले बाकी ₹800 एंट्री फीस जमा करनी होगी।',
+                'रजिस्ट्रेशन फीस किसी भी स्थिति में वापस नहीं की जाएगी।',
+                'टीम रजिस्टर करने के बाद 24 घंटे में लॉगिन करके स्टेटस चेक किया जा सकता है।',
+                'यदि टीम रिजेक्ट होती है तो कारण देखकर दोबारा सही जानकारी के साथ रजिस्टर किया जा सकता है।',
+                'एक बार टीम रजिस्टर होने के बाद री-एंट्री की अनुमति नहीं होगी।',
+                'टीम रजिस्टर करते समय मैच की तारीख चुन सकते हैं, कमेटी उसी अनुसार मैच कराने की कोशिश करेगी।',
+              ].map((rule, i) => (
+                <div key={i} className="flex gap-3 p-3 bg-blue-50 border-l-4 border-blue-500 rounded">
+                  <span className="font-bold text-blue-700 flex-shrink-0">{i + 1}.</span>
+                  <p className="text-gray-700">{rule}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Hero */}
       <section className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white px-4 relative overflow-hidden">
@@ -117,7 +152,10 @@ export default function Home() {
               </div>
             )}
             <button onClick={() => setShowRules(true)} className="bg-yellow-400 hover:bg-yellow-300 text-gray-900 font-bold py-3 px-8 rounded-full text-lg transition transform hover:scale-105 shadow-lg">
-              📋 Tournament Rules
+              📋 टूर्नामेंट नियम
+            </button>
+            <button onClick={() => setShowRegRules(true)} className="bg-blue-400 hover:bg-blue-300 text-gray-900 font-bold py-3 px-8 rounded-full text-lg transition transform hover:scale-105 shadow-lg">
+              📝 रजिस्ट्रेशन नियम
             </button>
           </div>
         </div>
