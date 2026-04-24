@@ -5,7 +5,7 @@ import { getTeamPlayers } from '../services/api'
 const COLORS = ['from-green-500', 'from-blue-500', 'from-purple-500', 'from-orange-500', 'from-pink-500', 'from-indigo-500', 'from-teal-500', 'from-red-500']
 const ROLE_LABELS = { batsman: '🏏 Batsman', bowler: '🎯 Bowler', 'all-rounder': '⭐ All-Rounder', 'wicket-keeper': '🧤 Wicket Keeper' }
 
-function PlayerModal({ player, onClose }) {
+function PlayerModal({ player, onClose, onPrev, onNext }) {
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={onClose}>
       <div className="bg-white rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl" onClick={e => e.stopPropagation()}>
@@ -18,6 +18,8 @@ function PlayerModal({ player, onClose }) {
             </div>
           )}
           <button onClick={onClose} className="absolute top-3 right-3 bg-black/50 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">✕</button>
+          <button onClick={e => { e.stopPropagation(); onPrev() }} className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 text-white w-9 h-9 rounded-full flex items-center justify-center text-xl">‹</button>
+          <button onClick={e => { e.stopPropagation(); onNext() }} className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 text-white w-9 h-9 rounded-full flex items-center justify-center text-xl">›</button>
           <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
             <p className="text-white font-bold text-xl">{player.name}</p>
             <p className="text-gray-300 text-sm">#{player.jerseyNumber}</p>
@@ -26,25 +28,16 @@ function PlayerModal({ player, onClose }) {
         <div className="p-5 space-y-3">
           <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
             <span className="text-2xl">🎽</span>
-            <div>
-              <p className="text-xs text-gray-500">Role</p>
-              <p className="font-bold">{ROLE_LABELS[player.role] || player.role}</p>
-            </div>
+            <div><p className="text-xs text-gray-500">Role</p><p className="font-bold">{ROLE_LABELS[player.role] || player.role}</p></div>
           </div>
           <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
             <span className="text-2xl">🔢</span>
-            <div>
-              <p className="text-xs text-gray-500">Jersey Number</p>
-              <p className="font-bold">#{player.jerseyNumber}</p>
-            </div>
+            <div><p className="text-xs text-gray-500">Jersey Number</p><p className="font-bold">#{player.jerseyNumber}</p></div>
           </div>
           {player.address && (
             <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
               <span className="text-2xl">📍</span>
-              <div>
-                <p className="text-xs text-gray-500">Address</p>
-                <p className="font-bold">{player.address}</p>
-              </div>
+              <div><p className="text-xs text-gray-500">Address</p><p className="font-bold">{player.address}</p></div>
             </div>
           )}
         </div>
@@ -53,39 +46,11 @@ function PlayerModal({ player, onClose }) {
   )
 }
 
-function PlayerCard({ player }) {
-  const [showModal, setShowModal] = useState(false)
-
-  return (
-    <>
-      <div
-        onClick={() => setShowModal(true)}
-        className="flex items-center gap-3 p-2 bg-gray-50 hover:bg-gray-100 rounded-xl cursor-pointer transition"
-      >
-        {player.photo ? (
-          <img src={player.photo} className="w-16 h-20 object-cover rounded-lg flex-shrink-0" alt={player.name} />
-        ) : (
-          <div className="w-16 h-20 bg-gray-200 rounded-lg flex items-center justify-center text-xl font-bold text-gray-400 flex-shrink-0">
-            {player.name?.charAt(0)}
-          </div>
-        )}
-        <div className="flex-1 min-w-0">
-          <p className="font-bold text-sm truncate">{player.name}</p>
-          <p className="text-xs text-primary font-medium">{ROLE_LABELS[player.role] || player.role}</p>
-          <p className="text-xs text-gray-400">Jersey #{player.jerseyNumber}</p>
-          {player.address && <p className="text-xs text-gray-400 truncate">📍 {player.address}</p>}
-        </div>
-        <span className="text-gray-300 text-lg flex-shrink-0">›</span>
-      </div>
-      {showModal && <PlayerModal player={player} onClose={() => setShowModal(false)} />}
-    </>
-  )
-}
-
 function TeamCard({ team, index }) {
   const [showPlayers, setShowPlayers] = useState(false)
   const [players, setPlayers] = useState([])
   const [loadingPlayers, setLoadingPlayers] = useState(false)
+  const [previewIndex, setPreviewIndex] = useState(null)
 
   const togglePlayers = async () => {
     if (!showPlayers && !players.length) {
@@ -129,13 +94,40 @@ function TeamCard({ team, index }) {
       </div>
 
       <button onClick={togglePlayers} className="w-full mt-4 bg-gray-50 hover:bg-gray-100 py-2 rounded-xl text-sm font-medium transition">
-        {loadingPlayers ? 'Loading...' : showPlayers ? 'Hide Players ▲' : `View Players ▼`}
+        {loadingPlayers ? 'Loading...' : showPlayers ? 'Hide Players ▲' : 'View Players ▼'}
       </button>
 
       {showPlayers && players.length > 0 && (
         <div className="mt-3 space-y-2">
-          {players.map(p => <PlayerCard key={p._id} player={p} />)}
+          {players.map((p, i) => (
+            <div key={p._id} onClick={() => setPreviewIndex(i)}
+              className="flex items-center gap-3 p-2 bg-gray-50 hover:bg-gray-100 rounded-xl cursor-pointer transition">
+              {p.photo ? (
+                <img src={p.photo} className="w-16 h-20 object-cover rounded-lg flex-shrink-0" alt={p.name} />
+              ) : (
+                <div className="w-16 h-20 bg-gray-200 rounded-lg flex items-center justify-center text-xl font-bold text-gray-400 flex-shrink-0">
+                  {p.name?.charAt(0)}
+                </div>
+              )}
+              <div className="flex-1 min-w-0">
+                <p className="font-bold text-sm truncate">{p.name}</p>
+                <p className="text-xs text-primary font-medium">{ROLE_LABELS[p.role] || p.role}</p>
+                <p className="text-xs text-gray-400">Jersey #{p.jerseyNumber}</p>
+                {p.address && <p className="text-xs text-gray-400 truncate">📍 {p.address}</p>}
+              </div>
+              <span className="text-gray-300 text-lg flex-shrink-0">›</span>
+            </div>
+          ))}
         </div>
+      )}
+
+      {previewIndex !== null && players[previewIndex] && (
+        <PlayerModal
+          player={players[previewIndex]}
+          onClose={() => setPreviewIndex(null)}
+          onPrev={() => setPreviewIndex((previewIndex - 1 + players.length) % players.length)}
+          onNext={() => setPreviewIndex((previewIndex + 1) % players.length)}
+        />
       )}
     </div>
   )
