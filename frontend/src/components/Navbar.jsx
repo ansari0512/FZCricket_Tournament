@@ -37,7 +37,6 @@ export default function Navbar() {
           ) : (
             <Link to="/login" className="text-sm bg-white/20 px-3 py-1.5 rounded-lg">Login</Link>
           )}
-          <Link to="/admin" className="text-sm bg-white/20 px-3 py-1.5 rounded-lg">Admin</Link>
         </div>
       </div>
     </nav>
