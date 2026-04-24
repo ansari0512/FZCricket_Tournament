@@ -11,15 +11,19 @@ dotenv.config();
 const app = express();
 const server = http.createServer(app);
 
+const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(',')
+  : ['https://fzcricket-tournament.netlify.app', 'https://fz-cricket-tournament.vercel.app', 'http://localhost:5173'];
+
 const io = socketIo(server, {
   cors: {
-    origin: "*",
+    origin: ALLOWED_ORIGINS,
     methods: ["GET", "POST"]
   }
 });
 
 app.use(cors({
-  origin: ['https://fzcricket-tournament.netlify.app', 'https://fz-cricket-tournament.vercel.app', 'http://localhost:5000'],
+  origin: ALLOWED_ORIGINS,
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 }));

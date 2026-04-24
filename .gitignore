@@ -1,8 +1,12 @@
 node_modules/
 .env
+.env.local
 .DS_Store
 *.log
 dist/
 build/
 frontend/node_modules/
 frontend/dist/
+frontend/.env
+frontend/.env.local
+uploads/
