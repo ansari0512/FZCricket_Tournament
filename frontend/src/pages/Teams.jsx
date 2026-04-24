@@ -90,9 +90,14 @@ function TeamCard({ team, index }) {
   const togglePlayers = async () => {
     if (!showPlayers && !players.length) {
       setLoadingPlayers(true)
-      const res = await getTeamPlayers(team._id)
-      setPlayers(res.data)
-      setLoadingPlayers(false)
+      try {
+        const res = await getTeamPlayers(team._id)
+        setPlayers(res.data)
+      } catch {
+        setPlayers([])
+      } finally {
+        setLoadingPlayers(false)
+      }
     }
     setShowPlayers(!showPlayers)
   }

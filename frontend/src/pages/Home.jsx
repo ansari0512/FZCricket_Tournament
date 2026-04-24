@@ -1,8 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
-
-const GALLERY = JSON.parse(localStorage.getItem('fzGallery') || '[]')
 
 function RulesModal({ onClose }) {
   const rules = [
@@ -56,7 +54,12 @@ function GallerySlider({ photos }) {
 export default function Home() {
   const { teams, matches, loading, registrationOpen } = useApp()
   const [showRules, setShowRules] = useState(false)
+  const [gallery, setGallery] = useState([])
   const liveMatch = matches.find(m => m.status === 'in-progress')
+
+  useEffect(() => {
+    setGallery(JSON.parse(localStorage.getItem('fzGallery') || '[]'))
+  }, [])
 
   if (loading) return (
     <div className="flex items-center justify-center min-h-screen">
@@ -161,11 +164,11 @@ export default function Home() {
       </section>
 
       {/* Gallery */}
-      {GALLERY.length > 0 && (
+      {gallery.length > 0 && (
         <section className="bg-gray-50 py-10 px-4">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-2xl font-bold text-center mb-6">📸 Photo Gallery</h2>
-            <GallerySlider photos={GALLERY} />
+            <GallerySlider photos={gallery} />
           </div>
         </section>
       )}
