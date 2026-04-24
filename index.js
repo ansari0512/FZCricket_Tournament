@@ -31,9 +31,17 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/fz_cricket')
+if (!process.env.MONGODB_URI) {
+  console.error('MONGODB_URI environment variable is not set');
+  process.exit(1);
+}
+
+mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('MongoDB connected successfully'))
-  .catch(err => console.log('MongoDB connection error:', err));
+  .catch(err => {
+    console.error('MongoDB connection error:', err);
+    process.exit(1);
+  });
 
 app.use('/api/teams', require('./routes/teamRoutes'));
 app.use('/api/matches', require('./routes/matchRoutes'));
@@ -41,7 +49,6 @@ app.use('/api/players', require('./routes/playerRoutes'));
 app.use('/api/scores', require('./routes/scoreRoutes'));
 app.use('/api/payments', require('./routes/paymentRoutes'));
 app.use('/api/auth', require('./routes/authRoutes'));
-require('./models/User');
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'FZCricket API is running' });
@@ -64,7 +71,6 @@ io.on('connection', (socket) => {
 
   socket.on('scoreUpdate', (data) => {
     io.to(`match-${data.matchId}`).emit('scoreUpdate', data);
-    io.emit('scoreUpdate', data);
   });
 
   socket.on('matchStatusChange', (data) => {
