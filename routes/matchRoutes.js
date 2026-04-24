@@ -75,12 +75,18 @@ router.post('/create', verifyAdmin, async (req, res) => {
   try {
     const { team1Id, team2Id, matchDate, matchType, overs, venue } = req.body;
 
+    if (!team1Id || !team2Id || !matchDate || !matchType)
+      return res.status(400).json({ message: 'team1Id, team2Id, matchDate aur matchType required hain' });
+    if (team1Id === team2Id)
+      return res.status(400).json({ message: 'Team1 aur Team2 alag honi chahiye' });
+    const validTypes = ['group', 'semi-final', 'final'];
+    if (!validTypes.includes(matchType))
+      return res.status(400).json({ message: 'matchType group, semi-final ya final hona chahiye' });
+
     const team1 = await Team.findById(team1Id);
     const team2 = await Team.findById(team2Id);
-
-    if (!team1 || !team2) {
+    if (!team1 || !team2)
       return res.status(404).json({ message: 'Team not found' });
-    }
 
     const matchCount = await Match.countDocuments() + 1;
     const match = new Match({

@@ -11,6 +11,21 @@ router.post('/register/:teamId', verifyUser, async (req, res) => {
     const { teamId } = req.params;
     const { name, age, jerseyNumber, role, phone, photo, address } = req.body;
 
+    if (!name || !jerseyNumber || !role)
+      return res.status(400).json({ message: 'name, jerseyNumber aur role required hain' });
+    if (name.trim().length < 2 || name.trim().length > 50)
+      return res.status(400).json({ message: 'Player name 2 se 50 characters ke beech hona chahiye' });
+    const ageNum = Number(age);
+    if (isNaN(ageNum) || ageNum < 10 || ageNum > 60)
+      return res.status(400).json({ message: 'Age 10 se 60 ke beech hona chahiye' });
+    const jerseyNum = Number(jerseyNumber);
+    if (isNaN(jerseyNum) || jerseyNum < 1 || jerseyNum > 99)
+      return res.status(400).json({ message: 'Jersey number 1 se 99 ke beech hona chahiye' });
+    const validRoles = ['batsman', 'bowler', 'all-rounder', 'wicket-keeper'];
+    if (!validRoles.includes(role))
+      return res.status(400).json({ message: 'Role batsman, bowler, all-rounder ya wicket-keeper hona chahiye' });
+    if (phone && !/^[0-9]{10}$/.test(phone))
+      return res.status(400).json({ message: 'Phone 10 digit ka hona chahiye' });
     const team = await Team.findById(teamId);
     if (!team) return res.status(404).json({ message: 'Team not found' });
 
@@ -62,11 +77,13 @@ router.delete('/:id', verifyAdmin, async (req, res) => {
   }
 });
 
-router.post('/bulk-register/:teamId', async (req, res) => {
+router.post('/bulk-register/:teamId', verifyUser, async (req, res) => {
   try {
     const { teamId } = req.params;
     const { players } = req.body;
 
+    if (!Array.isArray(players) || players.length === 0)
+      return res.status(400).json({ message: 'Players array required hai' });
     const team = await Team.findById(teamId);
     if (!team) {
       return res.status(404).json({ message: 'Team not found' });

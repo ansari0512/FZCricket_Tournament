@@ -66,7 +66,17 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ message: 'Registration is closed. All 8 teams have registered.' });
 
     const { teamName, captainName, captainPhone, city, userId } = req.body;
-    const existingTeam = await Team.findOne({ teamName });
+
+    if (!teamName || !captainName || !captainPhone || !city)
+      return res.status(400).json({ message: 'teamName, captainName, captainPhone aur city required hain' });
+    if (teamName.trim().length < 3 || teamName.trim().length > 50)
+      return res.status(400).json({ message: 'Team name 3 se 50 characters ke beech hona chahiye' });
+    if (captainName.trim().length < 3 || captainName.trim().length > 50)
+      return res.status(400).json({ message: 'Captain name 3 se 50 characters ke beech hona chahiye' });
+    if (!/^[0-9]{10}$/.test(captainPhone))
+      return res.status(400).json({ message: 'Captain phone 10 digit ka hona chahiye' });
+
+    const existingTeam = await Team.findOne({ teamName: teamName.trim() });
     if (existingTeam)
       return res.status(400).json({ message: 'Team name already exists' });
 

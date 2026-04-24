@@ -14,6 +14,12 @@ router.post('/register', async (req, res) => {
     const { mobile, username, password } = req.body;
     if (!mobile || !username || !password)
       return res.status(400).json({ message: 'All fields required' });
+    if (!/^[0-9]{10}$/.test(mobile))
+      return res.status(400).json({ message: 'Mobile 10 digit ka hona chahiye' });
+    if (username.trim().length < 3 || username.trim().length > 30)
+      return res.status(400).json({ message: 'Username 3 se 30 characters ke beech hona chahiye' });
+    if (password.length < 6)
+      return res.status(400).json({ message: 'Password kam se kam 6 characters ka hona chahiye' });
 
     const existing = await User.findOne({ $or: [{ mobile }, { username }] });
     if (existing)
