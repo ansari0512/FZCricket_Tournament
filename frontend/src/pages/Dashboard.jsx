@@ -3,7 +3,46 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 import { getNotifications, markNotificationsRead, getTeam, getTeamPlayers, registerPlayer, updatePlayer, updateTeam, changePassword } from '../services/api'
 import { uploadImage } from '../services/api'
-import toast from 'react-hot-toast'
+const ROLE_LABELS = { batsman: '🏏 Batsman', bowler: '🎯 Bowler', 'all-rounder': '⭐ All-Rounder', 'wicket-keeper': '🧤 Wicket Keeper' }
+
+function PlayerModal({ player, onClose, onPrev, onNext }) {
+  return (
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={onClose}>
+      <div className="bg-white rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl" onClick={e => e.stopPropagation()}>
+        <div className="relative bg-gray-900">
+          {player.photo ? (
+            <img src={player.photo} className="w-full h-72 object-contain" alt={player.name} />
+          ) : (
+            <div className="w-full h-72 bg-gray-200 flex items-center justify-center text-6xl font-bold text-gray-400">{player.name?.charAt(0)}</div>
+          )}
+          <button onClick={onClose} className="absolute top-3 right-3 bg-black/50 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">✕</button>
+          <button onClick={e => { e.stopPropagation(); onPrev() }} className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 text-white w-9 h-9 rounded-full flex items-center justify-center text-xl">‹</button>
+          <button onClick={e => { e.stopPropagation(); onNext() }} className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 text-white w-9 h-9 rounded-full flex items-center justify-center text-xl">›</button>
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
+            <p className="text-white font-bold text-xl">{player.name}</p>
+            <p className="text-gray-300 text-sm">#{player.jerseyNumber}</p>
+          </div>
+        </div>
+        <div className="p-5 space-y-3">
+          <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
+            <span className="text-2xl">🎽</span>
+            <div><p className="text-xs text-gray-500">Role</p><p className="font-bold">{ROLE_LABELS[player.role] || player.role}</p></div>
+          </div>
+          <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
+            <span className="text-2xl">🔢</span>
+            <div><p className="text-xs text-gray-500">Jersey Number</p><p className="font-bold">#{player.jerseyNumber}</p></div>
+          </div>
+          {player.address && (
+            <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
+              <span className="text-2xl">📍</span>
+              <div><p className="text-xs text-gray-500">Address</p><p className="font-bold">{player.address}</p></div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
 
 function PaymentSection({ team, onScreenshotUploaded }) {
   const [uploading, setUploading] = useState(false)
@@ -140,15 +179,24 @@ function NotificationsPanel({ userId }) {
   )
 }
 
-function PlayerRow({ p, onEdit, canEdit }) {
+function PlayerRow({ p, onPreview, onEdit, canEdit }) {
   return (
-    <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-xl">
-      {p.photo ? <img src={p.photo} className="w-10 h-10 rounded-full object-cover flex-shrink-0" /> : <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-xs font-bold flex-shrink-0">{p.jerseyNumber}</div>}
-      <span className="text-xs text-gray-400 font-bold w-5">#{p.jerseyNumber}</span>
-      <span className="font-medium text-sm flex-1 truncate">{p.name}</span>
-      <span className="text-xs bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded">{p.role === 'all-rounder' ? 'AR' : p.role === 'wicket-keeper' ? 'WK' : p.role === 'batsman' ? 'Bat' : 'Bowl'}</span>
-      <span className="text-xs text-gray-400 w-20 truncate hidden sm:block">{p.address}</span>
-      {canEdit && <button onClick={() => onEdit(p)} className="text-primary text-xs font-medium">Edit</button>}
+    <div className="flex items-center gap-3 p-2 bg-gray-50 hover:bg-gray-100 rounded-xl cursor-pointer transition" onClick={() => onPreview()}>
+      {p.photo ? (
+        <img src={p.photo} className="w-16 h-20 object-cover rounded-lg flex-shrink-0" alt={p.name} />
+      ) : (
+        <div className="w-16 h-20 bg-gray-200 rounded-lg flex items-center justify-center text-xl font-bold text-gray-400 flex-shrink-0">{p.jerseyNumber}</div>
+      )}
+      <div className="flex-1 min-w-0">
+        <p className="font-bold text-sm truncate">{p.name}</p>
+        <p className="text-xs text-primary font-medium">{ROLE_LABELS[p.role] || p.role}</p>
+        <p className="text-xs text-gray-400">Jersey #{p.jerseyNumber}</p>
+        {p.address && <p className="text-xs text-gray-400 truncate">📍 {p.address}</p>}
+      </div>
+      <div className="flex flex-col items-end gap-2 flex-shrink-0">
+        {canEdit && <button onClick={e => { e.stopPropagation(); onEdit(p) }} className="text-primary text-xs font-medium">Edit</button>}
+        <span className="text-gray-300 text-lg">›</span>
+      </div>
     </div>
   )
 }
@@ -205,6 +253,7 @@ export default function Dashboard() {
   const [uploading, setUploading] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
+  const [previewIndex, setPreviewIndex] = useState(null)
 
   useEffect(() => {
     if (!currentUser) { navigate('/login'); return }
@@ -339,7 +388,7 @@ export default function Dashboard() {
                 <div className="mt-4 border-t pt-4">
                   <p className="font-bold text-sm mb-3">Players ({players.length}/15)</p>
                   <div className="space-y-2">
-                    {players.map(p => (
+                    {players.map((p, i) => (
                       <div key={p._id}>
                         {editingPlayer?._id === p._id ? (
                           <EditPlayerForm
@@ -348,11 +397,19 @@ export default function Dashboard() {
                             onCancel={() => setEditingPlayer(null)}
                           />
                         ) : (
-                          <PlayerRow p={p} onEdit={setEditingPlayer} canEdit={canEdit} />
+                          <PlayerRow p={p} onPreview={() => setPreviewIndex(i)} onEdit={setEditingPlayer} canEdit={canEdit} />
                         )}
                       </div>
                     ))}
                   </div>
+                  {previewIndex !== null && players[previewIndex] && (
+                    <PlayerModal
+                      player={players[previewIndex]}
+                      onClose={() => setPreviewIndex(null)}
+                      onPrev={() => setPreviewIndex((previewIndex - 1 + players.length) % players.length)}
+                      onNext={() => setPreviewIndex((previewIndex + 1) % players.length)}
+                    />
+                  )}
                 </div>
               )}
             </div>
