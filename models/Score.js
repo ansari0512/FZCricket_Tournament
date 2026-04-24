@@ -32,7 +32,7 @@ const scoreSchema = new mongoose.Schema({
   },
   wicketType: {
     type: String,
-    enum: ['bowled', 'caught', 'lbw', 'stumped', 'run-out'],
+    enum: ['bowled', 'caught', 'lbw', 'stumped', 'run-out', null],
     default: null
   },
   timestamp: {

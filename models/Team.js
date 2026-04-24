@@ -19,10 +19,6 @@ const teamSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
-  submitted: {
-    type: Boolean,
-    default: false
-  },
   paymentScreenshot: {
     type: String,
     default: ''
@@ -51,14 +47,7 @@ const teamSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
-  paymentStatus: {
-    type: Boolean,
-    default: false
-  },
-  paymentId: {
-    type: String,
-    default: ''
-  },
+
   status: {
     type: String,
     enum: ['pending', 'approved', 'rejected'],
