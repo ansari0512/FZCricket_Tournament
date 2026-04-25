@@ -46,13 +46,24 @@ function PlayerModal({ player, onClose, onPrev, onNext }) {
   )
 }
 
-function PaymentSection({ team, onScreenshotUploaded }) {
+function PaymentSection({ team, onScreenshotUploaded, onPaymentConfirmed }) {
   const [uploading, setUploading] = useState(false)
   const [uploaded, setUploaded] = useState(!!team.paymentScreenshot)
+  const [copied, setCopied] = useState('')
 
-  const openUPI = (upiId) => {
-    const url = `upi://pay?pa=${upiId}&pn=FZCricket&am=300&cu=INR&tn=FZCricket Registration`
+  const openUPI = (upiId, app) => {
+    const url = `upi://pay?pa=${upiId}&pn=FZCricket&am=300&cu=INR&tn=FZCricket%20Registration`
+    // Mobile pe app open karo
     window.location.href = url
+    // Fallback: 2 sec baad agar app nahi khula toh UPI ID copy karo
+    setTimeout(() => {}, 2000)
+  }
+
+  const copyUPI = (upiId) => {
+    navigator.clipboard.writeText(upiId)
+    setCopied(upiId)
+    setTimeout(() => setCopied(''), 2000)
+    toast.success('UPI ID copy ho gayi!')
   }
 
   const handleUpload = async (e) => {
@@ -67,6 +78,17 @@ function PaymentSection({ team, onScreenshotUploaded }) {
       toast.success('Screenshot upload ho gaya! Admin confirm karega।')
     } catch { toast.error('Upload failed') }
     setUploading(false)
+  }
+
+  // Agar paymentDone ho gaya toh yeh section hide karo
+  if (team.paymentDone) {
+    return (
+      <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-3 text-center">
+        <p className="text-3xl mb-2">✅</p>
+        <p className="text-green-700 font-bold">Payment Confirm Ho Gayi!</p>
+        <p className="text-sm text-gray-500 mt-1">Aapki team officially registered hai।</p>
+      </div>
+    )
   }
 
   return (
@@ -88,33 +110,50 @@ function PaymentSection({ team, onScreenshotUploaded }) {
         </div>
       </div>
 
-      <p className="text-sm font-medium text-gray-700 mb-2">Payment app se pay karo (₹300):</p>
+      <p className="text-sm font-medium text-gray-700 mb-2">App se pay karo (₹300) — Mobile pe click karo:</p>
       <div className="grid grid-cols-3 gap-2 mb-3">
-        <button onClick={() => openUPI('shahidansari0512@oksbi')}
-          className="bg-green-500 text-white font-bold py-2 px-3 rounded-xl text-xs flex flex-col items-center gap-1">
-          <span className="text-lg">G</span> GPay
+        <button onClick={() => openUPI('shahidansari0512@oksbi', 'gpay')}
+          className="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-2 rounded-xl text-xs flex flex-col items-center gap-1 transition">
+          <span className="text-xl">📱</span> GPay
         </button>
-        <button onClick={() => openUPI('8127021765@ybl')}
-          className="bg-purple-600 text-white font-bold py-2 px-3 rounded-xl text-xs flex flex-col items-center gap-1">
-          <span className="text-lg">P</span> PhonePe
+        <button onClick={() => openUPI('8127021765@ybl', 'phonepe')}
+          className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-2 rounded-xl text-xs flex flex-col items-center gap-1 transition">
+          <span className="text-xl">📱</span> PhonePe
         </button>
-        <button onClick={() => openUPI('8127021765@ptaxis')}
-          className="bg-blue-500 text-white font-bold py-2 px-3 rounded-xl text-xs flex flex-col items-center gap-1">
-          <span className="text-lg">P</span> Paytm
+        <button onClick={() => openUPI('8127021765@ptaxis', 'paytm')}
+          className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-2 rounded-xl text-xs flex flex-col items-center gap-1 transition">
+          <span className="text-xl">📱</span> Paytm
         </button>
       </div>
 
-      <div className="bg-gray-50 rounded-xl p-3 mb-3 text-xs text-gray-600">
-        <p className="font-bold mb-1">UPI IDs:</p>
-        <p>GPay: shahidansari0512@oksbi</p>
-        <p>PhonePe: 8127021765@ybl</p>
-        <p>Paytm: 8127021765@ptaxis</p>
+      <p className="text-xs text-gray-500 mb-2">Ya UPI ID copy karke manually pay karo:</p>
+      <div className="space-y-2 mb-3">
+        {[
+          { label: 'GPay', id: 'shahidansari0512@oksbi' },
+          { label: 'PhonePe', id: '8127021765@ybl' },
+          { label: 'Paytm', id: '8127021765@ptaxis' },
+        ].map(({ label, id }) => (
+          <div key={id} className="flex items-center justify-between bg-white rounded-xl px-3 py-2 border">
+            <div>
+              <p className="text-xs text-gray-500">{label}</p>
+              <p className="text-sm font-medium">{id}</p>
+            </div>
+            <button onClick={() => copyUPI(id)}
+              className={`text-xs px-3 py-1.5 rounded-lg font-medium transition ${copied === id ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
+              {copied === id ? '✅ Copied!' : '📋 Copy'}
+            </button>
+          </div>
+        ))}
       </div>
 
       {uploaded ? (
         <div className="bg-green-50 border border-green-200 rounded-xl p-3 text-center">
           <p className="text-green-700 font-bold text-sm">✅ Screenshot upload ho gaya!</p>
           <p className="text-xs text-gray-500 mt-1">Admin confirm karne ka wait karo...</p>
+          <label className="mt-2 text-xs text-primary cursor-pointer block">
+            Dobara upload karo
+            <input type="file" accept="image/*" onChange={handleUpload} className="hidden" />
+          </label>
         </div>
       ) : (
         <div>
@@ -387,14 +426,15 @@ export default function Dashboard() {
               )}
 
               {/* Payment section */}
-              {team.status === 'approved' && !team.paymentDone && (
-                <PaymentSection team={team} onScreenshotUploaded={(url) => setTeam({ ...team, paymentScreenshot: url })} />
-              )}
-
-              {team.status === 'approved' && team.paymentDone && (
-                <div className="bg-green-50 border border-green-200 rounded-xl p-3 mb-3 text-center">
-                  <p className="text-green-700 font-bold">✅ Payment Confirmed! Team officially registered hai।</p>
-                </div>
+              {team.status === 'approved' && (
+                <PaymentSection
+                  team={team}
+                  onScreenshotUploaded={(url) => setTeam({ ...team, paymentScreenshot: url })}
+                  onPaymentConfirmed={() => {
+                    getTeam(currentUser.teamId).then(r => setTeam(r.data.team))
+                    setNotifRefresh(n => n + 1)
+                  }}
+                />
               )}
 
               {/* Players list */}
