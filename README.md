@@ -1,16 +1,16 @@
 # 🏏 FZCricket Tournament Website
 
-A complete cricket tournament management website for village-level tournaments.
+Village level cricket tournament management website.
 
 ## Features
 
 - Team Registration (8 teams, 15 players each)
-- Player Registration with role selection
+- Player Registration with photo upload
 - Tournament Schedule Generator
 - Live Match Score Updates
 - Leaderboard & Results
 - Mobile-Friendly Design
-- Admin Panel for score updates
+- Admin Panel
 
 ## Project Structure
 
@@ -28,28 +28,16 @@ FZCricket_Tournament/
 ├── models/           # Database Models (Mongoose)
 ├── routes/           # API Routes
 ├── middleware/       # Auth Middleware
-├── src/              # Old/unused frontend copy (can be removed)
 ├── .env              # Environment Variables
 └── package.json      # Dependencies
 ```
 
-## Deployment Guide
+## Deployment
 
-### Option 1: Frontend Only (GitHub Pages / Netlify)
-
-Upload the `frontend/` folder contents to any static hosting:
-- GitHub Pages
-- Netlify (Recommended)
-- Vercel
-
-### Option 2: Full Stack Deployment
-
-**Frontend:** Upload `frontend/` folder to Netlify/Vercel
-
-**Backend:** Deploy the root folder to:
-- Render.com (Free)
-- Railway.app
-- Heroku
+- **Frontend:** Vercel
+- **Backend:** Render.com
+- **Database:** MongoDB Atlas
+- **Images:** Cloudinary
 
 ## Environment Variables (.env)
 
@@ -58,6 +46,7 @@ MONGODB_URI=your_mongodb_connection_string
 PORT=5000
 ADMIN_SECRET=your_admin_password
 JWT_SECRET=your_jwt_secret
+ALLOWED_ORIGINS=https://fz-cricket-tournament.vercel.app
 ```
 
 ## API Endpoints
@@ -68,11 +57,7 @@ JWT_SECRET=your_jwt_secret
 - `POST /api/matches/create` - Create match
 - `POST /api/players/register/:teamId` - Add players
 - `POST /api/auth/admin/login` - Admin login
-
-## Admin Credentials
-
-- Username: admin
-- Password: Set in Render.com Environment Variables
+- `GET /api/gallery` - Get gallery photos
 
 ## Tech Stack
 
@@ -80,6 +65,7 @@ JWT_SECRET=your_jwt_secret
 - Backend: Node.js + Express
 - Database: MongoDB
 - Real-time: Socket.io
+- Images: Cloudinary
 
 ## License
 
