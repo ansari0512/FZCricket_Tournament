@@ -15,6 +15,7 @@ API.interceptors.request.use((config) => {
 export const CLOUDINARY_CLOUD = import.meta.env.VITE_CLOUDINARY_CLOUD || ''
 export const CLOUDINARY_PRESET = import.meta.env.VITE_CLOUDINARY_PRESET || ''
 export const CLOUDINARY_PLAYERS_PRESET = import.meta.env.VITE_CLOUDINARY_PLAYERS_PRESET || ''
+export const CLOUDINARY_PAYMENTS_PRESET = import.meta.env.VITE_CLOUDINARY_PAYMENTS_PRESET || 'fzcricket_payments'
 
 export const uploadImage = async (file, folder = null) => {
   const fd = new FormData()
@@ -36,8 +37,7 @@ export const uploadGalleryImage = async (file) => {
 export const uploadPaymentScreenshot = async (file) => {
   const fd = new FormData()
   fd.append('file', file)
-  fd.append('upload_preset', CLOUDINARY_PLAYERS_PRESET)
-  fd.append('folder', 'fzcricket/payments')
+  fd.append('upload_preset', CLOUDINARY_PAYMENTS_PRESET)
   const res = await axios.post(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, fd)
   return res.data.secure_url
 }
