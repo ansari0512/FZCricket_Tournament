@@ -6,7 +6,7 @@ const { verifyUser, verifyAdmin } = require('../middleware/auth');
 
 const MAX_PLAYERS = 15;
 
-router.post('/register/:teamId', verifyUser, async (req, res) => {
+router.post('/register/:teamId', async (req, res) => {
   try {
     const { teamId } = req.params;
     const { name, age, jerseyNumber, role, phone, photo, address } = req.body;
@@ -59,7 +59,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-router.put('/:id', verifyUser, async (req, res) => {
+router.put('/:id', async (req, res) => {
   try {
     const player = await Player.findByIdAndUpdate(req.params.id, req.body, { new: true });
     res.json(player);
@@ -77,7 +77,7 @@ router.delete('/:id', verifyAdmin, async (req, res) => {
   }
 });
 
-router.post('/bulk-register/:teamId', verifyUser, async (req, res) => {
+router.post('/bulk-register/:teamId', async (req, res) => {
   try {
     const { teamId } = req.params;
     const { players } = req.body;

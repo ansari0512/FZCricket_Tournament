@@ -100,22 +100,23 @@ router.post('/register', async (req, res) => {
   }
 });
 
-router.put('/:id', verifyUser, async (req, res) => {
+router.put('/:id', async (req, res) => {
   try {
     const { status, rejectReason, paymentDone } = req.body;
     const team = await Team.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!team) return res.status(404).json({ message: 'Team not found' });
 
     // Send notification to user
     if (team.userId) {
       let msg = '', type = 'info';
       if (status === 'approved') {
-        msg = `🎉 Congratulations! Your team "${team.teamName}" has been approved! Please pay the registration fee of ₹1100 to confirm your spot.`;
+        msg = `🎉 Congratulations! Aapki team "${team.teamName}" approve ho gayi! ₹300 registration fee pay karein।`;
         type = 'success';
       } else if (status === 'rejected') {
-        msg = `❌ Your team "${team.teamName}" has been rejected. Reason: ${rejectReason || 'Not specified'}`;
+        msg = `❌ Aapki team "${team.teamName}" reject ho gayi। Karan: ${rejectReason || 'Not specified'}`;
         type = 'error';
       } else if (paymentDone) {
-        msg = `✅ Payment confirmed! Your team "${team.teamName}" is now officially registered in the tournament.`;
+        msg = `✅ Payment confirm ho gayi! Aapki team "${team.teamName}" officially registered hai।`;
         type = 'success';
       }
       if (msg) {
