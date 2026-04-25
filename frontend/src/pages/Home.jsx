@@ -201,7 +201,7 @@ export default function Home() {
           <h2 className="text-2xl font-bold text-center mb-6">💰 Entry Fee & Prize Money</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {[
-              { icon: '🎟️', title: 'Entry Fee', amount: '₹1,100', sub: 'Cash on Arrival', bg: 'from-pink-500 to-rose-500' },
+              { icon: '🎟️', title: 'Entry Fee', amount: '₹1,100', sub: '', bg: 'from-green-400 to-green-600' },
               { icon: '🏆', title: 'Winner Prize', amount: '₹7,000', sub: '1st Place', bg: 'from-yellow-400 to-orange-400' },
               { icon: '🥈', title: 'Runner-up', amount: '₹3,000', sub: '2nd Place', bg: 'from-purple-500 to-indigo-500' },
             ].map((p, i) => (
@@ -209,7 +209,7 @@ export default function Home() {
                 <p className="text-4xl mb-2">{p.icon}</p>
                 <p className="font-bold text-lg">{p.title}</p>
                 <p className="text-4xl font-bold mt-2">{p.amount}</p>
-                <p className="text-sm mt-2 bg-white/20 rounded-full px-3 py-1 inline-block">{p.sub}</p>
+                {p.sub && <p className="text-sm mt-2 bg-white/20 rounded-full px-3 py-1 inline-block">{p.sub}</p>}
               </div>
             ))}
           </div>
