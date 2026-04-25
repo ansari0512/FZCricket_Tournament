@@ -24,9 +24,9 @@ const PageLoader = () => (
 )
 
 function AppContent() {
-  const { loading } = useApp()
+  const { loading, authLoading } = useApp()
 
-  if (loading) return (
+  if (loading || authLoading) return (
     <div className="fixed inset-0 bg-gray-900 flex flex-col items-center justify-center z-50">
       <span className="text-6xl mb-4">🏏</span>
       <p className="text-white text-xl font-bold mb-6">FZ Cricket Tournament</p>

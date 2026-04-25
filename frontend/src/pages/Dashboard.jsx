@@ -331,17 +331,19 @@ export default function Dashboard() {
 
         {/* Profile */}
         <div className="card">
-          <div className="flex justify-between items-center mb-1">
-            <div>
-              <h2 className="text-xl font-bold">👋 {currentUser.username}</h2>
-              <p className="text-gray-500 text-sm">{currentUser.mobile}</p>
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-3">
+              {currentUser.photo && <img src={currentUser.photo} className="w-10 h-10 rounded-full" alt="profile" />}
+              <div>
+                <h2 className="text-xl font-bold">👋 {currentUser.name || currentUser.email}</h2>
+                <p className="text-gray-500 text-sm">{currentUser.email}</p>
+              </div>
             </div>
             <button onClick={logout} className="text-red-500 font-medium text-sm">Logout</button>
           </div>
-          <ChangePasswordPanel userId={currentUser._id} />
         </div>
 
-        <NotificationsPanel userId={currentUser._id} />
+        <NotificationsPanel />
 
         {/* My Team */}
         <div className="card">
