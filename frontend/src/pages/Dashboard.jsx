@@ -129,11 +129,12 @@ function PaymentSection({ team, onScreenshotUploaded }) {
   )
 }
 
-function NotificationsPanel() {
+function NotificationsPanel({ onRefresh }) {
   const [notifs, setNotifs] = useState([])
-  useEffect(() => {
-    getNotifications().then(r => setNotifs(r.data)).catch(() => {})
-  }, [])
+  const load = () => getNotifications().then(r => setNotifs(r.data)).catch(() => {})
+  useEffect(() => { load() }, [])
+  // Parent se refresh trigger hone pe reload karo
+  useEffect(() => { if (onRefresh) load() }, [onRefresh])
   const unread = notifs.filter(n => !n.read).length
   const markRead = async () => {
     await markNotificationsRead()
@@ -234,11 +235,11 @@ export default function Dashboard() {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [previewIndex, setPreviewIndex] = useState(null)
+  const [notifRefresh, setNotifRefresh] = useState(0)
 
   useEffect(() => {
     if (!currentUser) { navigate('/login'); return }
     const load = async () => {
-      // teamId currentUser se ya location state se lo
       const teamId = currentUser.teamId || location.state?.teamId
       if (teamId) {
         try {
@@ -246,8 +247,14 @@ export default function Dashboard() {
           setTeam(teamRes.data.team)
           setEditTeamData({ teamName: teamRes.data.team.teamName, captainName: teamRes.data.team.captainName, captainPhone: teamRes.data.team.captainPhone, city: teamRes.data.team.city })
           setPlayers(playersRes.data)
+          setNotifRefresh(n => n + 1)
+          // localStorage mein fresh user data save karo
+          const savedUser = localStorage.getItem('fzUser')
+          if (savedUser) {
+            const parsed = JSON.parse(savedUser)
+            localStorage.setItem('fzUser', JSON.stringify({ ...parsed, teamId }))
+          }
         } catch {
-          // Agar fail ho toh refreshUser try karo
           await refreshUser()
         }
       } else {
@@ -335,7 +342,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <NotificationsPanel />
+        <NotificationsPanel onRefresh={notifRefresh} />
 
         {/* My Team */}
         <div className="card">
