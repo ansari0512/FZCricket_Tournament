@@ -80,7 +80,7 @@ router.post('/register', async (req, res) => {
     if (existingTeam)
       return res.status(400).json({ message: 'Team name already exists' });
 
-    const team = new Team({ teamName, captainName, captainPhone, city, userId: userId || null, status: 'pending', players: [] });
+    const team = new Team({ teamName, captainName, captainPhone, city, userId: userId || null, status: 'pending' });
     await team.save();
 
     if (userId) {
