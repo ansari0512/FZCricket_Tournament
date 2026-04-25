@@ -13,7 +13,7 @@ const server = http.createServer(app);
 
 const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(',')
-  : ['https://fzcricket-tournament.netlify.app', 'https://fz-cricket-tournament.vercel.app', 'http://localhost:5173'];
+  : ['https://fz-cricket-tournament.vercel.app', 'http://localhost:5173'];
 
 const io = socketIo(server, {
   cors: {

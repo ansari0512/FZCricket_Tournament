@@ -2,53 +2,45 @@
 
 ## FZ Cricket Tournament Website Ko Live Kaise Karein
 
-### Step 1: Backend Deploy Karein (Free)
+### Step 1: Backend Deploy Karein (Render.com)
 
-1. **Render.com** par jayein (free service hai)
+1. **Render.com** par jayein
 2. New Web Service create karein
-3. Ye details dein:
-   - Name: fz-cricket-backend
-   - Build Command: (empty)
-   - Start Command: node index.js
-4. Environment Variables add karein:
-   - `MONGODB_URI` = aapka MongoDB Atlas connection string
+3. GitHub repo connect karein
+4. Ye details dein:
+   - Build Command: `npm install`
+   - Start Command: `node index.js`
+5. Environment Variables add karein:
+   - `MONGODB_URI` = MongoDB Atlas connection string
    - `PORT` = 5000
-   - `ADMIN_SECRET` = koi strong password
-   - `JWT_SECRET` = koi random string
-5. Deploy karein
+   - `ADMIN_SECRET` = strong password
+   - `JWT_SECRET` = random string
+   - `ALLOWED_ORIGINS` = https://fz-cricket-tournament.vercel.app
 
-### Step 2: Frontend Deploy Karein
+### Step 2: Frontend Deploy Karein (Vercel)
 
-**Option A: Netlify (Recommend)**
-1. Netlify.com par jayein
-2. `frontend` folder ko upload karein (या GitHub repo connect karein)
-3. Build command: `npm run build`
-4. Publish directory: `dist`
-5. Deploy karein
+1. **Vercel.com** par jayein
+2. GitHub repo connect karein
+3. Root Directory: `frontend`
+4. Framework: `Vite`
+5. Build Command: `npm run build`
+6. Output Directory: `dist`
+7. Environment Variables add karein:
+   - `VITE_API_URL` = https://your-backend.onrender.com/api
+   - `VITE_CLOUDINARY_CLOUD` = cloudinary cloud name
+   - `VITE_CLOUDINARY_PRESET` = fzcricket_gallery
+   - `VITE_CLOUDINARY_PLAYERS_PRESET` = fzcricket_players
+   - `VITE_CLOUDINARY_PAYMENTS_PRESET` = fzcricket_payments
 
-**Option B: Vercel**
-1. Vercel.com par jayein
-2. `frontend` folder upload karein
-3. Auto-detect karega Vite settings
+### Step 3: MongoDB Setup (MongoDB Atlas)
 
-### Step 3: Environment Variables Set Karein
-
-Frontend ke liye `.env` file banayein:
-```
-VITE_API_URL=https://your-backend.onrender.com/api
-```
-
-### Step 4: MongoDB Setup (Free)
-
-1. MongoDB Atlas par jayein (mongodb.com)
-2. Free account create karein
-3. New Cluster create karein
-4. Connection string copy karein
-5. Backend environment variables mein daal dein
+1. MongoDB Atlas par jayein
+2. Free cluster create karein
+3. Database Access mein user banayein
+4. Network Access mein `0.0.0.0/0` allow karein
+5. Connection string copy karein aur Render mein daalein
 
 ---
-
-**Ab aapki website live ho jayegi!**
 
 Admin Login:
 - URL: yourwebsite.com/admin
