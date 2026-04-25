@@ -19,7 +19,9 @@ export default function Navbar() {
 
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2">
-          <div className="w-9 h-9 bg-yellow-400 rounded-full flex items-center justify-center text-lg shadow-md">🏏</div>
+          <div className="w-9 h-9 bg-black rounded-full flex items-center justify-center text-lg shadow-md">
+            <span className="text-white font-bold text-base">🏏</span>
+          </div>
           <div>
             <p className="font-extrabold text-white text-base leading-tight">FZ Cricket</p>
             <p className="text-yellow-300 text-[10px] leading-tight">Tournament 2026</p>
