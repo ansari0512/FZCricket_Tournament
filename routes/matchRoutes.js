@@ -112,9 +112,32 @@ router.put('/:id/status', verifyAdmin, async (req, res) => {
     const { status, winnerId } = req.body;
     const match = await Match.findByIdAndUpdate(
       req.params.id,
-      { status, winner: winnerId },
+      { status, winner: winnerId || null },
       { new: true }
     );
+
+    // Match complete hone pe team stats update karo
+    if (status === 'completed' && match) {
+      const team1Id = match.team1;
+      const team2Id = match.team2;
+
+      // Dono teams ke matchesPlayed increment karo
+      await Team.findByIdAndUpdate(team1Id, { $inc: { matchesPlayed: 1 } });
+      await Team.findByIdAndUpdate(team2Id, { $inc: { matchesPlayed: 1 } });
+
+      if (winnerId) {
+        const loserId = winnerId.toString() === team1Id.toString() ? team2Id : team1Id;
+        // Winner ko 2 points aur win
+        await Team.findByIdAndUpdate(winnerId, { $inc: { wins: 1, points: 2 } });
+        // Loser ko loss
+        await Team.findByIdAndUpdate(loserId, { $inc: { losses: 1 } });
+      } else {
+        // No result - dono ko 1 point
+        await Team.findByIdAndUpdate(team1Id, { $inc: { points: 1 } });
+        await Team.findByIdAndUpdate(team2Id, { $inc: { points: 1 } });
+      }
+    }
+
     res.json(match);
   } catch (err) {
     res.status(500).json({ error: err.message });

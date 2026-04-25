@@ -8,7 +8,6 @@ import BottomNav from './components/BottomNav'
 
 const Home = lazy(() => import('./pages/Home'))
 const Login = lazy(() => import('./pages/Login'))
-const RegisterAccount = lazy(() => import('./pages/RegisterAccount'))
 const Register = lazy(() => import('./pages/Register'))
 const Teams = lazy(() => import('./pages/Teams'))
 const Schedule = lazy(() => import('./pages/Schedule'))
@@ -43,7 +42,6 @@ function AppContent() {
           <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/register-account" element={<RegisterAccount />} />
           <Route path="/register" element={<Register />} />
           <Route path="/teams" element={<Teams />} />
           <Route path="/schedule" element={<Schedule />} />

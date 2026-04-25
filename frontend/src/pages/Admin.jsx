@@ -338,7 +338,13 @@ export default function Admin() {
           <div className="rounded-xl overflow-hidden border border-gray-200">
             <button onClick={() => toggle('Teams')}
               className={`w-full text-left px-4 py-3 font-medium text-sm flex justify-between items-center transition ${activeTab === 'Teams' ? 'cricket-gradient text-white' : 'bg-gray-100 hover:bg-gray-200'}`}>
-              🏏 Teams <span>{activeTab === 'Teams' ? '▲' : '▼'}</span>
+              🏏 Teams
+              {teams.filter(t => t.submitted && t.paymentScreenshot && !t.paymentDone).length > 0 && (
+                <span className="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full ml-2">
+                  {teams.filter(t => t.submitted && t.paymentScreenshot && !t.paymentDone).length} Payment Pending
+                </span>
+              )}
+              <span className="ml-auto">{activeTab === 'Teams' ? '▲' : '▼'}</span>
             </button>
             {activeTab === 'Teams' && (
               <div className="p-3 space-y-3">

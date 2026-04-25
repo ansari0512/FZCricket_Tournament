@@ -2,10 +2,11 @@ import { Link } from 'react-router-dom'
 
 export default function Contact() {
   const info = [
-    { icon: '👤', label: 'Contact Person', value: 'Shahid Ansari' },
-    { icon: '📞', label: 'Mobile', value: '+91 8127021765 / +91 9369429653' },
-    { icon: '📧', label: 'Email', value: 'shahidansari0512@gmail.com' },
-    { icon: '📍', label: 'Venue', value: 'Village Odajhar, Post Naseerpur, Biswan, Sitapur - 261202' },
+    { icon: '👤', label: 'Contact Person', value: 'Shahid Ansari', type: 'text' },
+    { icon: '📞', label: 'Mobile 1', value: '+91 8127021765', type: 'phone', href: 'tel:+918127021765' },
+    { icon: '📞', label: 'Mobile 2', value: '+91 9369429653', type: 'phone', href: 'tel:+919369429653' },
+    { icon: '📧', label: 'Email', value: 'shahidansari0512@gmail.com', type: 'email', href: 'mailto:shahidansari0512@gmail.com' },
+    { icon: '📍', label: 'Venue', value: 'Village Odajhar, Post Naseerpur, Biswan, Sitapur - 261202', type: 'text' },
   ]
 
   return (
@@ -16,9 +17,15 @@ export default function Contact() {
           {info.map((item, i) => (
             <div key={i} className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl">
               <span className="text-2xl">{item.icon}</span>
-              <div>
+              <div className="flex-1">
                 <p className="font-semibold text-sm text-gray-500">{item.label}</p>
-                <p className="font-medium">{item.value}</p>
+                {item.href ? (
+                  <a href={item.href} className="font-medium text-primary hover:underline">
+                    {item.value}
+                  </a>
+                ) : (
+                  <p className="font-medium">{item.value}</p>
+                )}
               </div>
             </div>
           ))}
