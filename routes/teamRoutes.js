@@ -65,7 +65,7 @@ router.post('/register', async (req, res) => {
     if (approvedCount >= MAX_TEAMS)
       return res.status(400).json({ message: 'Registration is closed. All 8 teams have registered.' });
 
-    const { teamName, captainName, captainPhone, city, userId } = req.body;
+    const { teamName, captainName, captainPhone, city, userId, firebaseUid } = req.body;
 
     if (!teamName || !captainName || !captainPhone || !city)
       return res.status(400).json({ message: 'teamName, captainName, captainPhone aur city required hain' });
@@ -80,11 +80,18 @@ router.post('/register', async (req, res) => {
     if (existingTeam)
       return res.status(400).json({ message: 'Team name already exists' });
 
-    const team = new Team({ teamName, captainName, captainPhone, city, userId: userId || null, status: 'pending' });
+    // firebaseUid se user dhundho
+    let dbUserId = userId || null
+    if (firebaseUid) {
+      const user = await User.findOne({ firebaseUid })
+      if (user) dbUserId = user._id
+    }
+
+    const team = new Team({ teamName, captainName, captainPhone, city, userId: dbUserId, status: 'pending' });
     await team.save();
 
-    if (userId) {
-      await User.findByIdAndUpdate(userId, { teamId: team._id, expiresAt: null });
+    if (dbUserId) {
+      await User.findByIdAndUpdate(dbUserId, { teamId: team._id });
     }
 
     res.status(201).json({ message: 'Team registered successfully', team });
