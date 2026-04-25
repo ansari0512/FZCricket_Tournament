@@ -65,9 +65,21 @@ export const AppProvider = ({ children }) => {
 
   const refreshUser = async () => {
     try {
+      const firebaseUser = auth.currentUser
+      if (!firebaseUser) return
+      // Pehle backend mein save karo
+      await googleLogin({
+        firebaseUid: firebaseUser.uid,
+        email: firebaseUser.email,
+        name: firebaseUser.displayName,
+        photo: firebaseUser.photoURL
+      })
       const res = await getMe()
       setCurrentUser(res.data)
-    } catch {}
+      return res.data
+    } catch (err) {
+      console.error('refreshUser error:', err)
+    }
   }
 
   const registrationOpen = allTeamsCount < 8

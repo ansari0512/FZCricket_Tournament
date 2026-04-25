@@ -244,11 +244,14 @@ export default function Dashboard() {
           setEditTeamData({ teamName: teamRes.data.team.teamName, captainName: teamRes.data.team.captainName, captainPhone: teamRes.data.team.captainPhone, city: teamRes.data.team.city })
           setPlayers(playersRes.data)
         } catch { toast.error('Data load failed') }
+      } else {
+        setTeam(null)
+        setPlayers([])
       }
       setLoading(false)
     }
     load()
-  }, [currentUser]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [currentUser?._id, currentUser?.teamId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleUpdateTeam = async (e) => {
     e.preventDefault()
