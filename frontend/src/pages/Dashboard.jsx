@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 import { getNotifications, markNotificationsRead, getTeam, getTeamPlayers, registerPlayer, updatePlayer, updateTeam, changePassword } from '../services/api'
-import { uploadImage } from '../services/api'
+import { uploadImage, uploadGalleryImage } from '../services/api'
 const ROLE_LABELS = { batsman: '🏏 Batsman', bowler: '🎯 Bowler', 'all-rounder': '⭐ All-Rounder', 'wicket-keeper': '🧤 Wicket Keeper' }
 
 function PlayerModal({ player, onClose, onPrev, onNext }) {
@@ -291,7 +291,7 @@ export default function Dashboard() {
     if (players.length >= 15) return setError('Maximum 15 players allowed')
     setUploading(true); setError('')
     try {
-      const photoUrl = await uploadImage(playerForm.photo)
+      const photoUrl = await uploadImage(playerForm.photo, team.teamName.replace(/\s+/g, '_'))
       const res = await registerPlayer(currentUser.teamId, {
         name: playerForm.name.toUpperCase(),
         role: playerForm.role,

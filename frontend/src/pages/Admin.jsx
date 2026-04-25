@@ -151,8 +151,8 @@ export default function Admin() {
     const file = e.target.files[0]; if (!file) return
     setUploading(true)
     try {
-      const { uploadImage } = await import('../services/api')
-      const url = await uploadImage(file)
+      const { uploadGalleryImage } = await import('../services/api')
+      const url = await uploadGalleryImage(file)
       await addGalleryPhoto({ url, caption })
       setCaption('')
       toast.success('Photo uploaded!')

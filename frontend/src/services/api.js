@@ -14,8 +14,18 @@ API.interceptors.request.use((config) => {
 
 export const CLOUDINARY_CLOUD = import.meta.env.VITE_CLOUDINARY_CLOUD || ''
 export const CLOUDINARY_PRESET = import.meta.env.VITE_CLOUDINARY_PRESET || ''
+export const CLOUDINARY_PLAYERS_PRESET = import.meta.env.VITE_CLOUDINARY_PLAYERS_PRESET || ''
 
-export const uploadImage = async (file) => {
+export const uploadImage = async (file, folder = null) => {
+  const fd = new FormData()
+  fd.append('file', file)
+  fd.append('upload_preset', CLOUDINARY_PLAYERS_PRESET)
+  if (folder) fd.append('folder', `fzcricket/${folder}`)
+  const res = await axios.post(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, fd)
+  return res.data.secure_url
+}
+
+export const uploadGalleryImage = async (file) => {
   const fd = new FormData()
   fd.append('file', file)
   fd.append('upload_preset', CLOUDINARY_PRESET)
