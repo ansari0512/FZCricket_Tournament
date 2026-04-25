@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 import { getNotifications, markNotificationsRead, getTeam, getTeamPlayers, registerPlayer, updatePlayer, updateTeam } from '../services/api'
 import { uploadImage, uploadPaymentScreenshot } from '../services/api'
@@ -220,8 +220,9 @@ function EditPlayerForm({ player, onSave, onCancel, teamName }) {
 }
 
 export default function Dashboard() {
-  const { currentUser, logout, registrationOpen } = useApp()
+  const { currentUser, logout, registrationOpen, refreshUser } = useApp()
   const navigate = useNavigate()
+  const location = useLocation()
   const [team, setTeam] = useState(null)
   const [players, setPlayers] = useState([])
   const [loading, setLoading] = useState(true)
@@ -237,13 +238,18 @@ export default function Dashboard() {
   useEffect(() => {
     if (!currentUser) { navigate('/login'); return }
     const load = async () => {
-      if (currentUser.teamId) {
+      // teamId currentUser se ya location state se lo
+      const teamId = currentUser.teamId || location.state?.teamId
+      if (teamId) {
         try {
-          const [teamRes, playersRes] = await Promise.all([getTeam(currentUser.teamId), getTeamPlayers(currentUser.teamId)])
+          const [teamRes, playersRes] = await Promise.all([getTeam(teamId), getTeamPlayers(teamId)])
           setTeam(teamRes.data.team)
           setEditTeamData({ teamName: teamRes.data.team.teamName, captainName: teamRes.data.team.captainName, captainPhone: teamRes.data.team.captainPhone, city: teamRes.data.team.city })
           setPlayers(playersRes.data)
-        } catch { toast.error('Data load failed') }
+        } catch {
+          // Agar fail ho toh refreshUser try karo
+          await refreshUser()
+        }
       } else {
         setTeam(null)
         setPlayers([])

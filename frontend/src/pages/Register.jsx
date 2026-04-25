@@ -70,7 +70,7 @@ export default function Register() {
 
     setLoading(true)
     try {
-      await registerTeam({
+      const res = await registerTeam({
         teamName: form.teamName.trim().toUpperCase(),
         captainName: form.registrantName.trim().toUpperCase(),
         captainPhone: form.mobile,
@@ -78,9 +78,16 @@ export default function Register() {
         userId: currentUser._id,
         firebaseUid: currentUser.firebaseUid
       })
-      await refreshUser()
-      toast.success('Team register ho gayi! Admin review karega।')
-      navigate('/dashboard')
+      // Team register hone ke baad user ko update karo teamId ke saath
+      const updatedUser = await refreshUser()
+      if (updatedUser) {
+        toast.success('Team register ho gayi! Admin review karega।')
+        navigate('/dashboard')
+      } else {
+        // Fallback - manually teamId set karke navigate karo
+        toast.success('Team register ho gayi! Admin review karega।')
+        navigate('/dashboard', { state: { teamId: res.data.team._id } })
+      }
     } catch (err) {
       toast.error(err.response?.data?.message || 'Registration failed')
     }
