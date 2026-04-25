@@ -39,8 +39,16 @@ export const AppProvider = ({ children }) => {
           })
           const res = await getMe()
           setCurrentUser(res.data)
-        } catch {
-          setCurrentUser(null)
+        } catch (err) {
+          console.error('Auth error:', err)
+          // Backend fail hone pe bhi basic user info set karo
+          setCurrentUser({
+            firebaseUid: firebaseUser.uid,
+            email: firebaseUser.email,
+            name: firebaseUser.displayName,
+            photo: firebaseUser.photoURL,
+            teamId: null
+          })
         }
       } else {
         setCurrentUser(null)
