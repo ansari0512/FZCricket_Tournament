@@ -213,12 +213,11 @@ export default function Admin() {
                 users.map(user => (
                   <div key={user._id} className="card flex justify-between items-center">
                     <div>
-                      <p className="font-bold">{user.username}</p>
-                      <p className="text-sm text-gray-500">{user.mobile}</p>
+                      <p className="font-bold">{user.name || user.email}</p>
+                      <p className="text-sm text-gray-500">{user.email}</p>
                       <p className="text-xs mt-1">{user.teamId ? <span className="text-green-600">✅ Team Registered</span> : <span className="text-yellow-600">⏳ No Team</span>}</p>
                     </div>
                     <div className="flex gap-2">
-                      <button onClick={() => { setResetModal(user); setResetForm({ newUsername: user.username, newPassword: '' }) }} className="text-xs bg-blue-100 text-blue-700 px-3 py-1.5 rounded-lg">Reset</button>
                       <button onClick={() => handleDeleteUser(user._id)} className="text-xs bg-red-100 text-red-700 px-3 py-1.5 rounded-lg">Delete</button>
                     </div>
                   </div>
@@ -235,8 +234,8 @@ export default function Admin() {
             </button>
             {activeTab === 'Teams' && (
               <div className="p-3 space-y-3">
-                {teams.length === 0 ? <p className="text-center text-gray-400 py-10">No teams yet</p> :
-                teams.map(team => (
+                {teams.filter(t => t.submitted).length === 0 ? <p className="text-center text-gray-400 py-10">Koi submitted team nahi hai</p> :
+                teams.filter(t => t.submitted).map(team => (
                   <div key={team._id} className="card">
                     <div className="flex justify-between items-start mb-2">
                       <div>
