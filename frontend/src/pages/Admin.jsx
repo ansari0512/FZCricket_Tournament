@@ -116,7 +116,7 @@ export default function Admin() {
   const handleApprove = async (id) => { await updateTeam(id, { status: 'approved' }); loadData(); toast.success('Team approved!') }
   const handleReject = (team) => { setRejectModal(team); setRejectReason('') }
   const confirmReject = async () => {
-    await updateTeam(rejectModal._id, { status: 'rejected', rejectReason })
+    await updateTeam(rejectModal._id, { status: 'rejected', rejectReason, submitted: false })
     setRejectModal(null); loadData(); toast.success('Team rejected')
   }
   const handlePayment = async (id) => { await updateTeam(id, { paymentDone: true }); loadData(); toast.success('Payment confirmed!') }

@@ -58,8 +58,18 @@ export const AppProvider = ({ children }) => {
           })
           // JWT token save karo
           localStorage.setItem('fzToken', res.data.token)
-          localStorage.setItem('fzUser', JSON.stringify(res.data.user))
-          setCurrentUser(res.data.user)
+          // Fresh user data backend se lo
+          const meRes = await fetch(`${import.meta.env.VITE_API_URL || 'https://fzcricket-backend.onrender.com/api'}/auth/me`, {
+            headers: { Authorization: `Bearer ${res.data.token}` }
+          })
+          if (meRes.ok) {
+            const userData = await meRes.json()
+            localStorage.setItem('fzUser', JSON.stringify(userData))
+            setCurrentUser(userData)
+          } else {
+            localStorage.setItem('fzUser', JSON.stringify(res.data.user))
+            setCurrentUser(res.data.user)
+          }
         } catch (err) {
           console.error('Auth error:', err)
           // localStorage se fallback

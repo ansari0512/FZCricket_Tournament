@@ -302,7 +302,7 @@ export default function Dashboard() {
     if (!confirm('Kya aap team submit karna chahte hain? Submit karne ke baad admin review karega।')) return
     setSubmitting(true)
     try {
-      await updateTeam(currentUser.teamId, { submitted: true })
+      await updateTeam(currentUser.teamId, { submitted: true, status: 'pending' })
       const res = await getTeam(currentUser.teamId)
       setTeam(res.data.team)
       toast.success('Team submit ho gayi! Admin review karega।')
