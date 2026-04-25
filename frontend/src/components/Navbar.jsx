@@ -19,8 +19,8 @@ export default function Navbar() {
 
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2">
-          <div className="w-9 h-9 bg-black rounded-full flex items-center justify-center text-lg shadow-md">
-            <span className="text-white font-bold text-base">🏏</span>
+          <div className="w-9 h-9 bg-white rounded-full flex items-center justify-center text-lg shadow-md">
+            <span className="text-base">🏏</span>
           </div>
           <div>
             <p className="font-extrabold text-white text-base leading-tight">FZ Cricket</p>
