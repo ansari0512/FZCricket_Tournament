@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { adminLogin, getAdminUsers, deleteAdminUser, resetUserCredentials, getAllTeams, updateTeam, deleteTeam, getTeamPlayers, deletePlayer, getMatches, updateMatchStatus, updateMatchScore, generateSchedule } from '../services/api'
+import { adminLogin, getAdminUsers, deleteAdminUser, resetUserCredentials, getAllTeams, updateTeam, deleteTeam, getTeamPlayers, deletePlayer, getMatches, updateMatchStatus, updateMatchScore, generateSchedule, getGallery, addGalleryPhoto, deleteGalleryPhoto } from '../services/api'
 import toast from 'react-hot-toast'
 
 const ROLE_LABELS = { batsman: '🏏 Batsman', bowler: '🎯 Bowler', 'all-rounder': '⭐ All-Rounder', 'wicket-keeper': '🧤 Wicket Keeper' }
@@ -83,15 +83,15 @@ export default function Admin() {
   const [scoreData, setScoreData] = useState({ t1runs: '', t1wickets: '', t2runs: '', t2wickets: '', winnerId: '' })
   const [resetModal, setResetModal] = useState(null)
   const [resetForm, setResetForm] = useState({ newUsername: '', newPassword: '' })
-  const [gallery, setGallery] = useState(JSON.parse(localStorage.getItem('fzGallery') || '[]'))
+  const [gallery, setGallery] = useState([])
   const [uploading, setUploading] = useState(false)
   const [caption, setCaption] = useState('')
   const [previewIndex, setPreviewIndex] = useState(null)
 
   const loadData = async () => {
     try {
-      const [t, u, m] = await Promise.all([getAllTeams(), getAdminUsers(), getMatches()])
-      setTeams(t.data); setUsers(u.data); setMatches(m.data)
+      const [t, u, m, g] = await Promise.all([getAllTeams(), getAdminUsers(), getMatches(), getGallery()])
+      setTeams(t.data); setUsers(u.data); setMatches(m.data); setGallery(g.data)
     } catch (error) {
       console.error('Failed to load admin data:', error)
     }
@@ -153,15 +153,18 @@ export default function Admin() {
     try {
       const { uploadImage } = await import('../services/api')
       const url = await uploadImage(file)
-      const updated = [...gallery, { url, caption }]
-      setGallery(updated); localStorage.setItem('fzGallery', JSON.stringify(updated))
-      setCaption(''); toast.success('Photo uploaded!')
+      await addGalleryPhoto({ url, caption })
+      setCaption('')
+      toast.success('Photo uploaded!')
+      loadData()
     } catch { toast.error('Upload failed') }
     setUploading(false)
   }
-  const handleDeleteGallery = (i) => {
-    const updated = gallery.filter((_, idx) => idx !== i)
-    setGallery(updated); localStorage.setItem('fzGallery', JSON.stringify(updated))
+  const handleDeleteGallery = async (id) => {
+    try {
+      await deleteGalleryPhoto(id)
+      setGallery(gallery.filter(p => p._id !== id))
+    } catch { toast.error('Delete failed') }
   }
 
   if (!loggedIn) return (
@@ -350,7 +353,7 @@ export default function Admin() {
                       <div key={i} className="relative rounded-2xl overflow-hidden aspect-square shadow">
                         <img src={p.url} className="w-full h-full object-cover" />
                         {p.caption && <p className="absolute bottom-0 inset-x-0 bg-black/50 text-white text-xs p-1 text-center">{p.caption}</p>}
-                        <button onClick={() => handleDeleteGallery(i)} className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 text-xs flex items-center justify-center">✕</button>
+                        <button onClick={() => handleDeleteGallery(p._id)} className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 text-xs flex items-center justify-center">✕</button>
                       </div>
                     ))}
                   </div>

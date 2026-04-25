@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
+import { getGallery } from '../services/api'
 
 function RulesModal({ onClose }) {
   const rules = [
@@ -66,7 +67,7 @@ export default function Home() {
   const liveMatch = matches.find(m => m.status === 'in-progress')
 
   useEffect(() => {
-    setGallery(JSON.parse(localStorage.getItem('fzGallery') || '[]'))
+    getGallery().then(r => setGallery(r.data)).catch(() => {})
   }, [])
 
   if (loading) return (

@@ -55,4 +55,9 @@ export const updateMatchStatus = (id, data) => API.put(`/matches/${id}/status`, 
 export const updateMatchScore = (id, data) => API.put(`/matches/${id}/score`, data)
 export const generateSchedule = () => API.post('/matches/generate-schedule')
 
+// Gallery
+export const getGallery = () => API.get('/gallery')
+export const addGalleryPhoto = (data) => API.post('/gallery', data)
+export const deleteGalleryPhoto = (id) => API.delete(`/gallery/${id}`)
+
 export default API

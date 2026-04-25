@@ -49,6 +49,7 @@ app.use('/api/players', require('./routes/playerRoutes'));
 app.use('/api/scores', require('./routes/scoreRoutes'));
 app.use('/api/payments', require('./routes/paymentRoutes'));
 app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/gallery', require('./routes/galleryRoutes'));
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'FZCricket API is running' });
