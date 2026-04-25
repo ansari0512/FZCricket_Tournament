@@ -47,6 +47,7 @@ function PlayerModal({ player, onClose, onPrev, onNext }) {
 }
 
 function PaymentSection({ team, onScreenshotUploaded, onPaymentConfirmed }) {
+  const [showQR, setShowQR] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [uploaded, setUploaded] = useState(!!team.paymentScreenshot)
   const [copied, setCopied] = useState('')
@@ -144,6 +145,30 @@ function PaymentSection({ team, onScreenshotUploaded, onPaymentConfirmed }) {
             </button>
           </div>
         ))}
+      </div>
+
+      {/* QR Code Section */}
+      <div className="mb-3">
+        <button
+          onClick={() => setShowQR(!showQR)}
+          className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 rounded-xl text-sm transition flex items-center justify-center gap-2"
+        >
+          <span>📷</span>
+          {showQR ? 'QR Code Band Karo' : 'QR Code Se Pay Karo (PC ke liye)'}
+        </button>
+        {showQR && (
+          <div className="mt-3 bg-white rounded-xl p-4 text-center border">
+            <p className="text-sm font-medium text-gray-700 mb-3">GPay QR Code scan karo (₹300)</p>
+            <img
+              src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=shahidansari0512@oksbi%26pn=FZCricket%26am=300%26cu=INR%26tn=FZCricket%20Registration`}
+              alt="UPI QR Code"
+              className="w-48 h-48 mx-auto rounded-xl shadow"
+            />
+            <p className="text-xs text-gray-500 mt-2">GPay, PhonePe, Paytm se scan karo</p>
+            <p className="text-sm font-bold text-primary mt-1">UPI: shahidansari0512@oksbi</p>
+            <p className="text-sm font-bold">Amount: ₹300</p>
+          </div>
+        )}
       </div>
 
       {uploaded ? (
