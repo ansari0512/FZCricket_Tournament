@@ -43,19 +43,45 @@ function RulesModal({ onClose }) {
 
 function GallerySlider({ photos }) {
   const [current, setCurrent] = useState(0)
+  const [fullscreen, setFullscreen] = useState(false)
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrent(p => (p + 1) % photos.length)
+    }, 3000)
+    return () => clearInterval(timer)
+  }, [photos.length])
+
   if (!photos.length) return null
+
   return (
-    <div className="relative rounded-2xl overflow-hidden shadow-xl h-72">
-      {photos.map((p, i) => (
-        <div key={i} className={`absolute inset-0 transition-opacity duration-700 ${i === current ? 'opacity-100' : 'opacity-0'}`}>
-          <img src={p.url} alt={p.caption} className="w-full h-full object-cover" />
-          {p.caption && <div className="absolute bottom-0 inset-x-0 bg-black/50 text-white text-center py-2 text-sm">{p.caption}</div>}
+    <>
+      <div className="relative rounded-2xl overflow-hidden shadow-xl h-72 cursor-pointer" onClick={() => setFullscreen(true)}>
+        {photos.map((p, i) => (
+          <div key={i} className={`absolute inset-0 transition-opacity duration-700 ${i === current ? 'opacity-100' : 'opacity-0'}`}>
+            <img src={p.url} alt={p.caption} className="w-full h-full object-cover" />
+            {p.caption && <div className="absolute bottom-0 inset-x-0 bg-black/50 text-white text-center py-2 text-sm">{p.caption}</div>}
+          </div>
+        ))}
+        <button onClick={e => { e.stopPropagation(); setCurrent(p => (p - 1 + photos.length) % photos.length) }} className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/50 text-white w-9 h-9 rounded-full flex items-center justify-center text-xl">‹</button>
+        <button onClick={e => { e.stopPropagation(); setCurrent(p => (p + 1) % photos.length) }} className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/50 text-white w-9 h-9 rounded-full flex items-center justify-center text-xl">›</button>
+        <div className="absolute top-3 right-3 bg-black/50 text-white text-xs px-2 py-1 rounded-full">{current + 1}/{photos.length}</div>
+        <div className="absolute bottom-8 right-3 bg-black/50 text-white text-xs px-2 py-1 rounded-full">🔍</div>
+      </div>
+
+      {fullscreen && (
+        <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center" onClick={() => setFullscreen(false)}>
+          <div className="relative w-full max-w-2xl px-4" onClick={e => e.stopPropagation()}>
+            <img src={photos[current].url} alt={photos[current].caption} className="w-full max-h-[80vh] object-contain rounded-xl" />
+            {photos[current].caption && <p className="text-white text-center mt-3 text-sm">{photos[current].caption}</p>}
+            <button onClick={() => setCurrent(p => (p - 1 + photos.length) % photos.length)} className="absolute left-6 top-1/2 -translate-y-1/2 bg-white/20 text-white w-10 h-10 rounded-full flex items-center justify-center text-2xl">‹</button>
+            <button onClick={() => setCurrent(p => (p + 1) % photos.length)} className="absolute right-6 top-1/2 -translate-y-1/2 bg-white/20 text-white w-10 h-10 rounded-full flex items-center justify-center text-2xl">›</button>
+            <button onClick={() => setFullscreen(false)} className="absolute top-2 right-6 bg-white/20 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">✕</button>
+            <div className="text-white text-center text-xs mt-2 opacity-60">{current + 1} / {photos.length}</div>
+          </div>
         </div>
-      ))}
-      <button onClick={() => setCurrent(p => (p - 1 + photos.length) % photos.length)} className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/50 text-white w-9 h-9 rounded-full flex items-center justify-center text-xl">‹</button>
-      <button onClick={() => setCurrent(p => (p + 1) % photos.length)} className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/50 text-white w-9 h-9 rounded-full flex items-center justify-center text-xl">›</button>
-      <div className="absolute top-3 right-3 bg-black/50 text-white text-xs px-2 py-1 rounded-full">{current + 1}/{photos.length}</div>
-    </div>
+      )}
+    </>
   )
 }
 
