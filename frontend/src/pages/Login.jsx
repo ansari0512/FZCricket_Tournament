@@ -1,63 +1,53 @@
-import { Link } from 'react-router-dom'
-import { loginUser } from '../services/api'
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { signInWithPopup } from 'firebase/auth'
+import { auth, googleProvider } from '../firebase'
 import { useApp } from '../context/AppContext'
-import { useForm } from '../hooks/useForm'
-import { useSubmit } from '../hooks/useSubmit'
-import FormInput from '../components/FormInput'
+import toast from 'react-hot-toast'
 
 export default function Login() {
-  const { login } = useApp()
-  const { form, setForm, loading, setLoading, showPass, setShowPass } = useForm({ username: '', password: '' })
-  const { handleSubmit } = useSubmit('Login successful!', '/dashboard')
+  const { currentUser } = useApp()
+  const navigate = useNavigate()
+  const [loading, setLoading] = useState(false)
 
-  const onSubmit = async (e) => {
-    e.preventDefault()
-    await handleSubmit(
-      async (data) => {
-        const response = await loginUser(data)
-        login(response.data.user, response.data.token)
-        return response
-      },
-      form,
-      setLoading
-    )
+  if (currentUser) {
+    navigate('/dashboard')
+    return null
+  }
+
+  const handleGoogleLogin = async () => {
+    setLoading(true)
+    try {
+      await signInWithPopup(auth, googleProvider)
+      toast.success('Login successful!')
+      navigate('/dashboard')
+    } catch (err) {
+      toast.error('Login failed. Please try again.')
+      console.error(err)
+    }
+    setLoading(false)
   }
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-16">
       <div className="w-full max-w-md">
-        <div className="card shadow-xl">
-          <div className="text-center mb-6">
-            <span className="text-5xl">👤</span>
-            <h2 className="text-2xl font-bold mt-3">User Login</h2>
-            <p className="text-gray-500 text-sm mt-1">Login to manage your team</p>
-          </div>
-          <form onSubmit={onSubmit} className="space-y-4">
-            <FormInput
-              type="text"
-              placeholder="Username or Mobile"
-              value={form.username}
-              onChange={e => setForm({ ...form, username: e.target.value })}
-              required
-            />
-            <FormInput
-              type="password"
-              placeholder="Password"
-              value={form.password}
-              onChange={e => setForm({ ...form, password: e.target.value })}
-              required
-              showPassToggle
-              showPass={showPass}
-              setShowPass={setShowPass}
-            />
-            <button type="submit" disabled={loading} className="btn-primary w-full">
-              {loading ? 'Logging in...' : 'Login'}
-            </button>
-          </form>
-          <p className="text-center mt-4 text-sm text-gray-500">
-            New user? <Link to="/register-account" className="text-primary font-bold">Create Account</Link>
+        <div className="card shadow-xl text-center">
+          <span className="text-5xl">🏏</span>
+          <h2 className="text-2xl font-bold mt-3 mb-2">User Login</h2>
+          <p className="text-gray-500 text-sm mb-8">Tournament mein participate karne ke liye login karo</p>
+
+          <button
+            onClick={handleGoogleLogin}
+            disabled={loading}
+            className="w-full flex items-center justify-center gap-3 bg-white border-2 border-gray-200 hover:border-primary hover:bg-gray-50 text-gray-700 font-bold py-3 px-6 rounded-xl transition-all shadow-sm disabled:opacity-50"
+          >
+            <img src="https://www.google.com/favicon.ico" className="w-5 h-5" alt="Google" />
+            {loading ? 'Logging in...' : 'Google se Login karo'}
+          </button>
+
+          <p className="text-xs text-gray-400 mt-6">
+            Login karne ke baad team register kar sakte ho
           </p>
-          <Link to="/" className="block text-center mt-2 text-sm text-gray-400">Back to Home</Link>
         </div>
       </div>
     </div>

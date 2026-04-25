@@ -10,3 +10,4 @@ frontend/dist/
 frontend/.env
 frontend/.env.local
 uploads/
+firebase-service-account.json

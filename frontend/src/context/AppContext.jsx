@@ -1,5 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react'
-import { getTeams, getMatches } from '../services/api'
+import { onAuthStateChanged, signOut } from 'firebase/auth'
+import { auth } from '../firebase'
+import { getTeams, getMatches, googleLogin, getMe } from '../services/api'
 
 const AppContext = createContext()
 
@@ -8,7 +10,8 @@ export const AppProvider = ({ children }) => {
   const [allTeamsCount, setAllTeamsCount] = useState(0)
   const [matches, setMatches] = useState([])
   const [loading, setLoading] = useState(true)
-  const [currentUser, setCurrentUser] = useState(JSON.parse(localStorage.getItem('fzUser') || 'null'))
+  const [currentUser, setCurrentUser] = useState(null)
+  const [authLoading, setAuthLoading] = useState(true)
 
   const fetchData = async () => {
     try {
@@ -23,24 +26,46 @@ export const AppProvider = ({ children }) => {
     }
   }
 
-  useEffect(() => { fetchData() }, [])
+  useEffect(() => {
+    fetchData()
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (firebaseUser) {
+        try {
+          await googleLogin({
+            firebaseUid: firebaseUser.uid,
+            email: firebaseUser.email,
+            name: firebaseUser.displayName,
+            photo: firebaseUser.photoURL
+          })
+          const res = await getMe()
+          setCurrentUser(res.data)
+        } catch {
+          setCurrentUser(null)
+        }
+      } else {
+        setCurrentUser(null)
+      }
+      setAuthLoading(false)
+    })
+    return () => unsubscribe()
+  }, [])
 
-  const login = (user, token) => {
-    localStorage.setItem('fzUser', JSON.stringify(user))
-    localStorage.setItem('fzToken', token)
-    setCurrentUser(user)
+  const logout = async () => {
+    await signOut(auth)
+    setCurrentUser(null)
   }
 
-  const logout = () => {
-    localStorage.removeItem('fzUser')
-    localStorage.removeItem('fzToken')
-    setCurrentUser(null)
+  const refreshUser = async () => {
+    try {
+      const res = await getMe()
+      setCurrentUser(res.data)
+    } catch {}
   }
 
   const registrationOpen = allTeamsCount < 8
 
   return (
-    <AppContext.Provider value={{ teams, matches, loading, currentUser, login, logout, fetchData, registrationOpen }}>
+    <AppContext.Provider value={{ teams, matches, loading, authLoading, currentUser, logout, fetchData, registrationOpen, refreshUser }}>
       {children}
     </AppContext.Provider>
   )

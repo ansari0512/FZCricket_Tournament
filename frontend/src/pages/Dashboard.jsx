@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
-import { getNotifications, markNotificationsRead, getTeam, getTeamPlayers, registerPlayer, updatePlayer, updateTeam, changePassword } from '../services/api'
+import { getNotifications, markNotificationsRead, getTeam, getTeamPlayers, registerPlayer, updatePlayer, updateTeam } from '../services/api'
 import { uploadImage, uploadGalleryImage, uploadPaymentScreenshot } from '../services/api'
 import toast from 'react-hot-toast'
 const ROLE_LABELS = { batsman: '🏏 Batsman', bowler: '🎯 Bowler', 'all-rounder': '⭐ All-Rounder', 'wicket-keeper': '🧤 Wicket Keeper' }
@@ -153,11 +153,11 @@ function ChangePasswordPanel({ userId }) {
 function NotificationsPanel({ userId }) {
   const [notifs, setNotifs] = useState([])
   useEffect(() => {
-    getNotifications(userId).then(r => setNotifs(r.data)).catch(() => {})
+    getNotifications().then(r => setNotifs(r.data)).catch(() => {})
   }, [userId])
   const unread = notifs.filter(n => !n.read).length
   const markRead = async () => {
-    await markNotificationsRead(userId)
+    await markNotificationsRead()
     setNotifs(notifs.map(n => ({ ...n, read: true })))
   }
   return (
