@@ -31,17 +31,17 @@ export const AppProvider = ({ children }) => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         try {
+          const token = await firebaseUser.getIdToken(true)
           await googleLogin({
             firebaseUid: firebaseUser.uid,
             email: firebaseUser.email,
             name: firebaseUser.displayName,
             photo: firebaseUser.photoURL
-          })
-          const res = await getMe()
+          }, token)
+          const res = await getMe(token)
           setCurrentUser(res.data)
         } catch (err) {
           console.error('Auth error:', err)
-          // Backend fail hone pe bhi basic user info set karo
           setCurrentUser({
             firebaseUid: firebaseUser.uid,
             email: firebaseUser.email,
@@ -67,14 +67,14 @@ export const AppProvider = ({ children }) => {
     try {
       const firebaseUser = auth.currentUser
       if (!firebaseUser) return
-      // Pehle backend mein save karo
+      const token = await firebaseUser.getIdToken(true)
       await googleLogin({
         firebaseUid: firebaseUser.uid,
         email: firebaseUser.email,
         name: firebaseUser.displayName,
         photo: firebaseUser.photoURL
-      })
-      const res = await getMe()
+      }, token)
+      const res = await getMe(token)
       setCurrentUser(res.data)
       return res.data
     } catch (err) {

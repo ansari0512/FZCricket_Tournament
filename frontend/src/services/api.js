@@ -52,9 +52,9 @@ export const uploadPaymentScreenshot = async (file) => {
 }
 
 // Auth
-export const googleLogin = (data) => API.post('/auth/google-login', data)
+export const googleLogin = (data, token = null) => API.post('/auth/google-login', data, token ? { headers: { Authorization: `Bearer ${token}` } } : {})
 export const updateMobile = (data) => API.put('/auth/update-mobile', data)
-export const getMe = () => API.get('/auth/me')
+export const getMe = (token = null) => token ? API.get('/auth/me', { headers: { Authorization: `Bearer ${token}` } }) : API.get('/auth/me')
 export const getNotifications = () => API.get('/auth/notifications')
 export const markNotificationsRead = () => API.put('/auth/notifications/read')
 export const adminLogin = (data) => API.post('/auth/admin/login', data)
