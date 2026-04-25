@@ -185,6 +185,16 @@ export default function Home() {
         </section>
       )}
 
+      {/* Gallery */}
+      {gallery.length > 0 && (
+        <section className="bg-gray-50 py-10 px-4">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-2xl font-bold text-center mb-6">📸 Photo Gallery</h2>
+            <GallerySlider photos={gallery} />
+          </div>
+        </section>
+      )}
+
       {/* Prize Money */}
       <section className="py-10 px-4">
         <div className="max-w-4xl mx-auto">
@@ -205,16 +215,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      {/* Gallery */}
-      {gallery.length > 0 && (
-        <section className="bg-gray-50 py-10 px-4">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-2xl font-bold text-center mb-6">📸 Photo Gallery</h2>
-            <GallerySlider photos={gallery} />
-          </div>
-        </section>
-      )}
 
       {/* Teams */}
       {teams.length > 0 && (
