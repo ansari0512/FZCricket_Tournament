@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 import { getNotifications, markNotificationsRead, getTeam, getTeamPlayers, registerPlayer, updatePlayer, updateTeam, changePassword } from '../services/api'
-import { uploadImage, uploadGalleryImage } from '../services/api'
+import { uploadImage, uploadGalleryImage, uploadPaymentScreenshot } from '../services/api'
 import toast from 'react-hot-toast'
 const ROLE_LABELS = { batsman: '🏏 Batsman', bowler: '🎯 Bowler', 'all-rounder': '⭐ All-Rounder', 'wicket-keeper': '🧤 Wicket Keeper' }
 
@@ -54,7 +54,7 @@ function PaymentSection({ team, onScreenshotUploaded }) {
     if (!file) return
     setUploading(true)
     try {
-      const url = await uploadGalleryImage(file)
+      const url = await uploadPaymentScreenshot(file)
       await updateTeam(team._id, { paymentScreenshot: url })
       onScreenshotUploaded(url)
       setUploaded(true)

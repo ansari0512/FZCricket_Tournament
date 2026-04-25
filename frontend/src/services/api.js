@@ -33,6 +33,15 @@ export const uploadGalleryImage = async (file) => {
   return res.data.secure_url
 }
 
+export const uploadPaymentScreenshot = async (file) => {
+  const fd = new FormData()
+  fd.append('file', file)
+  fd.append('upload_preset', CLOUDINARY_PLAYERS_PRESET)
+  fd.append('folder', 'fzcricket/payments')
+  const res = await axios.post(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, fd)
+  return res.data.secure_url
+}
+
 // Auth
 export const registerUser = (data) => API.post('/auth/register', data)
 export const loginUser = (data) => API.post('/auth/login', data)
