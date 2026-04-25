@@ -12,9 +12,16 @@ API.interceptors.request.use(async (config) => {
   }
   try {
     const { auth } = await import('../firebase')
-    const user = auth.currentUser
-    if (user) {
-      const token = await user.getIdToken()
+    // Wait for Firebase auth to be ready
+    await new Promise((resolve) => {
+      if (auth.currentUser) { resolve(); return }
+      const unsubscribe = auth.onAuthStateChanged((user) => {
+        unsubscribe()
+        resolve()
+      })
+    })
+    if (auth.currentUser) {
+      const token = await auth.currentUser.getIdToken()
       config.headers.Authorization = `Bearer ${token}`
     }
   } catch {}
