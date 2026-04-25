@@ -1,8 +1,99 @@
 import { useState, useEffect } from 'react'
-import { adminLogin, getAdminUsers, deleteAdminUser, getAllTeams, getTeam, updateTeam, deleteTeam, getTeamPlayers, deletePlayer, getMatches, updateMatchStatus, updateMatchScore, generateSchedule, getGallery, addGalleryPhoto, deleteGalleryPhoto } from '../services/api'
+import { adminLogin, getAdminUsers, deleteAdminUser, getAllTeams, getTeam, updateTeam, deleteTeam, getTeamPlayers, deletePlayer, getMatches, updateMatchStatus, updateMatchScore, generateSchedule, createMatch, deleteMatch, getGallery, addGalleryPhoto, deleteGalleryPhoto } from '../services/api'
 import toast from 'react-hot-toast'
 
 const ROLE_LABELS = { batsman: '🏏 Batsman', bowler: '🎯 Bowler', 'all-rounder': '⭐ All-Rounder', 'wicket-keeper': '🧤 Wicket Keeper' }
+
+function MatchCreateForm({ teams, onCreated }) {
+  const approvedTeams = teams.filter(t => t.status === 'approved' && t.paymentDone)
+  const [form, setForm] = useState({
+    team1Id: '', team2Id: '', matchDate: '', matchTime: '09:00',
+    matchType: 'group', overs: '8', venue: 'Odajhar Village'
+  })
+  const [loading, setLoading] = useState(false)
+
+  const handleCreate = async (e) => {
+    e.preventDefault()
+    if (!form.team1Id || !form.team2Id || !form.matchDate)
+      return toast.error('Team1, Team2 aur Date required hai')
+    if (form.team1Id === form.team2Id)
+      return toast.error('Dono teams alag honi chahiye')
+    setLoading(true)
+    try {
+      const matchDateTime = new Date(`${form.matchDate}T${form.matchTime}`)
+      await createMatch({
+        team1Id: form.team1Id,
+        team2Id: form.team2Id,
+        matchDate: matchDateTime,
+        matchType: form.matchType,
+        overs: Number(form.overs),
+        venue: form.venue
+      })
+      toast.success('Match create ho gaya!')
+      setForm({ team1Id: '', team2Id: '', matchDate: '', matchTime: '09:00', matchType: 'group', overs: '8', venue: 'Odajhar Village' })
+      onCreated()
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed')
+    }
+    setLoading(false)
+  }
+
+  if (approvedTeams.length < 2) return (
+    <p className="text-sm text-gray-500">Kam se kam 2 confirmed teams chahiye match create karne ke liye।</p>
+  )
+
+  return (
+    <form onSubmit={handleCreate} className="space-y-3">
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label className="text-xs text-gray-500 block mb-1">Team 1 *</label>
+          <select value={form.team1Id} onChange={e => setForm({ ...form, team1Id: e.target.value })} className="input text-sm" required>
+            <option value="">Select Team 1</option>
+            {approvedTeams.map(t => <option key={t._id} value={t._id}>{t.teamName}</option>)}
+          </select>
+        </div>
+        <div>
+          <label className="text-xs text-gray-500 block mb-1">Team 2 *</label>
+          <select value={form.team2Id} onChange={e => setForm({ ...form, team2Id: e.target.value })} className="input text-sm" required>
+            <option value="">Select Team 2</option>
+            {approvedTeams.map(t => <option key={t._id} value={t._id}>{t.teamName}</option>)}
+          </select>
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label className="text-xs text-gray-500 block mb-1">Date *</label>
+          <input type="date" value={form.matchDate} onChange={e => setForm({ ...form, matchDate: e.target.value })} className="input text-sm" required />
+        </div>
+        <div>
+          <label className="text-xs text-gray-500 block mb-1">Time *</label>
+          <input type="time" value={form.matchTime} onChange={e => setForm({ ...form, matchTime: e.target.value })} className="input text-sm" />
+        </div>
+      </div>
+      <div className="grid grid-cols-3 gap-3">
+        <div>
+          <label className="text-xs text-gray-500 block mb-1">Match Type</label>
+          <select value={form.matchType} onChange={e => setForm({ ...form, matchType: e.target.value })} className="input text-sm">
+            <option value="group">Group</option>
+            <option value="semi-final">Semi-Final</option>
+            <option value="final">Final</option>
+          </select>
+        </div>
+        <div>
+          <label className="text-xs text-gray-500 block mb-1">Overs</label>
+          <input type="number" value={form.overs} onChange={e => setForm({ ...form, overs: e.target.value })} className="input text-sm" min="1" max="20" />
+        </div>
+        <div>
+          <label className="text-xs text-gray-500 block mb-1">Venue</label>
+          <input type="text" value={form.venue} onChange={e => setForm({ ...form, venue: e.target.value })} className="input text-sm" />
+        </div>
+      </div>
+      <button type="submit" disabled={loading} className="btn-primary w-full">
+        {loading ? 'Creating...' : '➕ Match Add Karo'}
+      </button>
+    </form>
+  )
+}
 
 function PlayerModal({ player, onClose, onPrev, onNext }) {
   return (
@@ -148,6 +239,13 @@ export default function Admin() {
     setResetModal(null); loadData(); toast.success('Credentials reset!')
   }
   const handleMatchStatus = async (id, status) => { await updateMatchStatus(id, { status }); loadData() }
+  const handleDeleteMatch = async (id) => {
+    if (!confirm('Is match ko delete karna chahte ho?')) return
+    try {
+      await deleteMatch(id)
+      loadData(); toast.success('Match deleted!')
+    } catch { toast.error('Delete failed') }
+  }
   const handleScoreUpdate = async () => {
     await updateMatchScore(scoreModal._id, { team1Score: { runs: +scoreData.t1runs, wickets: +scoreData.t1wickets }, team2Score: { runs: +scoreData.t2runs, wickets: +scoreData.t2wickets } })
     if (scoreData.winnerId) await updateMatchStatus(scoreModal._id, { status: 'completed', winnerId: scoreData.winnerId })
@@ -333,9 +431,39 @@ export default function Admin() {
               📅 Schedule <span>{activeTab === 'Schedule' ? '▲' : '▼'}</span>
             </button>
             {activeTab === 'Schedule' && (
-              <div className="p-4">
-                <p className="text-gray-500 text-sm mb-4">Creates round-robin matches for all {teams.filter(t => t.status === 'approved').length} approved teams.</p>
-                <button onClick={handleGenerateSchedule} className="btn-primary">Generate Schedule</button>
+              <div className="p-4 space-y-4">
+
+                {/* Manual Match Create */}
+                <div className="card bg-gray-50">
+                  <h3 className="font-bold mb-3">➕ Naya Match Add Karo</h3>
+                  <MatchCreateForm teams={teams} onCreated={loadData} />
+                </div>
+
+                {/* Auto Generate */}
+                <div className="card bg-blue-50">
+                  <h3 className="font-bold mb-1">🔄 Auto Schedule Generate</h3>
+                  <p className="text-gray-500 text-sm mb-3">Sabhi {teams.filter(t => t.status === 'approved' && t.paymentDone).length} confirmed teams ke liye round-robin schedule banao।</p>
+                  <button onClick={handleGenerateSchedule} className="btn-primary">Generate Schedule</button>
+                </div>
+
+                {/* Existing Matches */}
+                {matches.length > 0 && (
+                  <div>
+                    <h3 className="font-bold mb-3">📋 Scheduled Matches ({matches.filter(m => m.status === 'scheduled').length})</h3>
+                    <div className="space-y-2">
+                      {matches.filter(m => m.status === 'scheduled').map(match => (
+                        <div key={match._id} className="card flex justify-between items-center">
+                          <div>
+                            <p className="font-bold text-sm">{match.team1?.teamName} vs {match.team2?.teamName}</p>
+                            <p className="text-xs text-gray-500">{new Date(match.matchDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })} • {new Date(match.matchDate).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</p>
+                            <p className="text-xs text-gray-400">{match.venue} • {match.overs} overs • {match.matchType}</p>
+                          </div>
+                          <button onClick={() => handleDeleteMatch(match._id)} className="text-red-500 text-xs bg-red-50 px-2 py-1 rounded-lg">🗑️</button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>

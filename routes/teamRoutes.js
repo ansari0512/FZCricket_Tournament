@@ -118,6 +118,12 @@ router.put('/:id', async (req, res) => {
       } else if (paymentDone) {
         msg = `✅ Payment confirm ho gayi! Aapki team "${team.teamName}" officially registered hai।`;
         type = 'success';
+      } else if (req.body.paymentScreenshot) {
+        msg = `📸 "${team.teamName}" ne payment screenshot upload kar diya hai। Please confirm karein।`;
+        type = 'info';
+        // Admin ko notification bhejo - admin user find karo
+        // (Admin notifications ke liye alag system nahi hai, isliye log mein print karo)
+        console.log(`[ADMIN ALERT] Team ${team.teamName} ne payment screenshot upload kiya`);
       }
       if (msg) {
         await User.findByIdAndUpdate(team.userId, { $push: { notifications: { message: msg, type } } });

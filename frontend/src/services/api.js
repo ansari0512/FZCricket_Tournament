@@ -72,6 +72,7 @@ export const createMatch = (data) => API.post('/matches/create', data)
 export const updateMatchStatus = (id, data) => API.put(`/matches/${id}/status`, data)
 export const updateMatchScore = (id, data) => API.put(`/matches/${id}/score`, data)
 export const generateSchedule = () => API.post('/matches/generate-schedule')
+export const deleteMatch = (id) => API.delete(`/matches/${id}`)
 
 // Gallery
 export const getGallery = () => API.get('/gallery')
