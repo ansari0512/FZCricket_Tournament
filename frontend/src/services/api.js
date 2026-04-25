@@ -4,27 +4,11 @@ const API = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'https://fzcricket-backend.onrender.com/api',
 })
 
-API.interceptors.request.use(async (config) => {
+API.interceptors.request.use((config) => {
   const adminToken = localStorage.getItem('adminToken')
-  if (adminToken) {
-    config.headers.Authorization = `Bearer ${adminToken}`
-    return config
-  }
-  try {
-    const { auth } = await import('../firebase')
-    // Wait for Firebase auth to be ready
-    await new Promise((resolve) => {
-      if (auth.currentUser) { resolve(); return }
-      const unsubscribe = auth.onAuthStateChanged((user) => {
-        unsubscribe()
-        resolve()
-      })
-    })
-    if (auth.currentUser) {
-      const token = await auth.currentUser.getIdToken()
-      config.headers.Authorization = `Bearer ${token}`
-    }
-  } catch {}
+  const userToken = localStorage.getItem('fzToken')
+  const token = adminToken || userToken
+  if (token) config.headers.Authorization = `Bearer ${token}`
   return config
 })
 
@@ -59,9 +43,9 @@ export const uploadPaymentScreenshot = async (file) => {
 }
 
 // Auth
-export const googleLogin = (data, token = null) => API.post('/auth/google-login', data, token ? { headers: { Authorization: `Bearer ${token}` } } : {})
+export const googleLogin = (data) => API.post('/auth/google-login', data)
 export const updateMobile = (data) => API.put('/auth/update-mobile', data)
-export const getMe = (token = null) => token ? API.get('/auth/me', { headers: { Authorization: `Bearer ${token}` } }) : API.get('/auth/me')
+export const getMe = () => API.get('/auth/me')
 export const getNotifications = () => API.get('/auth/notifications')
 export const markNotificationsRead = () => API.put('/auth/notifications/read')
 export const adminLogin = (data) => API.post('/auth/admin/login', data)

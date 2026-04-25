@@ -28,29 +28,37 @@ export const AppProvider = ({ children }) => {
 
   useEffect(() => {
     fetchData()
+
+    // Pehle localStorage se user load karo (instant)
+    const savedUser = localStorage.getItem('fzUser')
+    const savedToken = localStorage.getItem('fzToken')
+    if (savedUser && savedToken) {
+      setCurrentUser(JSON.parse(savedUser))
+      setAuthLoading(false)
+    }
+
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         try {
-          const token = await firebaseUser.getIdToken(true)
-          await googleLogin({
+          const res = await googleLogin({
             firebaseUid: firebaseUser.uid,
             email: firebaseUser.email,
             name: firebaseUser.displayName,
             photo: firebaseUser.photoURL
-          }, token)
-          const res = await getMe(token)
-          setCurrentUser(res.data)
+          })
+          // JWT token save karo
+          localStorage.setItem('fzToken', res.data.token)
+          localStorage.setItem('fzUser', JSON.stringify(res.data.user))
+          setCurrentUser(res.data.user)
         } catch (err) {
           console.error('Auth error:', err)
-          setCurrentUser({
-            firebaseUid: firebaseUser.uid,
-            email: firebaseUser.email,
-            name: firebaseUser.displayName,
-            photo: firebaseUser.photoURL,
-            teamId: null
-          })
+          // localStorage se fallback
+          const saved = localStorage.getItem('fzUser')
+          if (saved) setCurrentUser(JSON.parse(saved))
         }
       } else {
+        localStorage.removeItem('fzToken')
+        localStorage.removeItem('fzUser')
         setCurrentUser(null)
       }
       setAuthLoading(false)
@@ -60,21 +68,15 @@ export const AppProvider = ({ children }) => {
 
   const logout = async () => {
     await signOut(auth)
+    localStorage.removeItem('fzToken')
+    localStorage.removeItem('fzUser')
     setCurrentUser(null)
   }
 
   const refreshUser = async () => {
     try {
-      const firebaseUser = auth.currentUser
-      if (!firebaseUser) return
-      const token = await firebaseUser.getIdToken(true)
-      await googleLogin({
-        firebaseUid: firebaseUser.uid,
-        email: firebaseUser.email,
-        name: firebaseUser.displayName,
-        photo: firebaseUser.photoURL
-      }, token)
-      const res = await getMe(token)
+      const res = await getMe()
+      localStorage.setItem('fzUser', JSON.stringify(res.data))
       setCurrentUser(res.data)
       return res.data
     } catch (err) {

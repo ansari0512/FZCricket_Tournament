@@ -6,15 +6,15 @@ const { verifyAdmin, verifyUser } = require('../middleware/auth')
 
 const JWT_SECRET = process.env.JWT_SECRET
 
-// Firebase Google Login - user DB mein save karo
+// Firebase Google Login - user DB mein save karo aur JWT return karo
 router.post('/google-login', async (req, res) => {
   try {
-    const { firebaseUid, email, name, photo, mobile } = req.body
+    const { firebaseUid, email, name, photo } = req.body
     if (!firebaseUid || !email) return res.status(400).json({ message: 'Firebase UID aur email required hai' })
 
     let user = await User.findOne({ firebaseUid })
     if (!user) {
-      user = new User({ firebaseUid, email, name: name || '', photo: photo || '', mobile: mobile || '' })
+      user = new User({ firebaseUid, email, name: name || '', photo: photo || '' })
       await user.save()
     } else {
       user.name = name || user.name
@@ -22,25 +22,9 @@ router.post('/google-login', async (req, res) => {
       await user.save()
     }
 
-    res.json({ message: 'Login successful', user })
-  } catch (err) {
-    res.status(500).json({ error: err.message })
-  }
-})
-
-// Update mobile number
-router.put('/update-mobile', verifyUser, async (req, res) => {
-  try {
-    const { mobile } = req.body
-    if (!mobile || !/^[0-9]{10}$/.test(mobile))
-      return res.status(400).json({ message: 'Valid 10 digit mobile number required hai' })
-
-    const user = await User.findOneAndUpdate(
-      { firebaseUid: req.user.userId },
-      { mobile },
-      { new: true }
-    )
-    res.json({ message: 'Mobile updated', user })
+    // JWT token generate karo
+    const token = jwt.sign({ userId: user._id.toString(), firebaseUid, email }, JWT_SECRET, { expiresIn: '7d' })
+    res.json({ message: 'Login successful', user, token })
   } catch (err) {
     res.status(500).json({ error: err.message })
   }
@@ -49,7 +33,7 @@ router.put('/update-mobile', verifyUser, async (req, res) => {
 // Get current user
 router.get('/me', verifyUser, async (req, res) => {
   try {
-    const user = await User.findOne({ firebaseUid: req.user.userId })
+    const user = await User.findById(req.user.userId)
     if (!user) return res.status(404).json({ message: 'User not found' })
     res.json(user)
   } catch (err) {
@@ -60,7 +44,7 @@ router.get('/me', verifyUser, async (req, res) => {
 // Get Notifications
 router.get('/notifications', verifyUser, async (req, res) => {
   try {
-    const user = await User.findOne({ firebaseUid: req.user.userId })
+    const user = await User.findById(req.user.userId)
     if (!user) return res.status(404).json({ message: 'User not found' })
     res.json(user.notifications.sort((a, b) => b.createdAt - a.createdAt))
   } catch (err) {
@@ -71,10 +55,7 @@ router.get('/notifications', verifyUser, async (req, res) => {
 // Mark notifications read
 router.put('/notifications/read', verifyUser, async (req, res) => {
   try {
-    await User.findOneAndUpdate(
-      { firebaseUid: req.user.userId },
-      { $set: { 'notifications.$[].read': true } }
-    )
+    await User.findByIdAndUpdate(req.user.userId, { $set: { 'notifications.$[].read': true } })
     res.json({ message: 'Marked as read' })
   } catch (err) {
     res.status(500).json({ error: err.message })
@@ -111,8 +92,10 @@ router.delete('/admin/users/:userId', verifyAdmin, async (req, res) => {
     const user = await User.findById(req.params.userId)
     if (!user) return res.status(404).json({ message: 'User not found' })
     if (user.teamId) {
-      await require('../models/Player').deleteMany({ teamId: user.teamId })
-      await require('../models/Team').findByIdAndDelete(user.teamId)
+      const Player = require('../models/Player')
+      const Team = require('../models/Team')
+      await Player.deleteMany({ teamId: user.teamId })
+      await Team.findByIdAndDelete(user.teamId)
     }
     await User.findByIdAndDelete(req.params.userId)
     res.json({ message: 'User deleted' })
