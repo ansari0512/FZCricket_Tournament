@@ -33,8 +33,18 @@ export const AppProvider = ({ children }) => {
     const savedUser = localStorage.getItem('fzUser')
     const savedToken = localStorage.getItem('fzToken')
     if (savedUser && savedToken) {
-      setCurrentUser(JSON.parse(savedUser))
-      setAuthLoading(false)
+      try {
+        // Token valid hai ya nahi check karo
+        const payload = JSON.parse(atob(savedToken.split('.')[1]))
+        const isExpired = payload.exp * 1000 < Date.now()
+        if (!isExpired && payload.userId) {
+          setCurrentUser(JSON.parse(savedUser))
+          setAuthLoading(false)
+        }
+      } catch {
+        localStorage.removeItem('fzToken')
+        localStorage.removeItem('fzUser')
+      }
     }
 
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {

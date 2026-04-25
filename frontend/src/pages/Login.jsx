@@ -22,8 +22,9 @@ export default function Login() {
       toast.success('Login successful!')
       navigate('/dashboard')
     } catch (err) {
-      toast.error('Login failed. Please try again.')
-      console.error(err)
+      if (err.code !== 'auth/popup-closed-by-user') {
+        toast.error('Login failed. Please try again.')
+      }
     }
     setLoading(false)
   }
