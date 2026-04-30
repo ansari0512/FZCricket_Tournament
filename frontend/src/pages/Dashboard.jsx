@@ -49,6 +49,7 @@ function PlayerModal({ player, onClose, onPrev, onNext }) {
 function PaymentSection({ team, onScreenshotUploaded }) {
   const [showQR, setShowQR] = useState(false)
   const [uploading, setUploading] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState(0)
   const [uploaded, setUploaded] = useState(!!team.paymentScreenshot)
   const [copied, setCopied] = useState('')
 
@@ -71,14 +72,18 @@ function PaymentSection({ team, onScreenshotUploaded }) {
     const file = e.target.files[0]
     if (!file) return
     setUploading(true)
+    setUploadProgress(0)
     try {
-      const url = await uploadPaymentScreenshot(file)
+      const url = await uploadPaymentScreenshot(file, (percent) => {
+        setUploadProgress(percent)
+      })
       await updateTeam(team._id, { paymentScreenshot: url })
       onScreenshotUploaded(url)
       setUploaded(true)
       toast.success('Screenshot upload ho gaya! Admin confirm karega।')
     } catch { toast.error('Upload failed') }
     setUploading(false)
+    setUploadProgress(0)
   }
 
   // Agar paymentDone ho gaya toh yeh section hide karo
@@ -184,9 +189,17 @@ function PaymentSection({ team, onScreenshotUploaded }) {
         <div>
           <p className="text-sm text-yellow-700 mb-2">Payment ke baad screenshot upload karo:</p>
           <label className={`btn-primary w-full text-center cursor-pointer block ${uploading ? 'opacity-50' : ''}`}>
-            {uploading ? 'Uploading...' : '📸 Payment Screenshot Upload Karo'}
+            {uploading ? `Uploading... ${uploadProgress}%` : '📸 Payment Screenshot Upload Karo'}
             <input type="file" accept="image/*" onChange={handleUpload} disabled={uploading} className="hidden" />
           </label>
+          {uploading && (
+            <div className="mt-3">
+              <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                <div className="h-full bg-yellow-500 transition-all duration-300" style={{width: `${uploadProgress}%`}}></div>
+              </div>
+              <p className="text-xs text-yellow-700 text-center mt-1">{uploadProgress}% complete</p>
+            </div>
+          )}
         </div>
       )}
     </div>

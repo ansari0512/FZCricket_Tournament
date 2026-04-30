@@ -17,28 +17,43 @@ export const CLOUDINARY_PRESET = import.meta.env.VITE_CLOUDINARY_PRESET || ''
 export const CLOUDINARY_PLAYERS_PRESET = import.meta.env.VITE_CLOUDINARY_PLAYERS_PRESET || ''
 export const CLOUDINARY_PAYMENTS_PRESET = import.meta.env.VITE_CLOUDINARY_PAYMENTS_PRESET || 'fzcricket_payments'
 
-export const uploadImage = async (file, folder = null) => {
+export const uploadImage = async (file, folder = null, onProgress) => {
   const fd = new FormData()
   fd.append('file', file)
   fd.append('upload_preset', CLOUDINARY_PLAYERS_PRESET)
   if (folder) fd.append('folder', `fzcricket/${folder}`)
-  const res = await axios.post(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, fd)
+  const res = await axios.post(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, fd, {
+    onUploadProgress: (progressEvent) => {
+      const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total)
+      if (onProgress) onProgress(percent)
+    }
+  })
   return res.data.secure_url
 }
 
-export const uploadGalleryImage = async (file) => {
+export const uploadGalleryImage = async (file, onProgress) => {
   const fd = new FormData()
   fd.append('file', file)
   fd.append('upload_preset', CLOUDINARY_PRESET)
-  const res = await axios.post(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, fd)
+  const res = await axios.post(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, fd, {
+    onUploadProgress: (progressEvent) => {
+      const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total)
+      if (onProgress) onProgress(percent)
+    }
+  })
   return res.data.secure_url
 }
 
-export const uploadPaymentScreenshot = async (file) => {
+export const uploadPaymentScreenshot = async (file, onProgress) => {
   const fd = new FormData()
   fd.append('file', file)
   fd.append('upload_preset', CLOUDINARY_PAYMENTS_PRESET)
-  const res = await axios.post(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, fd)
+  const res = await axios.post(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, fd, {
+    onUploadProgress: (progressEvent) => {
+      const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total)
+      if (onProgress) onProgress(percent)
+    }
+  })
   return res.data.secure_url
 }
 

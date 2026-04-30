@@ -135,21 +135,47 @@ function TeamCard({ team, index }) {
 
 export default function Teams() {
   const { teams, loading } = useApp()
+  const [searchQuery, setSearchQuery] = useState('')
+  
+  const filteredTeams = teams.filter(t => 
+    t.teamName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    t.captainName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    t.city.toLowerCase().includes(searchQuery.toLowerCase())
+  )
 
   if (loading) return <div className="flex justify-center py-20"><div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" /></div>
 
   return (
     <div className="py-8 px-4 pb-20">
       <div className="max-w-6xl mx-auto">
-        <h2 className="text-2xl font-bold text-center mb-8">Registered Teams ({teams.length}/8)</h2>
-        {teams.length === 0 ? (
+        <h2 className="text-2xl font-bold text-center mb-4">Registered Teams ({teams.length}/8)</h2>
+        
+        {/* Search Bar */}
+        <div className="max-w-md mx-auto mb-8">
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Search by team, captain or city..."
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              className="input pl-10 w-full"
+            />
+            <svg className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+              fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+        </div>
+
+        {filteredTeams.length === 0 ? (
           <div className="text-center py-16 text-gray-400">
             <p className="text-5xl mb-3">👥</p>
             <p>No teams registered yet</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {teams.map((team, i) => <TeamCard key={team._id} team={team} index={i} />)}
+            {filteredTeams.map((team, i) => <TeamCard key={team._id} team={team} index={i} />)}
           </div>
         )}
       </div>

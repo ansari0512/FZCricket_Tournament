@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { adminLogin, getAdminUsers, deleteAdminUser, getAllTeams, getTeam, updateTeam, deleteTeam, getTeamPlayers, deletePlayer, getMatches, updateMatchStatus, updateMatchScore, createMatch, deleteMatch, getGallery, addGalleryPhoto, deleteGalleryPhoto } from '../services/api'
 import toast from 'react-hot-toast'
+import io from 'socket.io-client'
 
 const ROLE_LABELS = { batsman: '🏏 Batsman', bowler: '🎯 Bowler', 'all-rounder': '⭐ All-Rounder', 'wicket-keeper': '🧤 Wicket Keeper' }
 
@@ -178,16 +179,47 @@ export default function Admin() {
   const [previewIndex, setPreviewIndex] = useState(null)
   const [userTeamModal, setUserTeamModal] = useState(null) // {team, players}
 
-  const loadData = async () => {
-    try {
-      const [t, u, m, g] = await Promise.all([getAllTeams(), getAdminUsers(), getMatches(), getGallery()])
-      setTeams(t.data); setUsers(u.data); setMatches(m.data); setGallery(g.data)
-    } catch (error) {
-      console.error('Failed to load admin data:', error)
-    }
-  }
+   const loadData = async () => {
+     try {
+       const [t, u, m, g] = await Promise.all([getAllTeams(), getAdminUsers(), getMatches(), getGallery()])
+       setTeams(t.data); setUsers(u.data); setMatches(m.data); setGallery(g.data)
+     } catch (error) {
+       console.error('Failed to load admin data:', error)
+     }
+   }
 
-  useEffect(() => { if (loggedIn) loadData() }, [loggedIn])
+   useEffect(() => {
+     if (loggedIn) loadData()
+   }, [loggedIn])
+
+   useEffect(() => {
+     if (!loggedIn) return
+     const socket = io(import.meta.env.VITE_API_URL || 'https://fzcricket-backend.onrender.com', {
+       transports: ['websocket'],
+       reconnection: true,
+       reconnectionAttempts: 5
+     })
+
+     socket.on('connect', () => {
+       console.log('Admin: Socket connected')
+     })
+
+     socket.on('scoreUpdate', (data) => {
+       setMatches(prev => prev.map(m => m._id === data.matchId ? { ...m, team1Score: data.team1Score, team2Score: data.team2Score } : m))
+     })
+
+     socket.on('matchStatusChange', (data) => {
+       setMatches(prev => prev.map(m => m._id === data.matchId ? { ...m, ...data } : m))
+       // Teams stats update
+       if (data.status === 'completed') {
+         loadData()
+       }
+     })
+
+     return () => {
+       socket.disconnect()
+     }
+   }, [loggedIn])
 
   const toggle = (tab) => setActiveTab(activeTab === tab ? '' : tab)
 
@@ -283,9 +315,9 @@ export default function Admin() {
     </div>
   )
 
-  return (
-    <div className="py-6 px-4 pb-20">
-      <div className="max-w-6xl mx-auto">
+   return (
+    <div className="py-6 px-4 pb-24">
+      <div className="w-full max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold">Admin Dashboard</h2>
           <button onClick={() => { localStorage.removeItem('adminToken'); setLoggedIn(false) }} className="text-red-500 font-medium text-sm">Logout</button>

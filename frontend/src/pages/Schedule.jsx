@@ -1,10 +1,47 @@
 import { useApp } from '../context/AppContext'
+import { useEffect, useState } from 'react'
+import io from 'socket.io-client'
 
 export default function Schedule() {
   const { matches, loading } = useApp()
-  const scheduled = matches.filter(m => m.status === 'scheduled')
-  const live = matches.filter(m => m.status === 'in-progress')
-
+  const [liveMatches, setLiveMatches] = useState([])
+  const [scheduledMatches, setScheduledMatches] = useState([])
+  
+  useEffect(() => {
+    setLiveMatches(matches.filter(m => m.status === 'in-progress'))
+    setScheduledMatches(matches.filter(m => m.status === 'scheduled'))
+  }, [matches])
+  
+  useEffect(() => {
+    const socket = io(import.meta.env.VITE_API_URL || 'https://fzcricket-backend.onrender.com', {
+      transports: ['websocket'],
+      reconnection: true,
+      reconnectionAttempts: 5
+    })
+    
+    socket.on('connect', () => {
+      console.log('Schedule: Socket connected')
+    })
+    
+    socket.on('scoreUpdate', (data) => {
+      setLiveMatches(prev => prev.map(m => 
+        m._id === data.matchId ? { ...m, team1Score: data.team1Score, team2Score: data.team2Score } : m
+      ))
+    })
+    
+    socket.on('matchStatusChange', (data) => {
+      setLiveMatches(prev => {
+        const updated = prev.map(m => m._id === data.matchId ? { ...m, ...data } : m)
+        setScheduledMatches(scheduled => scheduled.filter(m => m._id !== data.matchId))
+        return updated
+      })
+    })
+    
+    return () => {
+      socket.disconnect()
+    }
+  }, [])
+  
   if (loading) return <div className="flex justify-center py-20"><div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" /></div>
 
   return (
@@ -12,7 +49,7 @@ export default function Schedule() {
       <div className="max-w-4xl mx-auto space-y-8">
 
         {/* Live Matches */}
-        {live.length > 0 && (
+        {liveMatches.length > 0 && (
           <div>
             <h2 className="text-2xl font-bold text-center mb-6 flex items-center justify-center gap-2">
               <span className="w-3 h-3 bg-red-600 rounded-full animate-pulse inline-block"></span>
@@ -48,14 +85,14 @@ export default function Schedule() {
         {/* Scheduled Matches */}
         <div>
           <h2 className="text-2xl font-bold text-center mb-6">📅 Tournament Schedule</h2>
-          {scheduled.length === 0 ? (
+          {scheduledMatches.length === 0 ? (
             <div className="text-center py-16 text-gray-400">
               <p className="text-5xl mb-3">📅</p>
               <p>Abhi koi match schedule nahi hai</p>
             </div>
           ) : (
             <div className="space-y-4">
-              {scheduled.map((match) => (
+              {scheduledMatches.map((match) => (
                 <div key={match._id} className="card hover:shadow-lg transition">
                   <div className="flex justify-between items-start mb-3">
                     <div className="flex gap-2">

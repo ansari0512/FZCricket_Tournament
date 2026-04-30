@@ -8,6 +8,7 @@ const AppContext = createContext()
 export const AppProvider = ({ children }) => {
   const [teams, setTeams] = useState([])
   const [allTeamsCount, setAllTeamsCount] = useState(0)
+  const [approvedPaidTeamsCount, setApprovedPaidTeamsCount] = useState(0)
   const [matches, setMatches] = useState([])
   const [loading, setLoading] = useState(true)
   const [currentUser, setCurrentUser] = useState(null)
@@ -15,9 +16,10 @@ export const AppProvider = ({ children }) => {
 
   const fetchData = async () => {
     try {
-      const [teamsRes, matchesRes] = await Promise.all([getTeams(), getMatches()])
+      const [teamsRes, matchesRes, allTeamsRes] = await Promise.all([getTeams(), getMatches(), getAllTeams()])
       setTeams(teamsRes.data)
       setAllTeamsCount(teamsRes.data.length)
+      setApprovedPaidTeamsCount(allTeamsRes.data.length)
       setMatches(matchesRes.data)
     } catch {
       setTeams([]); setMatches([])
@@ -104,7 +106,7 @@ export const AppProvider = ({ children }) => {
     }
   }
 
-  const registrationOpen = allTeamsCount < 8
+  const registrationOpen = approvedPaidTeamsCount < 8
 
   return (
     <AppContext.Provider value={{ teams, matches, loading, authLoading, currentUser, logout, fetchData, registrationOpen, refreshUser }}>
