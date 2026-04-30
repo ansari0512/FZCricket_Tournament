@@ -2,11 +2,15 @@ const express = require('express');
 const router = express.Router();
 const Player = require('../models/Player');
 const Team = require('../models/Team');
-const { verifyUser, verifyAdmin } = require('../middleware/auth');
+const { verifyAuth, verifyAdmin } = require('../middleware/auth');
 
 const MAX_PLAYERS = 15;
 
-router.post('/register/:teamId', async (req, res) => {
+const canManageTeam = (req, team) => {
+  return req.user.role === 'admin' || team.userId?.toString() === req.user.userId;
+};
+
+router.post('/register/:teamId', verifyAuth, async (req, res) => {
   try {
     const { teamId } = req.params;
     const { name, age, jerseyNumber, role, phone, photo, address } = req.body;
@@ -28,6 +32,7 @@ router.post('/register/:teamId', async (req, res) => {
       return res.status(400).json({ message: 'Phone 10 digit ka hona chahiye' });
     const team = await Team.findById(teamId);
     if (!team) return res.status(404).json({ message: 'Team not found' });
+    if (!canManageTeam(req, team)) return res.status(403).json({ message: 'You can add players only to your own team' });
 
     const playerCount = await Player.countDocuments({ teamId });
     if (playerCount >= MAX_PLAYERS) return res.status(400).json({ message: 'Team already has 15 players' });
@@ -59,9 +64,17 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', verifyAuth, async (req, res) => {
   try {
-    const player = await Player.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const existingPlayer = await Player.findById(req.params.id);
+    if (!existingPlayer) return res.status(404).json({ message: 'Player not found' });
+    const team = await Team.findById(existingPlayer.teamId);
+    if (!team) return res.status(404).json({ message: 'Team not found' });
+    if (!canManageTeam(req, team)) return res.status(403).json({ message: 'You can update players only in your own team' });
+
+    const allowedFields = ['name', 'age', 'jerseyNumber', 'role', 'phone', 'photo', 'address'];
+    const updateData = Object.fromEntries(Object.entries(req.body).filter(([key]) => allowedFields.includes(key)));
+    const player = await Player.findByIdAndUpdate(req.params.id, updateData, { new: true });
     res.json(player);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -77,7 +90,7 @@ router.delete('/:id', verifyAdmin, async (req, res) => {
   }
 });
 
-router.post('/bulk-register/:teamId', async (req, res) => {
+router.post('/bulk-register/:teamId', verifyAuth, async (req, res) => {
   try {
     const { teamId } = req.params;
     const { players } = req.body;
@@ -88,6 +101,7 @@ router.post('/bulk-register/:teamId', async (req, res) => {
     if (!team) {
       return res.status(404).json({ message: 'Team not found' });
     }
+    if (!canManageTeam(req, team)) return res.status(403).json({ message: 'You can add players only to your own team' });
 
     const currentCount = await Player.countDocuments({ teamId });
     if (currentCount + players.length > MAX_PLAYERS) {

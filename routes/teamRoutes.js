@@ -4,7 +4,7 @@ const Team = require('../models/Team');
 const Player = require('../models/Player');
 const Payment = require('../models/Payment');
 const User = require('../models/User');
-const { verifyAdmin, verifyUser } = require('../middleware/auth');
+const { verifyAdmin, verifyUser, verifyAuth } = require('../middleware/auth');
 
 const MAX_TEAMS = 8;
 const REGISTRATION_FEE = 300;
@@ -59,13 +59,13 @@ router.get('/:id/players', async (req, res) => {
   }
 });
 
-router.post('/register', async (req, res) => {
+router.post('/register', verifyUser, async (req, res) => {
   try {
     const approvedCount = await Team.countDocuments({ status: 'approved', paymentDone: true });
     if (approvedCount >= MAX_TEAMS)
       return res.status(400).json({ message: 'Registration is closed. All 8 teams have registered.' });
 
-    const { teamName, captainName, captainPhone, city, userId, firebaseUid } = req.body;
+    const { teamName, captainName, captainPhone, city } = req.body;
 
     if (!teamName || !captainName || !captainPhone || !city)
       return res.status(400).json({ message: 'teamName, captainName, captainPhone aur city required hain' });
@@ -80,19 +80,14 @@ router.post('/register', async (req, res) => {
     if (existingTeam)
       return res.status(400).json({ message: 'Team name already exists' });
 
-    // firebaseUid se user dhundho
-    let dbUserId = userId || null
-    if (firebaseUid) {
-      const user = await User.findOne({ firebaseUid })
-      if (user) dbUserId = user._id
-    }
+    const currentUser = await User.findById(req.user.userId);
+    if (!currentUser) return res.status(404).json({ message: 'User not found' });
+    if (currentUser.teamId) return res.status(400).json({ message: 'Aapki team already registered hai' });
 
-    const team = new Team({ teamName, captainName, captainPhone, city, userId: dbUserId, status: 'pending' });
+    const team = new Team({ teamName, captainName, captainPhone, city, userId: currentUser._id, status: 'pending' });
     await team.save();
 
-    if (dbUserId) {
-      await User.findByIdAndUpdate(dbUserId, { teamId: team._id });
-    }
+    await User.findByIdAndUpdate(currentUser._id, { teamId: team._id });
 
     res.status(201).json({ message: 'Team registered successfully', team });
   } catch (err) {
@@ -100,10 +95,26 @@ router.post('/register', async (req, res) => {
   }
 });
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', verifyAuth, async (req, res) => {
   try {
-    const { status, rejectReason, paymentDone } = req.body;
-    const team = await Team.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const existingTeam = await Team.findById(req.params.id);
+    if (!existingTeam) return res.status(404).json({ message: 'Team not found' });
+
+    const isAdmin = req.user.role === 'admin';
+    const isOwner = existingTeam.userId?.toString() === req.user.userId;
+    if (!isAdmin && !isOwner) return res.status(403).json({ message: 'You can update only your own team' });
+
+    const allowedUserFields = ['teamName', 'captainName', 'captainPhone', 'city', 'submitted', 'paymentScreenshot'];
+    const updateData = isAdmin
+      ? req.body
+      : Object.fromEntries(Object.entries(req.body).filter(([key]) => allowedUserFields.includes(key)));
+
+    if (!isAdmin && req.body.status === 'pending' && existingTeam.status === 'rejected') {
+      updateData.status = 'pending';
+    }
+    const { status, rejectReason, paymentDone } = updateData;
+
+    const team = await Team.findByIdAndUpdate(req.params.id, updateData, { new: true });
     if (!team) return res.status(404).json({ message: 'Team not found' });
 
     // Send notification to user

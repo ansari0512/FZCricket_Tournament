@@ -29,4 +29,15 @@ const verifyUser = (req, res, next) => {
   }
 }
 
-module.exports = { verifyAdmin, verifyUser }
+const verifyAuth = (req, res, next) => {
+  const token = req.headers.authorization?.split(' ')[1]
+  if (!token) return res.status(401).json({ message: 'No token provided' })
+  try {
+    req.user = jwt.verify(token, JWT_SECRET)
+    next()
+  } catch {
+    return res.status(401).json({ message: 'Invalid token' })
+  }
+}
+
+module.exports = { verifyAdmin, verifyUser, verifyAuth }
