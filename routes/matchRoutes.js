@@ -4,6 +4,33 @@ const Match = require('../models/Match');
 const Team = require('../models/Team');
 const { verifyAdmin } = require('../middleware/auth');
 
+const getResultUpdates = (match, winnerId, direction) => {
+  const team1Id = match.team1;
+  const team2Id = match.team2;
+  const updates = [
+    { id: team1Id, inc: { matchesPlayed: direction } },
+    { id: team2Id, inc: { matchesPlayed: direction } }
+  ];
+
+  if (winnerId) {
+    const loserId = winnerId.toString() === team1Id.toString() ? team2Id : team1Id;
+    updates.push({ id: winnerId, inc: { wins: direction, points: 2 * direction } });
+    updates.push({ id: loserId, inc: { losses: direction } });
+  } else {
+    updates.push({ id: team1Id, inc: { draws: direction, points: direction } });
+    updates.push({ id: team2Id, inc: { draws: direction, points: direction } });
+  }
+
+  return updates;
+};
+
+const applyTeamResult = async (match, winnerId, direction) => {
+  const updates = getResultUpdates(match, winnerId, direction);
+  for (const update of updates) {
+    await Team.findByIdAndUpdate(update.id, { $inc: update.inc });
+  }
+};
+
 router.get('/', async (req, res) => {
   try {
     const matches = await Match.find()
@@ -110,32 +137,20 @@ router.post('/create', verifyAdmin, async (req, res) => {
 router.put('/:id/status', verifyAdmin, async (req, res) => {
   try {
     const { status, winnerId } = req.body;
-    const match = await Match.findByIdAndUpdate(
-      req.params.id,
-      { status, winner: winnerId || null },
-      { new: true }
-    );
+    const match = await Match.findById(req.params.id);
+    if (!match) return res.status(404).json({ message: 'Match not found' });
 
-    // Match complete hone pe team stats update karo
-    if (status === 'completed' && match) {
-      const team1Id = match.team1;
-      const team2Id = match.team2;
+    const wasCompleted = match.status === 'completed';
+    if (wasCompleted) {
+      await applyTeamResult(match, match.winner, -1);
+    }
 
-      // Dono teams ke matchesPlayed increment karo
-      await Team.findByIdAndUpdate(team1Id, { $inc: { matchesPlayed: 1 } });
-      await Team.findByIdAndUpdate(team2Id, { $inc: { matchesPlayed: 1 } });
+    match.status = status;
+    match.winner = status === 'completed' ? (winnerId || null) : null;
+    await match.save();
 
-      if (winnerId) {
-        const loserId = winnerId.toString() === team1Id.toString() ? team2Id : team1Id;
-        // Winner ko 2 points aur win
-        await Team.findByIdAndUpdate(winnerId, { $inc: { wins: 1, points: 2 } });
-        // Loser ko loss
-        await Team.findByIdAndUpdate(loserId, { $inc: { losses: 1 } });
-      } else {
-        // No result - dono ko 1 point
-        await Team.findByIdAndUpdate(team1Id, { $inc: { points: 1 } });
-        await Team.findByIdAndUpdate(team2Id, { $inc: { points: 1 } });
-      }
+    if (status === 'completed') {
+      await applyTeamResult(match, match.winner, 1);
     }
 
     res.json(match);
