@@ -127,9 +127,78 @@ function PlayerModal({ player, onClose, onPrev, onNext }) {
             <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
               <span className="text-2xl">📍</span>
               <div><p className="text-xs text-gray-500">Address</p><p className="font-bold">{player.address}</p></div>
-            </div>
-          )}
+             </div>
+          </div>
         </div>
+      </div>
+    </div>
+  )
+}
+
+function UPIConfigPanel({ config, onUpdate }) {
+  const [editing, setEditing] = useState(false)
+  const [values, setValues] = useState({ gpay: '', phonepe: '', paytm: '' })
+  
+  useEffect(() => {
+    setValues({
+      gpay: config.gpay || '',
+      phonepe: config.phonepe || '',
+      paytm: config.paytm || ''
+    })
+  }, [config])
+  
+  const handleSave = async () => {
+    const updates = [
+      { key: 'UPI_GPAY', value: values.gpay, description: 'GPay UPI ID' },
+      { key: 'UPI_PHONEPE', value: values.phonepe, description: 'PhonePe UPI ID' },
+      { key: 'UPI_PAYTM', value: values.paytm, description: 'Paytm UPI ID' }
+    ]
+    for (const update of updates) {
+      await fetch('/api/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
+        body: JSON.stringify(update)
+      })
+    }
+    onUpdate()
+    setEditing(false)
+  }
+  
+  return (
+    <div className="mt-6">
+      <div className="flex justify-between items-center mb-3">
+        <h4 className="font-bold">⚙️ UPI Payment Settings</h4>
+        <button onClick={() => setEditing(!editing)} className="text-sm bg-gray-800 text-white px-3 py-1 rounded">
+          {editing ? 'Cancel' : 'Edit'}
+        </button>
+      </div>
+      <div className="space-y-2">
+        {editing ? (
+          <>
+            <div className="flex gap-2">
+              <span className="w-16 text-xs text-gray-500 pt-2">GPay:</span>
+              <input type="text" value={values.gpay} onChange={e => setValues({...values, gpay: e.target.value})}
+                className="input text-sm flex-1" />
+            </div>
+            <div className="flex gap-2">
+              <span className="w-16 text-xs text-gray-500 pt-2">PhonePe:</span>
+              <input type="text" value={values.phonepe} onChange={e => setValues({...values, phonepe: e.target.value})}
+                className="input text-sm flex-1" />
+            </div>
+            <div className="flex gap-2">
+              <span className="w-16 text-xs text-gray-500 pt-2">Paytm:</span>
+              <input type="text" value={values.paytm} onChange={e => setValues({...values, paytm: e.target.value})}
+                className="input text-sm flex-1" />
+            </div>
+            <button onClick={handleSave} className="w-full bg-green-600 text-white py-2 rounded mt-2 text-sm">Save</button>
+          </>
+        ) : (
+          <>
+            <p className="text-sm"><span className="text-gray-500">GPay:</span> {config.gpay || 'Not set'}</p>
+            <p className="text-sm"><span className="text-gray-500">PhonePe:</span> {config.phonepe || 'Not set'}</p>
+            <p className="text-sm"><span className="text-gray-500">Paytm:</span> {config.paytm || 'Not set'}</p>
+          </>
+        )}
       </div>
     </div>
   )
@@ -178,15 +247,20 @@ export default function Admin() {
   const [caption, setCaption] = useState('')
   const [previewIndex, setPreviewIndex] = useState(null)
   const [userTeamModal, setUserTeamModal] = useState(null) // {team, players}
+  const [upiConfig, setUpiConfig] = useState({ gpay: '', phonepe: '', paytm: '' })
 
-   const loadData = async () => {
-     try {
-       const [t, u, m, g] = await Promise.all([getAllTeams(), getAdminUsers(), getMatches(), getGallery()])
-       setTeams(t.data); setUsers(u.data); setMatches(m.data); setGallery(g.data)
-     } catch (error) {
-       console.error('Failed to load admin data:', error)
-     }
-   }
+  const loadData = async () => {
+    try {
+      const [t, u, m, g] = await Promise.all([getAllTeams(), getAdminUsers(), getMatches(), getGallery()])
+      setTeams(t.data); setUsers(u.data); setMatches(m.data); setGallery(g.data)
+      // Fetch UPI config
+      const res = await fetch('/api/config/payment')
+      const upi = await res.json()
+      setUpiConfig(upi)
+    } catch (error) {
+      console.error('Failed to load admin data:', error)
+    }
+  }
 
    useEffect(() => {
      if (loggedIn) loadData()
@@ -499,7 +573,7 @@ export default function Admin() {
                     <input type="file" accept="image/*" onChange={handleGalleryUpload} disabled={uploading} className="hidden" />
                   </label>
                 </div>
-                {gallery.length === 0 ? <p className="text-center text-gray-400 py-10">No photos yet</p> : (
+                 {gallery.length === 0 ? <p className="text-center text-gray-400 py-10">No photos yet</p> : (
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                     {gallery.map((p, i) => (
                       <div key={i} className="relative rounded-2xl overflow-hidden aspect-square shadow">
@@ -510,6 +584,7 @@ export default function Admin() {
                     ))}
                   </div>
                 )}
+                <UPIConfigPanel config={upiConfig} onUpdate={loadData} />
               </div>
             )}
           </div>

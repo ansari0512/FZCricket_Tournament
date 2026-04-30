@@ -310,6 +310,7 @@ export default function Dashboard() {
   const [previewIndex, setPreviewIndex] = useState(null)
   const [notifRefresh, setNotifRefresh] = useState(0)
   const [fileKey, setFileKey] = useState(0) // photo input reset ke liye
+  const [upiConfig, setUpiConfig] = useState({ gpay: '', phonepe: '', paytm: '' })
 
   useEffect(() => {
     if (!currentUser) { navigate('/login'); return }
@@ -358,15 +359,26 @@ export default function Dashboard() {
     }, 10000)
     return () => clearInterval(interval)
   }, [team?.status, team?.paymentDone, currentUser?.teamId]) // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Get UPI ID (in production, this should come from backend API to avoid exposing in frontend)
-  const getUPIID = (type) => {
-    const ids = {
-      gpay: 'UPID_HIDDEN',
-      phonepe: 'UPID_HIDDEN',
-      paytm: 'UPID_HIDDEN'
+  // Fetch UPI config for payments
+  useEffect(() => {
+    const fetchUPIs = async () => {
+      try {
+        const { getPaymentConfig } = await import('../services/api')
+        const res = await getPaymentConfig()
+        setUpiConfig({
+          gpay: res.data.gpay || '',
+          phonepe: res.data.phonepe || '',
+          paytm: res.data.paytm || ''
+        })
+      } catch (err) {
+        console.error('Failed to fetch payment config')
+      }
     }
-    return ids[type] || 'UPID_HIDDEN'
+    if (currentUser) fetchUPIs()
+  }, [currentUser])
+
+  const getUPIID = (type) => {
+    return upiConfig[type] || ''
   }
 
   const handleUpdateTeam = async (e) => {

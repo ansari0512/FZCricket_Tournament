@@ -44,18 +44,7 @@ export const uploadGalleryImage = async (file, onProgress) => {
   return res.data.secure_url
 }
 
-export const uploadPaymentScreenshot = async (file, onProgress) => {
-  const fd = new FormData()
-  fd.append('file', file)
-  fd.append('upload_preset', CLOUDINARY_PAYMENTS_PRESET)
-  const res = await axios.post(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, fd, {
-    onUploadProgress: (progressEvent) => {
-      const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total)
-      if (onProgress) onProgress(percent)
-    }
-  })
-  return res.data.secure_url
-}
+export const getPaymentConfig = () => API.get('/config/payment')
 
 // Auth
 export const googleLogin = (data) => API.post('/auth/google-login', data)
