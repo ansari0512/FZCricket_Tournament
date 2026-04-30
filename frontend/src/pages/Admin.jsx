@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { adminLogin, getAdminUsers, deleteAdminUser, getAllTeams, getTeam, updateTeam, deleteTeam, getTeamPlayers, deletePlayer, getMatches, updateMatchStatus, updateMatchScore, generateSchedule, createMatch, deleteMatch, getGallery, addGalleryPhoto, deleteGalleryPhoto } from '../services/api'
+import { adminLogin, getAdminUsers, deleteAdminUser, getAllTeams, getTeam, updateTeam, deleteTeam, getTeamPlayers, deletePlayer, getMatches, updateMatchStatus, updateMatchScore, createMatch, deleteMatch, getGallery, addGalleryPhoto, deleteGalleryPhoto } from '../services/api'
 import toast from 'react-hot-toast'
 
 const ROLE_LABELS = { batsman: '🏏 Batsman', bowler: '🎯 Bowler', 'all-rounder': '⭐ All-Rounder', 'wicket-keeper': '🧤 Wicket Keeper' }
@@ -248,10 +248,6 @@ export default function Admin() {
     if (scoreData.winnerId) await updateMatchStatus(scoreModal._id, { status: 'completed', winnerId: scoreData.winnerId })
     setScoreModal(null); loadData(); toast.success('Score updated!')
   }
-  const handleGenerateSchedule = async () => {
-    if (!confirm('Generate schedule for all teams?')) return
-    await generateSchedule(); loadData(); toast.success('Schedule generated!')
-  }
   const handleGalleryUpload = async (e) => {
     const file = e.target.files[0]; if (!file) return
     setUploading(true)
@@ -431,13 +427,6 @@ export default function Admin() {
                 <div className="card bg-gray-50">
                   <h3 className="font-bold mb-3">➕ Naya Match Add Karo</h3>
                   <MatchCreateForm teams={teams} onCreated={loadData} />
-                </div>
-
-                {/* Auto Generate */}
-                <div className="card bg-blue-50">
-                  <h3 className="font-bold mb-1">🔄 Auto Schedule Generate</h3>
-                  <p className="text-gray-500 text-sm mb-3">Sabhi {teams.filter(t => t.status === 'approved' && t.paymentDone).length} confirmed teams ke liye round-robin schedule banao।</p>
-                  <button onClick={handleGenerateSchedule} className="btn-primary">Generate Schedule</button>
                 </div>
 
                 {/* Existing Matches */}

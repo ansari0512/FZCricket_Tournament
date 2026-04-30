@@ -183,44 +183,7 @@ router.delete('/:id', verifyAdmin, async (req, res) => {
 });
 
 router.post('/generate-schedule', verifyAdmin, async (req, res) => {
-  try {
-    const teams = await Team.find({ status: 'approved' });
-    if (teams.length < 2) {
-      return res.status(400).json({ message: 'Need at least 2 teams' });
-    }
-
-    let matchNumber = await Match.countDocuments() + 1;
-    const startDate = new Date();
-    startDate.setDate(startDate.getDate() + 1);
-
-    const createdMatches = [];
-    for (let i = 0; i < teams.length; i++) {
-      for (let j = i + 1; j < teams.length; j++) {
-        const matchDate = new Date(startDate);
-        matchDate.setDate(matchDate.getDate() + Math.floor(createdMatches.length / 2));
-        matchDate.setHours(9 + (createdMatches.length % 3) * 3, 0, 0, 0);
-
-        const match = new Match({
-          matchId: `MATCH-${matchNumber}`,
-          team1: teams[i]._id,
-          team2: teams[j]._id,
-          matchDate,
-          matchType: 'group',
-          overs: 8,
-          venue: 'Odajhar Village',
-          status: 'scheduled'
-        });
-
-        await match.save();
-        createdMatches.push(match);
-        matchNumber++;
-      }
-    }
-
-    res.status(201).json({ message: 'Schedule generated successfully', matches: createdMatches });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  res.status(410).json({ message: 'Auto schedule disabled. Please create matches manually.' });
 });
 
 module.exports = router;
