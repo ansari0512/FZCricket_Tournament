@@ -204,26 +204,32 @@ export default function Admin() {
     } catch { toast.error('Invalid password') }
   }
 
-  const handleApprove = async (id) => { await updateTeam(id, { status: 'approved' }); loadData(); toast.success('Team approved!') }
+  const handleApprove = async (id, teamName) => {
+    if (!confirm(`"${teamName}" team ko approve karna chahte ho?`)) return
+    await updateTeam(id, { status: 'approved' }); loadData(); toast.success('Team approved!')
+  }
   const handleReject = (team) => { setRejectModal(team); setRejectReason('') }
   const confirmReject = async () => {
     await updateTeam(rejectModal._id, { status: 'rejected', rejectReason, submitted: false })
     setRejectModal(null); loadData(); toast.success('Team rejected')
   }
-  const handlePayment = async (id) => { await updateTeam(id, { paymentDone: true }); loadData(); toast.success('Payment confirmed!') }
-  const handleDeleteTeam = async (id) => {
-    if (!confirm('Delete this team?')) return
+  const handlePayment = async (id, teamName) => {
+    if (!confirm(`"${teamName}" ki payment confirm karna chahte ho?`)) return
+    await updateTeam(id, { paymentDone: true }); loadData(); toast.success('Payment confirmed!')
+  }
+  const handleDeleteTeam = async (id, teamName) => {
+    if (!confirm(`"${teamName}" team ko permanently delete karna chahte ho? Yeh action undo nahi hoga!`)) return
     await deleteTeam(id); loadData(); toast.success('Team deleted')
   }
   const loadPlayers = async (teamId) => {
     const res = await getTeamPlayers(teamId); setSelectedPlayers(res.data); setActiveTab('Players')
   }
   const handleDeletePlayer = async (id) => {
-    if (!confirm('Delete player?')) return
+    if (!confirm('Is player ko delete karna chahte ho?')) return
     await deletePlayer(id); setSelectedPlayers(selectedPlayers.filter(p => p._id !== id)); toast.success('Player deleted')
   }
-  const handleDeleteUser = async (id) => {
-    if (!confirm('Delete user and all data?')) return
+  const handleDeleteUser = async (id, name) => {
+    if (!confirm(`"${name}" user aur unka saara data permanently delete karna chahte ho?`)) return
     await deleteAdminUser(id); setUsers(users.filter(u => u._id !== id)); toast.success('User deleted')
   }
   const handleViewUserTeam = async (teamId) => {
@@ -326,7 +332,7 @@ export default function Admin() {
                       <p className="text-xs mt-1">{user.teamId ? <button onClick={() => handleViewUserTeam(user.teamId)} className="text-green-600 font-medium hover:underline">✅ Team Registered → Dekho</button> : <span className="text-yellow-600">⏳ No Team</span>}</p>
                     </div>
                     <div className="flex gap-2">
-                      <button onClick={() => handleDeleteUser(user._id)} className="text-xs bg-red-100 text-red-700 px-3 py-1.5 rounded-lg">Delete</button>
+                      <button onClick={() => handleDeleteUser(user._id, user.name || user.email)} className="text-xs bg-red-100 text-red-700 px-3 py-1.5 rounded-lg">Delete</button>
                     </div>
                   </div>
                 ))}
@@ -359,16 +365,16 @@ export default function Admin() {
                       <span className={team.status === 'approved' ? 'badge-approved' : team.status === 'rejected' ? 'badge-rejected' : 'badge-pending'}>{team.status}</span>
                     </div>
                     <div className="flex flex-wrap gap-2 mt-3">
-                      {team.status === 'pending' && <button onClick={() => handleApprove(team._id)} className="text-xs bg-green-100 text-green-700 px-3 py-1.5 rounded-lg font-medium">✅ Approve</button>}
+                      {team.status === 'pending' && <button onClick={() => handleApprove(team._id, team.teamName)} className="text-xs bg-green-100 text-green-700 px-3 py-1.5 rounded-lg font-medium">✅ Approve</button>}
                       {team.status === 'pending' && <button onClick={() => handleReject(team)} className="text-xs bg-orange-100 text-orange-700 px-3 py-1.5 rounded-lg font-medium">❌ Reject</button>}
-                      {team.status === 'rejected' && <button onClick={() => handleApprove(team._id)} className="text-xs bg-green-100 text-green-700 px-3 py-1.5 rounded-lg font-medium">✅ Approve</button>}
-                      {team.status === 'approved' && !team.paymentDone && <button onClick={() => handlePayment(team._id)} className="text-xs bg-blue-100 text-blue-700 px-3 py-1.5 rounded-lg font-medium">₹ Confirm Payment</button>}
+                      {team.status === 'rejected' && <button onClick={() => handleApprove(team._id, team.teamName)} className="text-xs bg-green-100 text-green-700 px-3 py-1.5 rounded-lg font-medium">✅ Approve</button>}
+                      {team.status === 'approved' && !team.paymentDone && <button onClick={() => handlePayment(team._id, team.teamName)} className="text-xs bg-blue-100 text-blue-700 px-3 py-1.5 rounded-lg font-medium">₹ Confirm Payment</button>}
                       {team.paymentDone && <span className="text-xs bg-green-100 text-green-700 px-3 py-1.5 rounded-lg font-medium">✅ Paid</span>}
                       {team.paymentScreenshot && !team.paymentDone && (
                         <a href={team.paymentScreenshot} target="_blank" rel="noreferrer" className="text-xs bg-purple-100 text-purple-700 px-3 py-1.5 rounded-lg font-medium">📸 View Screenshot</a>
                       )}
                       <button onClick={() => loadPlayers(team._id)} className="text-xs bg-purple-100 text-purple-700 px-3 py-1.5 rounded-lg font-medium">👥 Players</button>
-                      <button onClick={() => handleDeleteTeam(team._id)} className="text-xs bg-red-100 text-red-700 px-3 py-1.5 rounded-lg font-medium">🗑️ Delete</button>
+                      <button onClick={() => handleDeleteTeam(team._id, team.teamName)} className="text-xs bg-red-100 text-red-700 px-3 py-1.5 rounded-lg font-medium">🗑️ Delete</button>
                     </div>
                   </div>
                 ))}
