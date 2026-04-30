@@ -118,39 +118,35 @@ function PaymentSection({ team, onScreenshotUploaded }) {
 
       <p className="text-sm font-medium text-gray-700 mb-2">App se pay karo (₹300) — Mobile pe click karo:</p>
       <div className="grid grid-cols-3 gap-2 mb-3">
-        <button onClick={() => openUPI('shahidansari0512@oksbi')}
+        <button onClick={() => openUPI(getUPIID('gpay'))}
           className="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-2 rounded-xl text-xs flex flex-col items-center gap-1 transition">
           <span className="text-xl">📱</span> GPay
         </button>
-        <button onClick={() => openUPI('8127021765@ybl')}
+        <button onClick={() => openUPI(getUPIID('phonepe'))}
           className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-2 rounded-xl text-xs flex flex-col items-center gap-1 transition">
           <span className="text-xl">📱</span> PhonePe
         </button>
-        <button onClick={() => openUPI('8127021765@ptaxis')}
+        <button onClick={() => openUPI(getUPIID('paytm'))}
           className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-2 rounded-xl text-xs flex flex-col items-center gap-1 transition">
           <span className="text-xl">📱</span> Paytm
         </button>
       </div>
 
       <p className="text-xs text-gray-500 mb-2">Ya UPI ID copy karke manually pay karo:</p>
-      <div className="space-y-2 mb-3">
-        {[
-          { label: 'GPay', id: 'shahidansari0512@oksbi' },
-          { label: 'PhonePe', id: '8127021765@ybl' },
-          { label: 'Paytm', id: '8127021765@ptaxis' },
-        ].map(({ label, id }) => (
-          <div key={id} className="flex items-center justify-between bg-white rounded-xl px-3 py-2 border">
-            <div>
-              <p className="text-xs text-gray-500">{label}</p>
-              <p className="text-sm font-medium">{id}</p>
+        <div className="space-y-2 mb-3">
+          {['GPay', 'PhonePe', 'Paytm'].map((label) => (
+            <div key={label} className="flex items-center justify-between bg-white rounded-xl px-3 py-2 border">
+              <div>
+                <p className="text-xs text-gray-500">{label}</p>
+                <p className="text-sm font-medium">${getUPIID(label.toLowerCase())}</p>
+              </div>
+              <button onClick={() => copyUPI(getUPIID(label.toLowerCase()))}
+                className={`text-xs px-3 py-1.5 rounded-lg font-medium transition ${copied === getUPIID(label.toLowerCase()) ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
+                {copied === getUPIID(label.toLowerCase()) ? '✅ Copied!' : '📋 Copy'}
+              </button>
             </div>
-            <button onClick={() => copyUPI(id)}
-              className={`text-xs px-3 py-1.5 rounded-lg font-medium transition ${copied === id ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
-              {copied === id ? '✅ Copied!' : '📋 Copy'}
-            </button>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
 
       {/* QR Code Section */}
       <div className="mb-3">
@@ -164,13 +160,13 @@ function PaymentSection({ team, onScreenshotUploaded }) {
         {showQR && (
           <div className="mt-3 bg-white rounded-xl p-4 text-center border">
             <p className="text-sm font-medium text-gray-700 mb-3">GPay QR Code scan karo (₹300)</p>
-            <img
-              src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=shahidansari0512@oksbi%26pn=FZCricket%26am=300%26cu=INR%26tn=FZCricket%20Registration`}
+              <img
+              src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=${encodeURIComponent(getUPIID('gpay'))}%26pn=FZCricket%26am=300%26cu=INR%26tn=FZCricket%20Registration`}
               alt="UPI QR Code"
               className="w-48 h-48 mx-auto rounded-xl shadow"
             />
             <p className="text-xs text-gray-500 mt-2">GPay, PhonePe, Paytm se scan karo</p>
-            <p className="text-sm font-bold text-primary mt-1">UPI: shahidansari0512@oksbi</p>
+             <p className="text-sm font-bold text-primary mt-1">UPI: ${getUPIID('gpay')}</p>
             <p className="text-sm font-bold">Amount: ₹300</p>
           </div>
         )}
@@ -362,6 +358,16 @@ export default function Dashboard() {
     }, 10000)
     return () => clearInterval(interval)
   }, [team?.status, team?.paymentDone, currentUser?.teamId]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Get UPI ID (in production, this should come from backend API to avoid exposing in frontend)
+  const getUPIID = (type) => {
+    const ids = {
+      gpay: 'UPID_HIDDEN',
+      phonepe: 'UPID_HIDDEN',
+      paytm: 'UPID_HIDDEN'
+    }
+    return ids[type] || 'UPID_HIDDEN'
+  }
 
   const handleUpdateTeam = async (e) => {
     e.preventDefault()
