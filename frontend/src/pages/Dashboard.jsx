@@ -46,13 +46,13 @@ function PlayerModal({ player, onClose, onPrev, onNext }) {
   )
 }
 
-function PaymentSection({ team, onScreenshotUploaded, onPaymentConfirmed }) {
+function PaymentSection({ team, onScreenshotUploaded }) {
   const [showQR, setShowQR] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [uploaded, setUploaded] = useState(!!team.paymentScreenshot)
   const [copied, setCopied] = useState('')
 
-  const openUPI = (upiId, app) => {
+  const openUPI = (upiId) => {
     const url = `upi://pay?pa=${upiId}&pn=FZCricket&am=300&cu=INR&tn=FZCricket%20Registration`
     // Mobile pe app open karo
     window.location.href = url
@@ -113,15 +113,15 @@ function PaymentSection({ team, onScreenshotUploaded, onPaymentConfirmed }) {
 
       <p className="text-sm font-medium text-gray-700 mb-2">App se pay karo (₹300) — Mobile pe click karo:</p>
       <div className="grid grid-cols-3 gap-2 mb-3">
-        <button onClick={() => openUPI('shahidansari0512@oksbi', 'gpay')}
+        <button onClick={() => openUPI('shahidansari0512@oksbi')}
           className="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-2 rounded-xl text-xs flex flex-col items-center gap-1 transition">
           <span className="text-xl">📱</span> GPay
         </button>
-        <button onClick={() => openUPI('8127021765@ybl', 'phonepe')}
+        <button onClick={() => openUPI('8127021765@ybl')}
           className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-2 rounded-xl text-xs flex flex-col items-center gap-1 transition">
           <span className="text-xl">📱</span> PhonePe
         </button>
-        <button onClick={() => openUPI('8127021765@ptaxis', 'paytm')}
+        <button onClick={() => openUPI('8127021765@ptaxis')}
           className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-2 rounded-xl text-xs flex flex-col items-center gap-1 transition">
           <span className="text-xl">📱</span> Paytm
         </button>
@@ -343,7 +343,9 @@ export default function Dashboard() {
           setTeam(freshTeam)
           setNotifRefresh(n => n + 1)
         }
-      } catch {}
+      } catch (err) {
+        console.error('Team auto-refresh failed:', err)
+      }
     }, 10000)
     return () => clearInterval(interval)
   }, [team?.status, team?.paymentDone, currentUser?.teamId]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -474,10 +476,6 @@ export default function Dashboard() {
                 <PaymentSection
                   team={team}
                   onScreenshotUploaded={(url) => setTeam({ ...team, paymentScreenshot: url })}
-                  onPaymentConfirmed={() => {
-                    getTeam(currentUser.teamId).then(r => setTeam(r.data.team))
-                    setNotifRefresh(n => n + 1)
-                  }}
                 />
               )}
 

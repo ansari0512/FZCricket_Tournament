@@ -172,14 +172,11 @@ export default function Admin() {
   const [rejectReason, setRejectReason] = useState('')
   const [scoreModal, setScoreModal] = useState(null)
   const [scoreData, setScoreData] = useState({ t1runs: '', t1wickets: '', t2runs: '', t2wickets: '', winnerId: '' })
-  const [resetModal, setResetModal] = useState(null)
-  const [resetForm, setResetForm] = useState({ newUsername: '', newPassword: '' })
   const [gallery, setGallery] = useState([])
   const [uploading, setUploading] = useState(false)
   const [caption, setCaption] = useState('')
   const [previewIndex, setPreviewIndex] = useState(null)
   const [userTeamModal, setUserTeamModal] = useState(null) // {team, players}
-  const [userTeamLoading, setUserTeamLoading] = useState(false)
 
   const loadData = async () => {
     try {
@@ -233,16 +230,10 @@ export default function Admin() {
     await deleteAdminUser(id); setUsers(users.filter(u => u._id !== id)); toast.success('User deleted')
   }
   const handleViewUserTeam = async (teamId) => {
-    setUserTeamLoading(true)
     try {
       const [teamRes, playersRes] = await Promise.all([getTeam(teamId), getTeamPlayers(teamId)])
       setUserTeamModal({ team: teamRes.data.team, players: playersRes.data })
     } catch { toast.error('Team load failed') }
-    setUserTeamLoading(false)
-  }
-  const handleResetUser = async () => {
-    await resetUserCredentials(resetModal._id, resetForm)
-    setResetModal(null); loadData(); toast.success('Credentials reset!')
   }
   const handleMatchStatus = async (id, status) => { await updateMatchStatus(id, { status }); loadData() }
   const handleDeleteMatch = async (id) => {
@@ -293,15 +284,6 @@ export default function Admin() {
           <button type="submit" className="btn-primary w-full">Login</button>
         </form>
       </div>
-    </div>
-  )
-
-  const tabBtn = (tab, label) => (
-    <div className="rounded-xl overflow-hidden border border-gray-200">
-      <button onClick={() => toggle(tab)}
-        className={`w-full text-left px-4 py-3 font-medium text-sm flex justify-between items-center transition ${activeTab === tab ? 'cricket-gradient text-white' : 'bg-gray-100 hover:bg-gray-200'}`}>
-        {label} <span>{activeTab === tab ? '▲' : '▼'}</span>
-      </button>
     </div>
   )
 
@@ -607,23 +589,6 @@ export default function Admin() {
           </div>
         )}
 
-        {/* Reset Modal */}
-        {resetModal && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl p-6 w-full max-w-md">
-              <h3 className="font-bold text-lg mb-2">🔄 Reset Credentials</h3>
-              <p className="text-sm text-gray-500 mb-4">{resetModal.username} • {resetModal.mobile}</p>
-              <div className="space-y-3">
-                <input type="text" placeholder="New Username" value={resetForm.newUsername} onChange={e => setResetForm({ ...resetForm, newUsername: e.target.value })} className="input no-upper" />
-                <input type="text" placeholder="New Password (leave empty to keep)" value={resetForm.newPassword} onChange={e => setResetForm({ ...resetForm, newPassword: e.target.value })} className="input no-upper" />
-              </div>
-              <div className="flex gap-2 mt-4">
-                <button onClick={handleResetUser} className="flex-1 btn-primary">Reset</button>
-                <button onClick={() => setResetModal(null)} className="flex-1 btn-secondary">Cancel</button>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   )
