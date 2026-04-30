@@ -300,6 +300,7 @@ export default function Dashboard() {
   const [error, setError] = useState('')
   const [previewIndex, setPreviewIndex] = useState(null)
   const [notifRefresh, setNotifRefresh] = useState(0)
+  const [fileKey, setFileKey] = useState(0) // photo input reset ke liye
 
   useEffect(() => {
     if (!currentUser) { navigate('/login'); return }
@@ -329,6 +330,23 @@ export default function Dashboard() {
     }
     load()
   }, [currentUser?._id, currentUser?.teamId]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Auto refresh - jab team pending/submitted ho toh har 10 sec pe check karo
+  useEffect(() => {
+    if (!team || !currentUser?.teamId) return
+    if (team.status === 'approved' || team.status === 'rejected') return
+    const interval = setInterval(async () => {
+      try {
+        const res = await getTeam(currentUser.teamId)
+        const freshTeam = res.data.team
+        if (freshTeam.status !== team.status || freshTeam.paymentDone !== team.paymentDone) {
+          setTeam(freshTeam)
+          setNotifRefresh(n => n + 1)
+        }
+      } catch {}
+    }, 10000)
+    return () => clearInterval(interval)
+  }, [team?.status, team?.paymentDone, currentUser?.teamId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleUpdateTeam = async (e) => {
     e.preventDefault()
@@ -363,6 +381,7 @@ export default function Dashboard() {
       })
       setPlayers([...players, res.data.player])
       setPlayerForm({ name: '', role: 'batsman', address: '', photo: null, preview: '' })
+      setFileKey(k => k + 1) // file input reset karo
       toast.success(`Player ${players.length + 1} add ho gaya!`)
     } catch (err) { setError(err.response?.data?.message || 'Failed') }
     setUploading(false)
@@ -529,7 +548,7 @@ export default function Dashboard() {
                 <input type="text" placeholder="Address/Village *" value={playerForm.address} onChange={e => setPlayerForm({ ...playerForm, address: e.target.value })} className="input" />
                 <div>
                   <label className="text-sm font-medium block mb-1">Player Photo *</label>
-                  <input type="file" accept="image/*" onChange={e => { const f = e.target.files[0]; if (f) setPlayerForm({ ...playerForm, photo: f, preview: URL.createObjectURL(f) }) }} className="input" />
+                  <input key={fileKey} type="file" accept="image/*" onChange={e => { const f = e.target.files[0]; if (f) setPlayerForm({ ...playerForm, photo: f, preview: URL.createObjectURL(f) }) }} className="input" />
                   {playerForm.preview && <img src={playerForm.preview} className="mt-2 w-16 h-16 object-cover rounded-xl" />}
                 </div>
                 <button onClick={handleAddPlayer} disabled={uploading} className="btn-primary w-full">
