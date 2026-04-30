@@ -17,7 +17,8 @@ const Dashboard = lazy(() => import('./pages/Dashboard'))
 const Admin = lazy(() => import('./pages/Admin'))
 
 const PageLoader = () => (
-  <div className="flex justify-center py-20">
+  <div className="fixed inset-0 bg-gray-50 flex flex-col items-center justify-center z-40">
+    <span className="text-5xl mb-4">🏏</span>
     <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
   </div>
 )
