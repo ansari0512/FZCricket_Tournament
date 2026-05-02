@@ -64,7 +64,7 @@ function PaymentSection({ team, onScreenshotUploaded, upiConfig }) {
     navigator.clipboard.writeText(upiId)
     setCopied(upiId)
     setTimeout(() => setCopied(''), 2000)
-    toast.success('UPI ID copy ho gayi!')
+    toast.success('UPI ID copied!')
   }
 
   const handleUpload = async (e) => {
@@ -79,19 +79,19 @@ function PaymentSection({ team, onScreenshotUploaded, upiConfig }) {
       await updateTeam(team._id, { paymentScreenshot: url })
       onScreenshotUploaded(url)
       setUploaded(true)
-      toast.success('Screenshot upload ho gaya! Admin confirm karega।')
+      toast.success('Screenshot uploaded! Admin will verify it.')
     } catch { toast.error('Upload failed') }
     setUploading(false)
     setUploadProgress(0)
   }
 
-  // Agar paymentDone ho gaya toh yeh section hide karo
+  // Hide payment section if already paid
   if (team.paymentDone) {
     return (
       <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-3 text-center">
         <p className="text-3xl mb-2">✅</p>
-        <p className="text-green-700 font-bold">Payment Confirm Ho Gayi!</p>
-        <p className="text-sm text-gray-500 mt-1">Aapki team officially registered hai।</p>
+        <p className="text-green-700 font-bold">✅ Payment Confirmed!</p>
+        <p className="text-sm text-gray-500 mt-1">Your team is officially registered.</p>
       </div>
     )
   }
@@ -102,7 +102,7 @@ function PaymentSection({ team, onScreenshotUploaded, upiConfig }) {
 
       <div className="bg-white rounded-xl p-3 mb-3 text-sm space-y-1">
         <div className="flex justify-between">
-          <span className="text-gray-600">Abhi pay karo:</span>
+          <span className="text-gray-600">Amount to pay now:</span>
           <span className="font-bold text-primary">₹300</span>
         </div>
         <div className="flex justify-between">
@@ -115,7 +115,7 @@ function PaymentSection({ team, onScreenshotUploaded, upiConfig }) {
         </div>
       </div>
 
-      <p className="text-sm font-medium text-gray-700 mb-2">App se pay karo (₹300) — Mobile pe click karo:</p>
+      <p className="text-sm font-medium text-gray-700 mb-2">Pay now (₹300) via app - Click on your phone:</p>
       <div className="grid grid-cols-3 gap-2 mb-3">
         <button onClick={() => openUPI(getUPIID('gpay'))}
           className="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-2 rounded-xl text-xs flex flex-col items-center gap-1 transition">
@@ -131,7 +131,7 @@ function PaymentSection({ team, onScreenshotUploaded, upiConfig }) {
         </button>
       </div>
 
-      <p className="text-xs text-gray-500 mb-2">Ya UPI ID copy karke manually pay karo:</p>
+      <p className="text-xs text-gray-500 mb-2">Or copy the UPI ID and pay manually:</p>
         <div className="space-y-2 mb-3">
           {['GPay', 'PhonePe', 'Paytm'].map((label) => (
             <div key={label} className="flex items-center justify-between bg-white rounded-xl px-3 py-2 border">
@@ -154,17 +154,17 @@ function PaymentSection({ team, onScreenshotUploaded, upiConfig }) {
           className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 rounded-xl text-sm transition flex items-center justify-center gap-2"
         >
           <span>📷</span>
-          {showQR ? 'QR Code Band Karo' : 'QR Code Se Pay Karo (PC ke liye)'}
+          {showQR ? 'Hide QR Code' : 'Pay via QR Code (For Desktop)'}
         </button>
         {showQR && (
           <div className="mt-3 bg-white rounded-xl p-4 text-center border">
-            <p className="text-sm font-medium text-gray-700 mb-3">GPay QR Code scan karo (₹300)</p>
+            <p className="text-sm font-medium text-gray-700 mb-3">Scan GPay QR Code (₹300)</p>
               <img
               src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=${encodeURIComponent(getUPIID('gpay'))}%26pn=FZCricket%26am=300%26cu=INR%26tn=FZCricket%20Registration`}
               alt="UPI QR Code"
               className="w-48 h-48 mx-auto rounded-xl shadow"
             />
-            <p className="text-xs text-gray-500 mt-2">GPay, PhonePe, Paytm se scan karo</p>
+            <p className="text-xs text-gray-500 mt-2">Scan from GPay, PhonePe, or Paytm</p>
              <p className="text-sm font-bold text-primary mt-1">UPI: {getUPIID('gpay')}</p>
             <p className="text-sm font-bold">Amount: ₹300</p>
           </div>
@@ -174,17 +174,17 @@ function PaymentSection({ team, onScreenshotUploaded, upiConfig }) {
       {uploaded ? (
         <div className="bg-green-50 border border-green-200 rounded-xl p-3 text-center">
           <p className="text-green-700 font-bold text-sm">✅ Screenshot upload ho gaya!</p>
-          <p className="text-xs text-gray-500 mt-1">Admin confirm karne ka wait karo...</p>
+          <p className="text-xs text-gray-500 mt-1">Waiting for admin verification...</p>
           <label className="mt-2 text-xs text-primary cursor-pointer block">
-            Dobara upload karo
+            Upload Again
             <input type="file" accept="image/*" onChange={handleUpload} className="hidden" />
           </label>
         </div>
       ) : (
         <div>
-          <p className="text-sm text-yellow-700 mb-2">Payment ke baad screenshot upload karo:</p>
+          <p className="text-sm text-yellow-700 mb-2">After payment, upload the screenshot:</p>
           <label className={`btn-primary w-full text-center cursor-pointer block ${uploading ? 'opacity-50' : ''}`}>
-            {uploading ? `Uploading... ${uploadProgress}%` : '📸 Payment Screenshot Upload Karo'}
+            {uploading ? `Uploading... ${uploadProgress}%` : '📸 Upload Payment Screenshot'}
             <input type="file" accept="image/*" onChange={handleUpload} disabled={uploading} className="hidden" />
           </label>
           {uploading && (
@@ -205,7 +205,7 @@ function NotificationsPanel({ onRefresh }) {
   const [notifs, setNotifs] = useState([])
   const load = () => getNotifications().then(r => setNotifs(r.data)).catch(() => {})
   useEffect(() => { load() }, [])
-  // Parent se refresh trigger hone pe reload karo
+  // Reload when parent component triggers refresh
   useEffect(() => { if (onRefresh) load() }, [onRefresh])
   const unread = notifs.filter(n => !n.read).length
   const markRead = async () => {
@@ -322,7 +322,7 @@ export default function Dashboard() {
           setEditTeamData({ teamName: teamRes.data.team.teamName, captainName: teamRes.data.team.captainName, captainPhone: teamRes.data.team.captainPhone, city: teamRes.data.team.city })
           setPlayers(playersRes.data)
           setNotifRefresh(n => n + 1)
-          // localStorage mein fresh user data save karo
+          // Save fresh user data to localStorage
           const savedUser = localStorage.getItem('fzUser')
           if (savedUser) {
             const parsed = JSON.parse(savedUser)
@@ -340,7 +340,7 @@ export default function Dashboard() {
     load()
   }, [currentUser?._id, currentUser?.teamId]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Auto refresh - jab team pending/submitted ho toh har 10 sec pe check karo
+  // Auto refresh - check every 10 seconds when team is pending/submitted
   useEffect(() => {
     if (!team || !currentUser?.teamId) return
     if (team.status === 'approved' || team.status === 'rejected') return
@@ -396,9 +396,9 @@ export default function Dashboard() {
   }
 
   const handleAddPlayer = async () => {
-    if (!playerForm.name.trim()) return setError('Player name required hai')
-    if (!playerForm.address.trim()) return setError('Player address required hai')
-    if (!playerForm.photo) return setError('Player photo required hai')
+    if (!playerForm.name.trim()) return setError('Player name is required')
+    if (!playerForm.address.trim()) return setError('Player address is required')
+    if (!playerForm.photo) return setError('Player photo is required')
     if (players.length >= 15) return setError('Maximum 15 players allowed hain')
     setUploading(true); setError('')
     try {
@@ -413,26 +413,26 @@ export default function Dashboard() {
       })
       setPlayers([...players, res.data.player])
       setPlayerForm({ name: '', role: 'batsman', address: '', photo: null, preview: '' })
-      setFileKey(k => k + 1) // file input reset karo
-      toast.success(`Player ${players.length + 1} add ho gaya!`)
+      setFileKey(k => k + 1) // Reset file input
+      toast.success(`Player ${players.length + 1} added!`)
     } catch (err) { setError(err.response?.data?.message || 'Failed') }
     setUploading(false)
   }
 
   const handleSubmitTeam = async () => {
     if (players.length < 11) return setError('Minimum 11 players required hain')
-    if (!confirm('Kya aap team submit karna chahte hain? Submit karne ke baad admin review karega।')) return
+    if (!confirm('Are you sure you want to submit your team? Admin will review it.')) return
     setSubmitting(true)
     try {
       await updateTeam(currentUser.teamId, { submitted: true, status: 'pending' })
       const res = await getTeam(currentUser.teamId)
       setTeam(res.data.team)
-      toast.success('Team submit ho gayi! Admin review karega।')
+      toast.success('Team submitted successfully! Admin will review it.')
     } catch { toast.error('Submission failed') }
     setSubmitting(false)
   }
 
-  // canEdit: sirf tab jab team submitted nahi hai ya rejected hai
+  // Can edit: only if team is not submitted or is rejected
   const canEdit = team && (!team.submitted || team.status === 'rejected')
   const isSubmitted = team?.submitted && team?.status !== 'rejected'
 
@@ -497,7 +497,7 @@ export default function Dashboard() {
                 <div className="bg-red-50 border border-red-200 rounded-xl p-3 mb-3">
                   <p className="text-sm font-bold text-red-700 mb-1">❌ Team Reject Hui — Karan:</p>
                   <p className="text-sm text-red-600">{team.rejectReason}</p>
-                  <p className="text-xs text-gray-500 mt-2">Upar Edit karke dobara submit karo।</p>
+                  <p className="text-xs text-gray-500 mt-2">Edit above and resubmit your team.</p>
                 </div>
               )}
 
@@ -516,7 +516,7 @@ export default function Dashboard() {
                   <div className="flex justify-between items-center mb-3">
                     <p className="font-bold text-sm">Players ({players.length}/15)</p>
                     {players.length < 11 && (
-                      <p className="text-xs text-orange-500">{11 - players.length} aur chahiye submit ke liye</p>
+                      <p className="text-xs text-orange-500">{11 - players.length} more players needed to submit</p>
                     )}
                   </div>
                   <div className="space-y-2">
@@ -548,8 +548,8 @@ export default function Dashboard() {
             </div>
           ) : (
             <div className="text-center py-4">
-              <p className="text-gray-400 mb-4">Abhi tak koi team register nahi ki।</p>
-              {registrationOpen && <Link to="/register" className="btn-primary inline-block">Team Register Karo</Link>}
+              <p className="text-gray-400 mb-4">You haven't registered a team yet.</p>
+              {registrationOpen && <Link to="/register" className="btn-primary inline-block">Register Team</Link>}
             </div>
           )}
         </div>
@@ -557,10 +557,10 @@ export default function Dashboard() {
         {/* Add Players - sirf tab jab canEdit ho */}
         {team && canEdit && (
           <div className="card">
-            <h3 className="font-bold mb-1">➕ Players Add Karo ({players.length}/15)</h3>
+            <h3 className="font-bold mb-1">➕ Add Players ({players.length}/15)</h3>
             <p className="text-sm text-gray-500 mb-4">
-              Submit karne ke liye minimum 11 players chahiye।
-              {players.length >= 11 && players.length < 15 && <span className="text-green-600 font-medium"> Submit kar sakte ho!</span>}
+              Minimum 11 players are required to submit your team.
+              {players.length >= 11 && players.length < 15 && <span className="text-green-600 font-medium"> You can submit now!</span>}
             </p>
 
             {error && <div className="bg-red-50 text-red-600 px-3 py-2 rounded-xl mb-3 text-sm">{error}</div>}
@@ -581,7 +581,7 @@ export default function Dashboard() {
                   {playerForm.preview && <img src={playerForm.preview} className="mt-2 w-16 h-16 object-cover rounded-xl" />}
                 </div>
                 <button onClick={handleAddPlayer} disabled={uploading} className="btn-primary w-full">
-                  {uploading ? `Uploading Player ${players.length + 1}...` : `+ Player ${players.length + 1} Add Karo`}
+                  {uploading ? `Uploading Player ${players.length + 1}...` : `+ Add Player ${players.length + 1}`}
                 </button>
               </div>
             )}
@@ -593,7 +593,7 @@ export default function Dashboard() {
                 disabled={submitting}
                 className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl disabled:opacity-50 text-lg"
               >
-                {submitting ? 'Submitting...' : '🚀 Team Submit Karo (Review ke liye)'}
+                {submitting ? 'Submitting...' : '🚀 Submit Team (For Admin Review)'}
               </button>
             )}
           </div>
@@ -603,8 +603,8 @@ export default function Dashboard() {
         {isSubmitted && team.status !== 'approved' && (
           <div className="card bg-blue-50 border border-blue-200 text-center">
             <p className="text-2xl mb-2">📋</p>
-            <p className="font-bold text-blue-700">Team Review Mein Hai</p>
-            <p className="text-sm text-gray-500 mt-1">Admin aapki team review kar raha hai। Notification milegi।</p>
+            <p className="font-bold text-blue-700">Team Under Review</p>
+            <p className="text-sm text-gray-500 mt-1">Admin is reviewing your team. You'll receive a notification soon.</p>
           </div>
         )}
 

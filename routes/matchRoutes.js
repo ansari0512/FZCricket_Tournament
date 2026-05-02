@@ -103,12 +103,12 @@ router.post('/create', verifyAdmin, async (req, res) => {
     const { team1Id, team2Id, matchDate, matchType, overs, venue } = req.body;
 
     if (!team1Id || !team2Id || !matchDate || !matchType)
-      return res.status(400).json({ message: 'team1Id, team2Id, matchDate aur matchType required hain' });
+      return res.status(400).json({ message: 'team1Id, team2Id, matchDate, and matchType are required' });
     if (team1Id === team2Id)
-      return res.status(400).json({ message: 'Team1 aur Team2 alag honi chahiye' });
+      return res.status(400).json({ message: 'Team1 and Team2 must be different' });
     const validTypes = ['group', 'semi-final', 'final'];
     if (!validTypes.includes(matchType))
-      return res.status(400).json({ message: 'matchType group, semi-final ya final hona chahiye' });
+      return res.status(400).json({ message: 'matchType must be group, semi-final, or final' });
 
     const team1 = await Team.findById(team1Id);
     const team2 = await Team.findById(team2Id);

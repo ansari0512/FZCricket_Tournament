@@ -17,9 +17,9 @@ function MatchCreateForm({ teams, onCreated }) {
   const handleCreate = async (e) => {
     e.preventDefault()
     if (!form.team1Id || !form.team2Id || !form.matchDate)
-      return toast.error('Team1, Team2 aur Date required hai')
+      return toast.error('Team1, Team2, and Date are required')
     if (form.team1Id === form.team2Id)
-      return toast.error('Dono teams alag honi chahiye')
+      return toast.error('Both teams must be different')
     setLoading(true)
     try {
       const matchDateTime = new Date(`${form.matchDate}T${form.matchTime}`)
@@ -31,7 +31,7 @@ function MatchCreateForm({ teams, onCreated }) {
         overs: Number(form.overs),
         venue: form.venue
       })
-      toast.success('Match create ho gaya!')
+      toast.success('Match created successfully!')
       setForm({ team1Id: '', team2Id: '', matchDate: '', matchTime: '09:00', matchType: 'group', overs: '8', venue: 'Odajhar Village' })
       onCreated()
     } catch (err) {
@@ -41,7 +41,7 @@ function MatchCreateForm({ teams, onCreated }) {
   }
 
   if (approvedTeams.length < 2) return (
-    <p className="text-sm text-gray-500">Kam se kam 2 confirmed teams chahiye match create karne ke liye।</p>
+    <p className="text-sm text-gray-500">At least 2 confirmed teams are required to create a match.</p>
   )
 
   return (
@@ -91,7 +91,7 @@ function MatchCreateForm({ teams, onCreated }) {
         </div>
       </div>
       <button type="submit" disabled={loading} className="btn-primary w-full">
-        {loading ? 'Creating...' : '➕ Match Add Karo'}
+        {loading ? 'Creating...' : '➕ Add Match'}
       </button>
     </form>
   )
@@ -307,7 +307,7 @@ export default function Admin() {
   }
 
   const handleApprove = async (id, teamName) => {
-    if (!confirm(`"${teamName}" team ko approve karna chahte ho?`)) return
+    if (!confirm(`Are you sure you want to approve "${teamName}" team?`)) return
     await updateTeam(id, { status: 'approved' }); loadData(); toast.success('Team approved!')
   }
   const handleReject = (team) => { setRejectModal(team); setRejectReason('') }
@@ -316,22 +316,22 @@ export default function Admin() {
     setRejectModal(null); loadData(); toast.success('Team rejected')
   }
   const handlePayment = async (id, teamName) => {
-    if (!confirm(`"${teamName}" ki payment confirm karna chahte ho?`)) return
+    if (!confirm(`Are you sure you want to confirm payment for "${teamName}"?`)) return
     await updateTeam(id, { paymentDone: true }); loadData(); toast.success('Payment confirmed!')
   }
   const handleDeleteTeam = async (id, teamName) => {
-    if (!confirm(`"${teamName}" team ko permanently delete karna chahte ho? Yeh action undo nahi hoga!`)) return
+    if (!confirm(`Are you sure you want to permanently delete "${teamName}" team? This action cannot be undone!`)) return
     await deleteTeam(id); loadData(); toast.success('Team deleted')
   }
   const loadPlayers = async (teamId) => {
     const res = await getTeamPlayers(teamId); setSelectedPlayers(res.data); setActiveTab('Players')
   }
   const handleDeletePlayer = async (id) => {
-    if (!confirm('Is player ko delete karna chahte ho?')) return
+    if (!confirm('Are you sure you want to delete this player?')) return
     await deletePlayer(id); setSelectedPlayers(selectedPlayers.filter(p => p._id !== id)); toast.success('Player deleted')
   }
   const handleDeleteUser = async (id, name) => {
-    if (!confirm(`"${name}" user aur unka saara data permanently delete karna chahte ho?`)) return
+    if (!confirm(`Are you sure you want to permanently delete "${name}" user and all their data?`)) return
     await deleteAdminUser(id); setUsers(users.filter(u => u._id !== id)); toast.success('User deleted')
   }
   const handleViewUserTeam = async (teamId) => {
@@ -342,7 +342,7 @@ export default function Admin() {
   }
   const handleMatchStatus = async (id, status) => { await updateMatchStatus(id, { status }); loadData() }
   const handleDeleteMatch = async (id) => {
-    if (!confirm('Is match ko delete karna chahte ho?')) return
+    if (!confirm('Are you sure you want to delete this match?')) return
     try {
       await deleteMatch(id)
       loadData(); toast.success('Match deleted!')
@@ -437,7 +437,7 @@ export default function Admin() {
             </button>
             {activeTab === 'Teams' && (
               <div className="p-3 space-y-3">
-                {teams.filter(t => t.submitted).length === 0 ? <p className="text-center text-gray-400 py-10">Koi submitted team nahi hai</p> :
+                {teams.filter(t => t.submitted).length === 0 ? <p className="text-center text-gray-400 py-10">No submitted teams yet</p> :
                 teams.filter(t => t.submitted).map(team => (
                   <div key={team._id} className="card">
                     <div className="flex justify-between items-start mb-2">
@@ -530,7 +530,7 @@ export default function Admin() {
 
                 {/* Manual Match Create */}
                 <div className="card bg-gray-50">
-                  <h3 className="font-bold mb-3">➕ Naya Match Add Karo</h3>
+                  <h3 className="font-bold mb-3">➕ Add New Match</h3>
                   <MatchCreateForm teams={teams} onCreated={loadData} />
                 </div>
 

@@ -6,11 +6,11 @@ const { verifyAdmin, verifyUser } = require('../middleware/auth')
 
 const JWT_SECRET = process.env.JWT_SECRET
 
-// Firebase Google Login - user DB mein save karo aur JWT return karo
+// Firebase Google Login - save user to database and return JWT
 router.post('/google-login', async (req, res) => {
   try {
     const { firebaseUid, email, name, photo } = req.body
-    if (!firebaseUid || !email) return res.status(400).json({ message: 'Firebase UID aur email required hai' })
+    if (!firebaseUid || !email) return res.status(400).json({ message: 'Firebase UID and email are required' })
 
     let user = await User.findOne({ firebaseUid })
     if (!user) {
@@ -22,7 +22,7 @@ router.post('/google-login', async (req, res) => {
       await user.save()
     }
 
-    // JWT token generate karo
+    // Generate JWT token
     const token = jwt.sign({ userId: user._id.toString(), firebaseUid, email }, JWT_SECRET, { expiresIn: '7d' })
     res.json({ message: 'Login successful', user, token })
   } catch (err) {

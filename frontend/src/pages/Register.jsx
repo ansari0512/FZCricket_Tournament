@@ -33,8 +33,8 @@ export default function Register() {
       <div className="card max-w-md w-full text-center shadow-card p-8">
         <div className="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-4"><span className="text-3xl">🔒</span></div>
         <h2 className="text-xl font-bold mb-2">Login Required</h2>
-        <p className="text-gray-500 text-sm mb-6">Team register karne ke liye pehle login karo।</p>
-        <Link to="/login" className="btn-primary w-full">Login Karo</Link>
+        <p className="text-gray-500 text-sm mb-6">You need to log in first before registering a team.</p>
+        <Link to="/login" className="btn-primary w-full">Login</Link>
       </div>
     </div>
   )
@@ -44,8 +44,8 @@ export default function Register() {
       <div className="card max-w-md w-full text-center shadow-card p-8">
         <div className="w-16 h-16 bg-green-50 rounded-2xl flex items-center justify-center mx-auto mb-4"><span className="text-3xl">🏏</span></div>
         <h2 className="text-xl font-bold mb-2">Team Already Registered!</h2>
-        <p className="text-gray-500 text-sm mb-6">Dashboard pe jaake apni team manage karo।</p>
-        <Link to="/dashboard" className="btn-primary w-full">Dashboard Pe Jao</Link>
+        <p className="text-gray-500 text-sm mb-6">Go to your dashboard to manage your team.</p>
+        <Link to="/dashboard" className="btn-primary w-full">Go to Dashboard</Link>
       </div>
     </div>
   )
@@ -55,17 +55,17 @@ export default function Register() {
       <div className="card max-w-md w-full text-center shadow-card p-8">
         <div className="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-4"><span className="text-3xl">😔</span></div>
         <h2 className="text-xl font-bold mb-2">Registration Closed</h2>
-        <p className="text-gray-500 text-sm mb-6">Sabhi 8 teams register ho chuki hain।</p>
-        <Link to="/" className="btn-primary w-full">Home Pe Jao</Link>
+        <p className="text-gray-500 text-sm mb-6">All 8 teams have already registered.</p>
+        <Link to="/" className="btn-primary w-full">Go to Home</Link>
       </div>
     </div>
   )
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!form.teamName.trim()) return toast.error('Team name required hai')
-    if (!form.address.trim()) return toast.error('Address required hai')
-    if (!form.registrantName.trim()) return toast.error('Aapka naam required hai')
+    if (!form.teamName.trim()) return toast.error('Team name is required')
+    if (!form.address.trim()) return toast.error('Address is required')
+    if (!form.registrantName.trim()) return toast.error('Your name is required')
     if (!/^[0-9]{10}$/.test(form.mobile)) return toast.error('Valid 10 digit mobile number daalo')
 
     setLoading(true)
@@ -78,14 +78,14 @@ export default function Register() {
         userId: currentUser._id,
         firebaseUid: currentUser.firebaseUid
       })
-      // Team register hone ke baad user ko update karo teamId ke saath
+      // Update user with teamId after team registration
       const updatedUser = await refreshUser()
       if (updatedUser) {
         toast.success('Team register ho gayi! Admin review karega।')
         navigate('/dashboard')
       } else {
-        // Fallback - manually teamId set karke navigate karo
-        toast.success('Team register ho gayi! Admin review karega।')
+        // Fallback - navigate with teamId
+        toast.success('Team registered successfully! Admin will review it.')
         navigate('/dashboard', { state: { teamId: res.data.team._id } })
       }
     } catch (err) {
@@ -100,7 +100,7 @@ export default function Register() {
         <div className="bg-white rounded-3xl shadow-card overflow-hidden">
           <div className="p-6" style={{ background: 'linear-gradient(135deg, #064e3b, #047857)' }}>
             <h2 className="text-xl font-bold text-white text-center">📝 Team Registration Rules</h2>
-            <p className="text-center text-white/70 text-sm mt-1">Pehle yeh rules padho, phir register karo</p>
+            <p className="text-center text-white/70 text-sm mt-1">Read the rules first, then register your team</p>
           </div>
           <div className="p-5 space-y-2.5 mb-2">
             {RULES.map((rule, i) => (

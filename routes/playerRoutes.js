@@ -16,20 +16,20 @@ router.post('/register/:teamId', verifyAuth, async (req, res) => {
     const { name, age, jerseyNumber, role, phone, photo, address } = req.body;
 
     if (!name || !jerseyNumber || !role)
-      return res.status(400).json({ message: 'name, jerseyNumber aur role required hain' });
+      return res.status(400).json({ message: 'name, jerseyNumber, and role are required' });
     if (name.trim().length < 2 || name.trim().length > 50)
-      return res.status(400).json({ message: 'Player name 2 se 50 characters ke beech hona chahiye' });
+      return res.status(400).json({ message: 'Player name must be between 2 and 50 characters' });
     const ageNum = Number(age);
     if (isNaN(ageNum) || ageNum < 10 || ageNum > 60)
-      return res.status(400).json({ message: 'Age 10 se 60 ke beech hona chahiye' });
+      return res.status(400).json({ message: 'Age must be between 10 and 60' });
     const jerseyNum = Number(jerseyNumber);
     if (isNaN(jerseyNum) || jerseyNum < 1 || jerseyNum > 99)
-      return res.status(400).json({ message: 'Jersey number 1 se 99 ke beech hona chahiye' });
+      return res.status(400).json({ message: 'Jersey number must be between 1 and 99' });
     const validRoles = ['batsman', 'bowler', 'all-rounder', 'wicket-keeper'];
     if (!validRoles.includes(role))
-      return res.status(400).json({ message: 'Role batsman, bowler, all-rounder ya wicket-keeper hona chahiye' });
+      return res.status(400).json({ message: 'Role must be batsman, bowler, all-rounder, or wicket-keeper' });
     if (phone && !/^[0-9]{10}$/.test(phone))
-      return res.status(400).json({ message: 'Phone 10 digit ka hona chahiye' });
+      return res.status(400).json({ message: 'Phone must be 10 digits' });
     const team = await Team.findById(teamId);
     if (!team) return res.status(404).json({ message: 'Team not found' });
     if (!canManageTeam(req, team)) return res.status(403).json({ message: 'You can add players only to your own team' });
@@ -96,7 +96,7 @@ router.post('/bulk-register/:teamId', verifyAuth, async (req, res) => {
     const { players } = req.body;
 
     if (!Array.isArray(players) || players.length === 0)
-      return res.status(400).json({ message: 'Players array required hai' });
+      return res.status(400).json({ message: 'Players array is required' });
     const team = await Team.findById(teamId);
     if (!team) {
       return res.status(404).json({ message: 'Team not found' });

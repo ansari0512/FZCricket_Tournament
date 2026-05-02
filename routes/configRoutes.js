@@ -23,7 +23,7 @@ router.get('/payment', async (req, res) => {
     const configMap = {}
     paymentConfig.forEach(c => { configMap[c.key] = c.value })
 
-    // DB mein nahi hai toh .env se fallback
+    // If not in database, fallback to environment variables
     res.json({
       gpay: configMap['UPI_GPAY'] || process.env.UPI_GPAY || '',
       phonepe: configMap['UPI_PHONEPE'] || process.env.UPI_PHONEPE || '',

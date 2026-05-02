@@ -15,7 +15,7 @@ router.get('/', async (req, res) => {
 router.post('/', verifyAdmin, async (req, res) => {
   try {
     const { url, caption } = req.body
-    if (!url) return res.status(400).json({ message: 'URL required hai' })
+    if (!url) return res.status(400).json({ message: 'URL is required' })
     const photo = new Gallery({ url, caption })
     await photo.save()
     res.status(201).json(photo)

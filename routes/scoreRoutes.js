@@ -17,9 +17,9 @@ router.post('/update', verifyAdmin, async (req, res) => {
     const { matchId, over, ball, batsmanId, bowlerId, runs, isWicket, wicketType } = req.body;
 
     if (!matchId || over === undefined || ball === undefined || runs === undefined)
-      return res.status(400).json({ message: 'matchId, over, ball aur runs required hain' });
+      return res.status(400).json({ message: 'matchId, over, ball, and runs are required' });
     if (runs < 0 || runs > 6)
-      return res.status(400).json({ message: 'Runs 0 se 6 ke beech hone chahiye' });
+      return res.status(400).json({ message: 'Runs must be between 0 and 6' });
 
     const score = new Score({ matchId, over, ball, batsmanId, bowlerId, runs, isWicket, wicketType });
     await score.save();

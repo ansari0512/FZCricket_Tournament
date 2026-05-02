@@ -6,7 +6,7 @@ if (!admin.apps.length) {
   if (process.env.FIREBASE_SERVICE_ACCOUNT) {
     try {
       const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)
-      // Render.com mein \n escape ho jaata hai - fix karo
+      // In Render.com, \n characters get escaped - fix this
       if (serviceAccount.private_key) {
         serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n')
       }

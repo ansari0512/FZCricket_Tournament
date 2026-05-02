@@ -68,13 +68,13 @@ router.post('/register', verifyUser, async (req, res) => {
     const { teamName, captainName, captainPhone, city } = req.body;
 
     if (!teamName || !captainName || !captainPhone || !city)
-      return res.status(400).json({ message: 'teamName, captainName, captainPhone aur city required hain' });
+      return res.status(400).json({ message: 'teamName, captainName, captainPhone, and city are required' });
     if (teamName.trim().length < 3 || teamName.trim().length > 50)
-      return res.status(400).json({ message: 'Team name 3 se 50 characters ke beech hona chahiye' });
+      return res.status(400).json({ message: 'Team name must be between 3 and 50 characters' });
     if (captainName.trim().length < 3 || captainName.trim().length > 50)
-      return res.status(400).json({ message: 'Captain name 3 se 50 characters ke beech hona chahiye' });
+      return res.status(400).json({ message: 'Captain name must be between 3 and 50 characters' });
     if (!/^[0-9]{10}$/.test(captainPhone))
-      return res.status(400).json({ message: 'Captain phone 10 digit ka hona chahiye' });
+      return res.status(400).json({ message: 'Captain phone must be 10 digits' });
 
     const existingTeam = await Team.findOne({ teamName: teamName.trim() });
     if (existingTeam)
@@ -82,7 +82,7 @@ router.post('/register', verifyUser, async (req, res) => {
 
     const currentUser = await User.findById(req.user.userId);
     if (!currentUser) return res.status(404).json({ message: 'User not found' });
-    if (currentUser.teamId) return res.status(400).json({ message: 'Aapki team already registered hai' });
+    if (currentUser.teamId) return res.status(400).json({ message: 'Your team is already registered' });
 
     const team = new Team({ teamName, captainName, captainPhone, city, userId: currentUser._id, status: 'pending' });
     await team.save();
@@ -121,20 +121,20 @@ router.put('/:id', verifyAuth, async (req, res) => {
     if (team.userId) {
       let msg = '', type = 'info';
       if (status === 'approved') {
-        msg = `🎉 Congratulations! Aapki team "${team.teamName}" approve ho gayi! ₹300 registration fee pay karein।`;
+        msg = `🎉 Congratulations! Your team "${team.teamName}" has been approved! Please pay the ₹300 registration fee.`;
         type = 'success';
       } else if (status === 'rejected') {
-        msg = `❌ Aapki team "${team.teamName}" reject ho gayi। Karan: ${rejectReason || 'Not specified'}`;
+        msg = `❌ Your team "${team.teamName}" has been rejected. Reason: ${rejectReason || 'Not specified'}`;
         type = 'error';
       } else if (paymentDone) {
-        msg = `✅ Payment confirm ho gayi! Aapki team "${team.teamName}" officially registered hai।`;
+        msg = `✅ Payment confirmed! Your team "${team.teamName}" is now officially registered.`;
         type = 'success';
       } else if (req.body.paymentScreenshot) {
-        msg = `📸 "${team.teamName}" ne payment screenshot upload kar diya hai। Please confirm karein।`;
+        msg = `📸 Payment screenshot for "${team.teamName}" has been uploaded. Please verify.`;
         type = 'info';
-        // Admin ko notification bhejo - admin user find karo
-        // (Admin notifications ke liye alag system nahi hai, isliye log mein print karo)
-        console.log(`[ADMIN ALERT] Team ${team.teamName} ne payment screenshot upload kiya`);
+        // Notify admin about payment screenshot - admin user lookup
+        // (No separate admin notification system, so logging for now)
+        console.log(`[ADMIN ALERT] Team ${team.teamName} has uploaded a payment screenshot`);
       }
       if (msg) {
         await User.findByIdAndUpdate(team.userId, { $push: { notifications: { message: msg, type } } });

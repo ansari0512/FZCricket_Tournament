@@ -31,12 +31,12 @@ export const AppProvider = ({ children }) => {
   useEffect(() => {
     fetchData()
 
-    // Pehle localStorage se user load karo (instant)
+    // First load user from localStorage (instant)
     const savedUser = localStorage.getItem('fzUser')
     const savedToken = localStorage.getItem('fzToken')
     if (savedUser && savedToken) {
       try {
-        // Token valid hai ya nahi check karo
+        // Check if token is valid
         const payload = JSON.parse(atob(savedToken.split('.')[1]))
         const isExpired = payload.exp * 1000 < Date.now()
         if (!isExpired && payload.userId) {
@@ -58,9 +58,9 @@ export const AppProvider = ({ children }) => {
             name: firebaseUser.displayName,
             photo: firebaseUser.photoURL
           })
-          // JWT token save karo
+          // Save JWT token
           localStorage.setItem('fzToken', res.data.token)
-          // Fresh user data backend se lo
+          // Get fresh user data from backend
           const meRes = await fetch(`${import.meta.env.VITE_API_URL || 'https://fzcricket-backend.onrender.com/api'}/auth/me`, {
             headers: { Authorization: `Bearer ${res.data.token}` }
           })

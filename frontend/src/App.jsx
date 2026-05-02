@@ -54,8 +54,8 @@ function AppContent() {
             <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
               <p className="text-6xl mb-4">🏏</p>
               <h2 className="text-2xl font-bold mb-2">404 - Page Not Found</h2>
-              <p className="text-gray-500 mb-6">Yeh page exist nahi karta.</p>
-              <a href="/" className="btn-primary">Home Pe Jao</a>
+              <p className="text-gray-500 mb-6">This page does not exist.</p>
+              <a href="/" className="btn-primary">Go Home</a>
             </div>
           } />
         </Routes>

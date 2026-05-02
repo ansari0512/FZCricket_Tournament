@@ -1,31 +1,31 @@
-# 🚀 Deployment Guide (Hindi)
+# 🚀 Deployment Guide
 
-## FZ Cricket Tournament Website Ko Live Kaise Karein
+## How to Deploy FZ Cricket Tournament Website Live
 
-### Step 1: Backend Deploy Karein (Render.com)
+### Step 1: Deploy Backend (Render.com)
 
-1. **Render.com** par jayein
-2. New Web Service create karein
-3. GitHub repo connect karein
-4. Ye details dein:
+1. Go to **Render.com**
+2. Create a new web service
+3. Connect your GitHub repository
+4. Provide these details:
    - Build Command: `npm install`
    - Start Command: `node index.js`
-5. Environment Variables add karein:
+5. Add environment variables:
    - `MONGODB_URI` = MongoDB Atlas connection string
    - `PORT` = 5000
    - `ADMIN_SECRET` = strong password
    - `JWT_SECRET` = random string
    - `ALLOWED_ORIGINS` = https://fz-cricket-tournament.vercel.app
 
-### Step 2: Frontend Deploy Karein (Vercel)
+### Step 2: Deploy Frontend (Vercel)
 
-1. **Vercel.com** par jayein
-2. GitHub repo connect karein
+1. Go to **Vercel.com**
+2. Connect your GitHub repository
 3. Root Directory: `frontend`
 4. Framework: `Vite`
 5. Build Command: `npm run build`
 6. Output Directory: `dist`
-7. Environment Variables add karein:
+7. Add environment variables:
    - `VITE_API_URL` = https://your-backend.onrender.com/api
    - `VITE_CLOUDINARY_CLOUD` = cloudinary cloud name
    - `VITE_CLOUDINARY_PRESET` = fzcricket_gallery
@@ -34,14 +34,14 @@
 
 ### Step 3: MongoDB Setup (MongoDB Atlas)
 
-1. MongoDB Atlas par jayein
-2. Free cluster create karein
-3. Database Access mein user banayein
-4. Network Access mein `0.0.0.0/0` allow karein
-5. Connection string copy karein aur Render mein daalein
+1. Go to MongoDB Atlas
+2. Create a free cluster
+3. Create a user in Database Access
+4. Allow `0.0.0.0/0` in Network Access
+5. Copy the connection string and paste it into Render
 
 ---
 
 Admin Login:
 - URL: yourwebsite.com/admin
-- Password: Jo tumne Render.com ke ADMIN_SECRET mein set kiya hai
+- Password: The password you set in ADMIN_SECRET on Render.com
