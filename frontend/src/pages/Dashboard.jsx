@@ -137,7 +137,7 @@ function PaymentSection({ team, onScreenshotUploaded, upiConfig }) {
             <div key={label} className="flex items-center justify-between bg-white rounded-xl px-3 py-2 border">
               <div>
                 <p className="text-xs text-gray-500">{label}</p>
-                <p className="text-sm font-medium">${getUPIID(label.toLowerCase())}</p>
+                <p className="text-sm font-medium">{getUPIID(label.toLowerCase())}</p>
               </div>
               <button onClick={() => copyUPI(getUPIID(label.toLowerCase()))}
                 className={`text-xs px-3 py-1.5 rounded-lg font-medium transition ${copied === getUPIID(label.toLowerCase()) ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
@@ -165,7 +165,7 @@ function PaymentSection({ team, onScreenshotUploaded, upiConfig }) {
               className="w-48 h-48 mx-auto rounded-xl shadow"
             />
             <p className="text-xs text-gray-500 mt-2">GPay, PhonePe, Paytm se scan karo</p>
-             <p className="text-sm font-bold text-primary mt-1">UPI: ${getUPIID('gpay')}</p>
+             <p className="text-sm font-bold text-primary mt-1">UPI: {getUPIID('gpay')}</p>
             <p className="text-sm font-bold">Amount: ₹300</p>
           </div>
         )}

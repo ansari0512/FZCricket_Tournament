@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { adminLogin, getAdminUsers, deleteAdminUser, getAllTeams, getTeam, updateTeam, deleteTeam, getTeamPlayers, deletePlayer, getMatches, updateMatchStatus, updateMatchScore, createMatch, deleteMatch, getGallery, addGalleryPhoto, deleteGalleryPhoto, getPaymentConfig, SOCKET_URL } from '../services/api'
+import API from '../services/api'
 import toast from 'react-hot-toast'
 import io from 'socket.io-client'
 
@@ -153,15 +154,14 @@ function UPIConfigPanel({ config, onUpdate }) {
       { key: 'UPI_PHONEPE', value: values.phonepe, description: 'PhonePe UPI ID' },
       { key: 'UPI_PAYTM', value: values.paytm, description: 'Paytm UPI ID' }
     ]
-    for (const update of updates) {
-      await fetch('/api/config', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
-        body: JSON.stringify(update)
-      })
-    }
-    onUpdate()
-    setEditing(false)
+    try {
+      for (const update of updates) {
+        await API.post('/config', update)
+      }
+      onUpdate()
+      setEditing(false)
+      toast.success('UPI IDs saved!')
+    } catch { toast.error('Save failed') }
   }
   
   return (
