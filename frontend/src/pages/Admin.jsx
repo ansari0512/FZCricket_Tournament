@@ -454,9 +454,9 @@ export default function Admin() {
                       {team.status === 'approved' && !team.paymentDone && <button onClick={() => handlePayment(team._id, team.teamName)} className="text-xs bg-blue-100 text-blue-700 px-3 py-1.5 rounded-lg font-medium">₹ Confirm Payment</button>}
                       {team.paymentDone && <span className="text-xs bg-sky-100 text-sky-700 px-3 py-1.5 rounded-lg font-medium">✅ Paid</span>}
                       {team.paymentScreenshot && !team.paymentDone && (
-                        <a href={team.paymentScreenshot} target="_blank" rel="noreferrer" className="text-xs bg-purple-100 text-purple-700 px-3 py-1.5 rounded-lg font-medium">📸 View Screenshot</a>
+                        <a href={team.paymentScreenshot} target="_blank" rel="noreferrer" className="text-xs bg-blue-100 text-blue-700 px-3 py-1.5 rounded-lg font-medium">📸 View Screenshot</a>
                       )}
-                      <button onClick={() => loadPlayers(team._id)} className="text-xs bg-purple-100 text-purple-700 px-3 py-1.5 rounded-lg font-medium">👥 Players</button>
+                      <button onClick={() => loadPlayers(team._id)} className="text-xs bg-blue-100 text-blue-700 px-3 py-1.5 rounded-lg font-medium">👥 Players</button>
                       <button onClick={() => handleDeleteTeam(team._id, team.teamName)} className="text-xs bg-slate-100 text-slate-700 px-3 py-1.5 rounded-lg font-medium">🗑️ Delete</button>
                     </div>
                   </div>
