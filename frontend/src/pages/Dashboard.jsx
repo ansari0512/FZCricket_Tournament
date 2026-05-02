@@ -88,17 +88,17 @@ function PaymentSection({ team, onScreenshotUploaded, upiConfig }) {
   // Hide payment section if already paid
   if (team.paymentDone) {
     return (
-      <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-3 text-center">
+      <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 mb-3 text-center">
         <p className="text-3xl mb-2">✅</p>
-        <p className="text-green-700 font-bold">✅ Payment Confirmed!</p>
+        <p className="text-slate-900 font-bold">✅ Payment Confirmed!</p>
         <p className="text-sm text-gray-500 mt-1">Your team is officially registered.</p>
       </div>
     )
   }
 
   return (
-    <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-3">
-      <p className="font-bold text-yellow-800 mb-3">💰 Registration Fee Payment</p>
+    <div className="bg-sky-50 border border-sky-200 rounded-xl p-4 mb-3">
+      <p className="font-bold text-sky-800 mb-3">💰 Registration Fee Payment</p>
 
       <div className="bg-white rounded-xl p-3 mb-3 text-sm space-y-1">
         <div className="flex justify-between">
@@ -107,7 +107,7 @@ function PaymentSection({ team, onScreenshotUploaded, upiConfig }) {
         </div>
         <div className="flex justify-between">
           <span className="text-gray-600">On match day:</span>
-          <span className="font-bold text-orange-500">₹800</span>
+          <span className="font-bold text-primary">₹800</span>
         </div>
         <div className="flex justify-between border-t pt-1">
           <span className="font-bold">Total:</span>
@@ -118,15 +118,15 @@ function PaymentSection({ team, onScreenshotUploaded, upiConfig }) {
       <p className="text-sm font-medium text-gray-700 mb-2">Pay now (₹300) via app - Click on your phone:</p>
       <div className="grid grid-cols-3 gap-2 mb-3">
         <button onClick={() => openUPI(getUPIID('gpay'))}
-          className="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-2 rounded-xl text-xs flex flex-col items-center gap-1 transition">
+          className="bg-sky-600 hover:bg-sky-700 text-white font-bold py-3 px-2 rounded-xl text-xs flex flex-col items-center gap-1 transition">
           <span className="text-xl">📱</span> GPay
         </button>
         <button onClick={() => openUPI(getUPIID('phonepe'))}
-          className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-2 rounded-xl text-xs flex flex-col items-center gap-1 transition">
+          className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-2 rounded-xl text-xs flex flex-col items-center gap-1 transition">
           <span className="text-xl">📱</span> PhonePe
         </button>
         <button onClick={() => openUPI(getUPIID('paytm'))}
-          className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-2 rounded-xl text-xs flex flex-col items-center gap-1 transition">
+          className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-2 rounded-xl text-xs flex flex-col items-center gap-1 transition">
           <span className="text-xl">📱</span> Paytm
         </button>
       </div>
@@ -140,7 +140,7 @@ function PaymentSection({ team, onScreenshotUploaded, upiConfig }) {
                 <p className="text-sm font-medium">{getUPIID(label.toLowerCase())}</p>
               </div>
               <button onClick={() => copyUPI(getUPIID(label.toLowerCase()))}
-                className={`text-xs px-3 py-1.5 rounded-lg font-medium transition ${copied === getUPIID(label.toLowerCase()) ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
+                className={`text-xs px-3 py-1.5 rounded-lg font-medium transition ${copied === getUPIID(label.toLowerCase()) ? 'bg-sky-100 text-sky-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
                 {copied === getUPIID(label.toLowerCase()) ? '✅ Copied!' : '📋 Copy'}
               </button>
             </div>
@@ -172,8 +172,8 @@ function PaymentSection({ team, onScreenshotUploaded, upiConfig }) {
       </div>
 
       {uploaded ? (
-        <div className="bg-green-50 border border-green-200 rounded-xl p-3 text-center">
-          <p className="text-green-700 font-bold text-sm">✅ Screenshot upload ho gaya!</p>
+        <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 text-center">
+          <p className="text-slate-900 font-bold text-sm">✅ Screenshot upload ho gaya!</p>
           <p className="text-xs text-gray-500 mt-1">Waiting for admin verification...</p>
           <label className="mt-2 text-xs text-primary cursor-pointer block">
             Upload Again
@@ -182,7 +182,7 @@ function PaymentSection({ team, onScreenshotUploaded, upiConfig }) {
         </div>
       ) : (
         <div>
-          <p className="text-sm text-yellow-700 mb-2">After payment, upload the screenshot:</p>
+          <p className="text-sm text-primary mb-2">After payment, upload the screenshot:</p>
           <label className={`btn-primary w-full text-center cursor-pointer block ${uploading ? 'opacity-50' : ''}`}>
             {uploading ? `Uploading... ${uploadProgress}%` : '📸 Upload Payment Screenshot'}
             <input type="file" accept="image/*" onChange={handleUpload} disabled={uploading} className="hidden" />
@@ -190,9 +190,9 @@ function PaymentSection({ team, onScreenshotUploaded, upiConfig }) {
           {uploading && (
             <div className="mt-3">
               <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                <div className="h-full bg-yellow-500 transition-all duration-300" style={{width: `${uploadProgress}%`}}></div>
+                <div className="h-full bg-primary transition-all duration-300" style={{width: `${uploadProgress}%`}}></div>
               </div>
-              <p className="text-xs text-yellow-700 text-center mt-1">{uploadProgress}% complete</p>
+              <p className="text-xs text-primary text-center mt-1">{uploadProgress}% complete</p>
             </div>
           )}
         </div>
@@ -216,12 +216,12 @@ function NotificationsPanel({ onRefresh }) {
   return (
     <div className="card">
       <div className="flex justify-between items-center mb-3">
-        <h3 className="font-bold">🔔 Notifications {unread > 0 && <span className="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full ml-1">{unread}</span>}</h3>
+        <h3 className="font-bold">🔔 Notifications {unread > 0 && <span className="bg-primary text-white text-xs px-2 py-0.5 rounded-full ml-1">{unread}</span>}</h3>
         {unread > 0 && <button onClick={markRead} className="text-sm text-primary">Mark all read</button>}
       </div>
       <div className="space-y-2">
         {notifs.map((n, i) => (
-          <div key={i} className={`p-3 rounded-xl border-l-4 text-sm ${n.type === 'success' ? 'bg-green-50 border-green-500' : n.type === 'error' ? 'bg-red-50 border-red-500' : 'bg-blue-50 border-blue-500'} ${!n.read ? 'font-medium' : 'opacity-60'}`}>
+          <div key={i} className={`p-3 rounded-xl border-l-4 text-sm ${n.type === 'success' ? 'bg-sky-50 border-sky-200' : n.type === 'error' ? 'bg-slate-50 border-slate-200' : 'bg-blue-50 border-blue-500'} ${!n.read ? 'font-medium' : 'opacity-60'}`}>
             <p>{n.message}</p>
             <p className="text-xs text-gray-400 mt-1">{new Date(n.createdAt).toLocaleDateString('en-IN')}</p>
           </div>
@@ -453,7 +453,7 @@ export default function Dashboard() {
                 <p className="text-gray-500 text-sm">{currentUser.email}</p>
               </div>
             </div>
-            <button onClick={logout} className="text-red-500 font-medium text-sm">Logout</button>
+            <button onClick={logout} className="text-slate-700 font-medium text-sm">Logout</button>
           </div>
         </div>
 
@@ -494,9 +494,9 @@ export default function Dashboard() {
 
               {/* Rejection reason */}
               {team.status === 'rejected' && team.rejectReason && (
-                <div className="bg-red-50 border border-red-200 rounded-xl p-3 mb-3">
-                  <p className="text-sm font-bold text-red-700 mb-1">❌ Team Rejected — Reason:</p>
-                  <p className="text-sm text-red-600">{team.rejectReason}</p>
+                <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 mb-3">
+                  <p className="text-sm font-bold text-slate-900 mb-1">❌ Team Rejected — Reason:</p>
+                  <p className="text-sm text-slate-700">{team.rejectReason}</p>
                   <p className="text-xs text-gray-500 mt-2">Edit above and resubmit your team.</p>
                 </div>
               )}
@@ -516,7 +516,7 @@ export default function Dashboard() {
                   <div className="flex justify-between items-center mb-3">
                     <p className="font-bold text-sm">Players ({players.length}/15)</p>
                     {players.length < 11 && (
-                      <p className="text-xs text-orange-500">{11 - players.length} more players needed to submit</p>
+                      <p className="text-xs text-primary">{11 - players.length} more players needed to submit</p>
                     )}
                   </div>
                   <div className="space-y-2">
@@ -560,11 +560,10 @@ export default function Dashboard() {
             <h3 className="font-bold mb-1">➕ Add Players ({players.length}/15)</h3>
             <p className="text-sm text-gray-500 mb-4">
               Minimum 11 players are required to submit your team.
-              {players.length >= 11 && players.length < 15 && <span className="text-green-600 font-medium"> You can submit now!</span>}
-            </p>
+                {players.length >= 11 && players.length < 15 && <span className="text-sky-600 font-medium"> You can submit now!</span>}
+              </p>
 
-            {error && <div className="bg-red-50 text-red-600 px-3 py-2 rounded-xl mb-3 text-sm">{error}</div>}
-
+            {error && <div className="bg-slate-50 text-slate-800 px-3 py-2 rounded-xl mb-3 text-sm">{error}</div>}
             {players.length < 15 && (
               <div className="bg-gray-50 rounded-xl p-4 space-y-3 mb-4">
                 <input type="text" placeholder="Player Name *" value={playerForm.name} onChange={e => setPlayerForm({ ...playerForm, name: e.target.value })} className="input" />
@@ -591,7 +590,7 @@ export default function Dashboard() {
               <button
                 onClick={handleSubmitTeam}
                 disabled={submitting}
-                className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl disabled:opacity-50 text-lg"
+                className="w-full bg-primary hover:bg-sky-700 text-white font-bold py-3 rounded-xl disabled:opacity-50 text-lg"
               >
                 {submitting ? 'Submitting...' : '🚀 Submit Team (For Admin Review)'}
               </button>

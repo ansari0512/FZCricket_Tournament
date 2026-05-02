@@ -32,7 +32,7 @@ export default function Schedule() {
   )
 
   const matchTypeLabel = { group: 'Group Stage', 'semi-final': 'Semi Final', final: 'Final' }
-  const matchTypeBg = { group: 'bg-blue-100 text-blue-700', 'semi-final': 'bg-purple-100 text-purple-700', final: 'bg-amber-100 text-amber-700' }
+  const matchTypeBg = { group: 'bg-sky-100 text-sky-700', 'semi-final': 'bg-indigo-100 text-indigo-700', final: 'bg-slate-100 text-slate-700' }
 
   return (
     <div className="py-8 px-4 pb-20 page-enter">
@@ -42,15 +42,15 @@ export default function Schedule() {
         {liveMatches.length > 0 && (
           <div>
             <div className="flex items-center justify-center gap-2 mb-5">
-              <span className="w-3 h-3 bg-red-500 rounded-full animate-pulse" />
-              <h2 className="text-2xl font-black text-red-600 tracking-wide uppercase">Live Matches</h2>
-              <span className="w-3 h-3 bg-red-500 rounded-full animate-pulse" />
+              <span className="w-3 h-3 bg-sky-400 rounded-full animate-pulse" />
+              <h2 className="text-2xl font-black text-sky-600 tracking-wide uppercase">Live Matches</h2>
+              <span className="w-3 h-3 bg-sky-400 rounded-full animate-pulse" />
             </div>
             <div className="space-y-4">
               {liveMatches.map(match => (
-                <div key={match._id} className="rounded-2xl overflow-hidden shadow-lg border-2 border-red-400"
-                  style={{ background: 'linear-gradient(135deg, #1a0000, #3b0000)' }}>
-                  <div className="flex items-center justify-between px-4 py-2 bg-red-600">
+                <div key={match._id} className="rounded-2xl overflow-hidden shadow-lg border-2 border-slate-700"
+                  style={{ background: 'linear-gradient(135deg, #0f172a, #1e293b)' }}>
+                  <div className="flex items-center justify-between px-4 py-2 bg-sky-600">
                     <div className="flex items-center gap-2">
                       <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
                       <span className="text-white text-xs font-black tracking-widest uppercase">Live</span>
@@ -113,7 +113,7 @@ export default function Schedule() {
 
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex-1 text-center">
-                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white text-xl font-black mx-auto mb-2 shadow-md">
+                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-sky-500 to-indigo-600 flex items-center justify-center text-white text-xl font-black mx-auto mb-2 shadow-md">
                         {match.team1?.teamName?.charAt(0) || '?'}
                       </div>
                       <p className="font-bold text-sm">{match.team1?.teamName || 'TBD'}</p>

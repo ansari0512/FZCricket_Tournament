@@ -15,20 +15,20 @@
 
   /* ── Gradients ── */
   .cricket-gradient {
-    background: linear-gradient(135deg, #064e3b 0%, #065f46 50%, #047857 100%);
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
   }
   .gold-gradient {
-    background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+    background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
   }
   .hero-gradient {
-    background: linear-gradient(135deg, #020c07 0%, #064e3b 40%, #065f46 70%, #0a3d2e 100%);
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 40%, #334155 70%, #0f172a 100%);
   }
 
   /* ── Buttons ── */
   .btn-primary {
     @apply bg-primary hover:bg-primary-dark text-white font-bold py-3 px-6 rounded-xl
            transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed
-           shadow-md hover:shadow-glow-green active:scale-95 inline-flex items-center justify-center gap-2;
+           shadow-md hover:shadow-glow-blue active:scale-95 inline-flex items-center justify-center gap-2;
   }
   .btn-secondary {
     @apply bg-white hover:bg-gray-50 text-gray-700 font-semibold py-3 px-6 rounded-xl
@@ -36,15 +36,15 @@
            shadow-sm active:scale-95 inline-flex items-center justify-center gap-2;
   }
   .btn-gold {
-    @apply text-gray-900 font-bold py-3 px-6 rounded-xl transition-all duration-200
-           shadow-md hover:shadow-glow-gold active:scale-95 inline-flex items-center justify-center gap-2;
-    background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+    @apply text-white font-bold py-3 px-6 rounded-xl transition-all duration-200
+           shadow-md hover:shadow-glow-sky active:scale-95 inline-flex items-center justify-center gap-2;
+    background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
   }
   .btn-gold:hover {
-    background: linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%);
+    background: linear-gradient(135deg, #60a5fa 0%, #38bdf8 100%);
   }
   .btn-danger {
-    @apply bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-xl
+    @apply bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 px-6 rounded-xl
            transition-all duration-200 shadow-sm active:scale-95;
   }
 
@@ -75,16 +75,16 @@
 
   /* ── Badges ── */
   .badge-pending {
-    @apply bg-amber-50 text-amber-700 border border-amber-200 px-3 py-1 rounded-full text-xs font-bold;
+    @apply bg-sky-50 text-sky-700 border border-sky-200 px-3 py-1 rounded-full text-xs font-bold;
   }
   .badge-approved {
-    @apply bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-1 rounded-full text-xs font-bold;
+    @apply bg-sky-50 text-sky-700 border border-sky-200 px-3 py-1 rounded-full text-xs font-bold;
   }
   .badge-rejected {
-    @apply bg-red-50 text-red-700 border border-red-200 px-3 py-1 rounded-full text-xs font-bold;
+    @apply bg-slate-100 text-slate-700 border border-slate-200 px-3 py-1 rounded-full text-xs font-bold;
   }
   .badge-live {
-    @apply bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold animate-pulse;
+    @apply bg-sky-500 text-white px-3 py-1 rounded-full text-xs font-bold animate-pulse;
   }
 
   /* ── Section Headers ── */
@@ -103,7 +103,7 @@
 
   /* ── Table ── */
   .table-header {
-    background: linear-gradient(135deg, #064e3b 0%, #047857 100%);
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
     @apply text-white;
   }
 
@@ -128,13 +128,13 @@
   font-size: clamp(11px, 3vw, 13px);
   font-weight: 800;
   letter-spacing: 1.5px;
-  background: linear-gradient(90deg, #ffd700, #ffed4e, #ffd700, #ffed4e);
+  background: linear-gradient(90deg, #38bdf8, #2563eb, #818cf8, #38bdf8);
   background-size: 200% auto;
-  color: #000;
+  color: #fff;
   padding: 5px 20px;
   border-radius: 20px;
-  border: 1.5px solid rgba(255,255,255,0.6);
-  box-shadow: 0 0 15px rgba(255,215,0,0.5), inset 0 1px 0 rgba(255,255,255,0.4);
+  border: 1.5px solid rgba(255,255,255,0.18);
+  box-shadow: 0 0 18px rgba(56,189,248,0.25), inset 0 1px 0 rgba(255,255,255,0.08);
   animation: marquee-move 8s linear infinite, shimmer 2s linear infinite;
 }
 @keyframes marquee-move {
@@ -156,8 +156,9 @@
 .page-enter { animation: slideUp 0.35s ease-out; }
 
 /* ── Glow effects ── */
-.glow-green { box-shadow: 0 0 30px rgba(5,150,105,0.25); }
-.glow-gold  { box-shadow: 0 0 30px rgba(245,158,11,0.3); }
+.glow-green { box-shadow: 0 0 30px rgba(56,189,248,0.2); }
+.glow-gold  { box-shadow: 0 0 30px rgba(56,189,248,0.22); }
+.glow-blue { box-shadow: 0 0 30px rgba(56,189,248,0.25); }
 
 /* ── Mobile ── */
 @media (max-width: 640px) {

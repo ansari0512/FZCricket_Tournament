@@ -190,7 +190,7 @@ function UPIConfigPanel({ config, onUpdate }) {
               <input type="text" value={values.paytm} onChange={e => setValues({...values, paytm: e.target.value})}
                 className="input text-sm flex-1" />
             </div>
-            <button onClick={handleSave} className="w-full bg-green-600 text-white py-2 rounded mt-2 text-sm">Save</button>
+            <button onClick={handleSave} className="w-full bg-primary hover:bg-sky-700 text-white py-2 rounded mt-2 text-sm">Save</button>
           </>
         ) : (
           <>
@@ -222,7 +222,7 @@ function AdminPlayerCard({ player, onDelete, onPreview }) {
             <p className="text-xs text-gray-500">Jersey #{player.jerseyNumber}</p>
             {player.address && <p className="text-xs text-gray-400">📍 {player.address}</p>}
           </div>
-          <button onClick={() => onDelete(player._id)} className="text-red-500 text-sm bg-red-50 px-3 py-1.5 rounded-lg flex-shrink-0">Delete</button>
+          <button onClick={() => onDelete(player._id)} className="text-slate-700 text-sm bg-slate-100 px-3 py-1.5 rounded-lg flex-shrink-0">Delete</button>
         </div>
       </div>
     </>
@@ -393,7 +393,7 @@ export default function Admin() {
       <div className="w-full max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold">Admin Dashboard</h2>
-          <button onClick={() => { localStorage.removeItem('adminToken'); setLoggedIn(false) }} className="text-red-500 font-medium text-sm">Logout</button>
+          <button onClick={() => { localStorage.removeItem('adminToken'); setLoggedIn(false) }} className="text-slate-700 font-medium text-sm">Logout</button>
         </div>
 
         <div className="space-y-2">
@@ -412,10 +412,10 @@ export default function Admin() {
                     <div>
                       <p className="font-bold">{user.name || user.email}</p>
                       <p className="text-sm text-gray-500">{user.email}</p>
-                      <p className="text-xs mt-1">{user.teamId ? <button onClick={() => handleViewUserTeam(user.teamId)} className="text-green-600 font-medium hover:underline">✅ Team Registered → Dekho</button> : <span className="text-yellow-600">⏳ No Team</span>}</p>
+                      <p className="text-xs mt-1">{user.teamId ? <button onClick={() => handleViewUserTeam(user.teamId)} className="text-sky-600 font-medium hover:underline">✅ Team Registered → Dekho</button> : <span className="text-slate-600">⏳ No Team</span>}</p>
                     </div>
                     <div className="flex gap-2">
-                      <button onClick={() => handleDeleteUser(user._id, user.name || user.email)} className="text-xs bg-red-100 text-red-700 px-3 py-1.5 rounded-lg">Delete</button>
+                      <button onClick={() => handleDeleteUser(user._id, user.name || user.email)} className="text-xs bg-slate-100 text-slate-700 px-3 py-1.5 rounded-lg">Delete</button>
                     </div>
                   </div>
                 ))}
@@ -429,7 +429,7 @@ export default function Admin() {
               className={`w-full text-left px-4 py-3 font-medium text-sm flex justify-between items-center transition ${activeTab === 'Teams' ? 'cricket-gradient text-white' : 'bg-gray-100 hover:bg-gray-200'}`}>
               🏏 Teams
               {teams.filter(t => t.submitted && t.paymentScreenshot && !t.paymentDone).length > 0 && (
-                <span className="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full ml-2">
+                <span className="bg-primary text-white text-xs px-2 py-0.5 rounded-full ml-2">
                   {teams.filter(t => t.submitted && t.paymentScreenshot && !t.paymentDone).length} Payment Pending
                 </span>
               )}
@@ -448,16 +448,16 @@ export default function Admin() {
                       <span className={team.status === 'approved' ? 'badge-approved' : team.status === 'rejected' ? 'badge-rejected' : 'badge-pending'}>{team.status}</span>
                     </div>
                     <div className="flex flex-wrap gap-2 mt-3">
-                      {team.status === 'pending' && <button onClick={() => handleApprove(team._id, team.teamName)} className="text-xs bg-green-100 text-green-700 px-3 py-1.5 rounded-lg font-medium">✅ Approve</button>}
-                      {team.status === 'pending' && <button onClick={() => handleReject(team)} className="text-xs bg-orange-100 text-orange-700 px-3 py-1.5 rounded-lg font-medium">❌ Reject</button>}
-                      {team.status === 'rejected' && <button onClick={() => handleApprove(team._id, team.teamName)} className="text-xs bg-green-100 text-green-700 px-3 py-1.5 rounded-lg font-medium">✅ Approve</button>}
+                      {team.status === 'pending' && <button onClick={() => handleApprove(team._id, team.teamName)} className="text-xs bg-sky-100 text-sky-700 px-3 py-1.5 rounded-lg font-medium">✅ Approve</button>}
+                      {team.status === 'pending' && <button onClick={() => handleReject(team)} className="text-xs bg-slate-100 text-slate-700 px-3 py-1.5 rounded-lg font-medium">❌ Reject</button>}
+                      {team.status === 'rejected' && <button onClick={() => handleApprove(team._id, team.teamName)} className="text-xs bg-sky-100 text-sky-700 px-3 py-1.5 rounded-lg font-medium">✅ Approve</button>}
                       {team.status === 'approved' && !team.paymentDone && <button onClick={() => handlePayment(team._id, team.teamName)} className="text-xs bg-blue-100 text-blue-700 px-3 py-1.5 rounded-lg font-medium">₹ Confirm Payment</button>}
-                      {team.paymentDone && <span className="text-xs bg-green-100 text-green-700 px-3 py-1.5 rounded-lg font-medium">✅ Paid</span>}
+                      {team.paymentDone && <span className="text-xs bg-sky-100 text-sky-700 px-3 py-1.5 rounded-lg font-medium">✅ Paid</span>}
                       {team.paymentScreenshot && !team.paymentDone && (
                         <a href={team.paymentScreenshot} target="_blank" rel="noreferrer" className="text-xs bg-purple-100 text-purple-700 px-3 py-1.5 rounded-lg font-medium">📸 View Screenshot</a>
                       )}
                       <button onClick={() => loadPlayers(team._id)} className="text-xs bg-purple-100 text-purple-700 px-3 py-1.5 rounded-lg font-medium">👥 Players</button>
-                      <button onClick={() => handleDeleteTeam(team._id, team.teamName)} className="text-xs bg-red-100 text-red-700 px-3 py-1.5 rounded-lg font-medium">🗑️ Delete</button>
+                      <button onClick={() => handleDeleteTeam(team._id, team.teamName)} className="text-xs bg-slate-100 text-slate-700 px-3 py-1.5 rounded-lg font-medium">🗑️ Delete</button>
                     </div>
                   </div>
                 ))}
@@ -506,11 +506,11 @@ export default function Admin() {
                         <p className="font-bold">{match.team1?.teamName} vs {match.team2?.teamName}</p>
                         <p className="text-xs text-gray-500">{match.status} {match.team1Score ? `• ${match.team1Score.runs}/${match.team1Score.wickets} - ${match.team2Score.runs}/${match.team2Score.wickets}` : ''}</p>
                       </div>
-                      <span className={`text-xs px-2 py-1 rounded-full ${match.status === 'in-progress' ? 'bg-red-100 text-red-700' : match.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>{match.status}</span>
+                      <span className={`text-xs px-2 py-1 rounded-full ${match.status === 'in-progress' ? 'bg-sky-100 text-sky-700' : match.status === 'completed' ? 'bg-indigo-100 text-indigo-700' : 'bg-gray-100 text-gray-600'}`}>{match.status}</span>
                     </div>
                     <div className="flex gap-2 flex-wrap">
                       {match.status === 'scheduled' && <button onClick={() => handleMatchStatus(match._id, 'in-progress')} className="text-xs bg-blue-100 text-blue-700 px-3 py-1.5 rounded-lg">▶ Start</button>}
-                      {match.status === 'in-progress' && <button onClick={() => { setScoreModal(match); setScoreData({ t1runs: match.team1Score?.runs || '', t1wickets: match.team1Score?.wickets || '', t2runs: match.team2Score?.runs || '', t2wickets: match.team2Score?.wickets || '', winnerId: '' }) }} className="text-xs bg-green-100 text-green-700 px-3 py-1.5 rounded-lg">📊 Update Score</button>}
+                      {match.status === 'in-progress' && <button onClick={() => { setScoreModal(match); setScoreData({ t1runs: match.team1Score?.runs || '', t1wickets: match.team1Score?.wickets || '', t2runs: match.team2Score?.runs || '', t2wickets: match.team2Score?.wickets || '', winnerId: '' }) }} className="text-xs bg-sky-100 text-sky-700 px-3 py-1.5 rounded-lg">📊 Update Score</button>}
                       {match.status === 'in-progress' && <button onClick={() => handleMatchStatus(match._id, 'completed')} className="text-xs bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg">⏹ End</button>}
                     </div>
                   </div>
@@ -546,7 +546,7 @@ export default function Admin() {
                             <p className="text-xs text-gray-500">{new Date(match.matchDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })} • {new Date(match.matchDate).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</p>
                             <p className="text-xs text-gray-400">{match.venue} • {match.overs} overs • {match.matchType}</p>
                           </div>
-                          <button onClick={() => handleDeleteMatch(match._id)} className="text-red-500 text-xs bg-red-50 px-2 py-1 rounded-lg">🗑️</button>
+                          <button onClick={() => handleDeleteMatch(match._id)} className="text-slate-700 text-xs bg-slate-100 px-2 py-1 rounded-lg">🗑️</button>
                         </div>
                       ))}
                     </div>
@@ -578,7 +578,7 @@ export default function Admin() {
                       <div key={i} className="relative rounded-2xl overflow-hidden aspect-square shadow">
                         <img src={p.url} className="w-full h-full object-cover" />
                         {p.caption && <p className="absolute bottom-0 inset-x-0 bg-black/50 text-white text-xs p-1 text-center">{p.caption}</p>}
-                        <button onClick={() => handleDeleteGallery(p._id)} className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 text-xs flex items-center justify-center">✕</button>
+                        <button onClick={() => handleDeleteGallery(p._id)} className="absolute top-2 right-2 bg-slate-800 text-white rounded-full w-6 h-6 text-xs flex items-center justify-center">✕</button>
                       </div>
                     ))}
                   </div>
@@ -642,7 +642,7 @@ export default function Admin() {
               <h3 className="font-bold text-lg mb-3">❌ Reject Team: {rejectModal.teamName}</h3>
               <textarea value={rejectReason} onChange={e => setRejectReason(e.target.value)} placeholder="Reason for rejection..." rows={3} className="input mb-4" />
               <div className="flex gap-2">
-                <button onClick={confirmReject} className="flex-1 bg-red-500 text-white font-bold py-2 rounded-xl">Confirm Reject</button>
+                <button onClick={confirmReject} className="flex-1 bg-slate-800 text-white font-bold py-2 rounded-xl">Confirm Reject</button>
                 <button onClick={() => setRejectModal(null)} className="flex-1 btn-secondary">Cancel</button>
               </div>
             </div>

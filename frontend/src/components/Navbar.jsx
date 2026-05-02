@@ -14,21 +14,21 @@ export default function Navbar() {
   ]
 
   return (
-    <nav className="sticky top-0 z-50" style={{ background: 'linear-gradient(135deg, #020c07 0%, #064e3b 60%, #065f46 100%)' }}>
+    <nav className="sticky top-0 z-50" style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #111827 100%)' }}>
       {/* Top accent line */}
-      <div className="h-0.5 w-full" style={{ background: 'linear-gradient(90deg, #F59E0B, #10B981, #F59E0B)' }} />
+      <div className="h-0.5 w-full" style={{ background: 'linear-gradient(90deg, #38bdf8, #2563eb, #38bdf8)' }} />
 
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
 
         {/* Logo */}
         <Link to="/" className="flex items-center gap-3 group">
           <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform"
-            style={{ background: 'linear-gradient(135deg, #F59E0B, #D97706)' }}>
+            style={{ background: 'linear-gradient(135deg, #2563eb, #818cf8)' }}>
             <span className="text-lg">🏏</span>
           </div>
           <div>
             <p className="font-extrabold text-white text-base leading-tight tracking-wide">FZ Cricket</p>
-            <p className="text-xs leading-tight font-medium" style={{ color: '#F59E0B' }}>Tournament 2026</p>
+            <p className="text-xs leading-tight font-medium" style={{ color: '#38bdf8' }}>Tournament 2026</p>
           </div>
         </Link>
 
@@ -38,10 +38,10 @@ export default function Navbar() {
             <Link key={l.to} to={l.to}
               className={`px-4 py-2 rounded-xl font-semibold transition-all duration-200 text-sm ${
                 location.pathname === l.to
-                  ? 'text-gray-900 shadow-md font-bold'
+                  ? 'text-white shadow-md font-bold'
                   : 'text-white/70 hover:text-white hover:bg-white/10'
               }`}
-              style={location.pathname === l.to ? { background: 'linear-gradient(135deg, #F59E0B, #D97706)' } : {}}>
+              style={location.pathname === l.to ? { background: 'linear-gradient(135deg, #2563eb, #4f46e5)' } : {}}>
               {l.label}
             </Link>
           ))}
@@ -52,7 +52,7 @@ export default function Navbar() {
           {currentUser ? (
             <Link to="/dashboard"
               className="flex items-center gap-2 px-3 py-1.5 rounded-full font-bold text-sm shadow-md hover:scale-105 transition-all"
-              style={{ background: 'linear-gradient(135deg, #F59E0B, #D97706)', color: '#111' }}>
+              style={{ background: 'linear-gradient(135deg, #2563eb, #4f46e5)', color: '#fff' }}>
               {currentUser.photo
                 ? <img src={currentUser.photo} className="w-6 h-6 rounded-full ring-2 ring-white/50" alt="" />
                 : <span className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-xs">👤</span>

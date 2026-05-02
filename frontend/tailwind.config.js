@@ -4,16 +4,16 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: { DEFAULT: '#059669', dark: '#047857', darker: '#065f46', light: '#d1fae5' },
-        gold: { DEFAULT: '#F59E0B', light: '#FEF3C7', dark: '#D97706' },
-        cricket: { green: '#064e3b', pitch: '#92400e', sky: '#0ea5e9' },
+        primary: { DEFAULT: '#2563eb', dark: '#1d4ed8', darker: '#1e40af', light: '#dbeafe' },
+        gold: { DEFAULT: '#38bdf8', light: '#e0f2fe', dark: '#0ea5e9' },
+        cricket: { green: '#0f172a', pitch: '#1e3a8a', sky: '#2563eb' },
       },
       fontFamily: { sans: ['Poppins', 'sans-serif'] },
       boxShadow: {
         'card': '0 2px 15px -3px rgba(0,0,0,0.07), 0 10px 20px -2px rgba(0,0,0,0.04)',
         'card-hover': '0 10px 40px -10px rgba(0,0,0,0.15)',
-        'glow-green': '0 0 20px rgba(5,150,105,0.3)',
-        'glow-gold': '0 0 20px rgba(245,158,11,0.4)',
+        'glow-blue': '0 0 20px rgba(56,189,248,0.22)',
+        'glow-sky': '0 0 20px rgba(56,189,248,0.25)',
         'inner-sm': 'inset 0 1px 3px rgba(0,0,0,0.1)',
       },
       backgroundImage: {

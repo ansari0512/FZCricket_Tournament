@@ -30,7 +30,7 @@ function AppContent() {
     <div className="fixed inset-0 bg-gray-900 flex flex-col items-center justify-center z-50">
       <span className="text-6xl mb-4">🏏</span>
       <p className="text-white text-xl font-bold mb-6">FZ Cricket Tournament</p>
-      <div className="w-12 h-12 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin" />
+      <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
       <p className="text-gray-400 text-sm mt-4">Loading...</p>
     </div>
   )

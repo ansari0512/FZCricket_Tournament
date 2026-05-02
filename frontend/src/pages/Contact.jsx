@@ -2,11 +2,11 @@ import { Link } from 'react-router-dom'
 
 export default function Contact() {
   const info = [
-    { icon: '👤', label: 'Contact Person', value: 'Shahid Ansari', type: 'text', color: 'from-emerald-500 to-teal-600' },
-    { icon: '📞', label: 'Mobile 1', value: '+91 8127021765', href: 'tel:+918127021765', color: 'from-blue-500 to-indigo-600' },
-    { icon: '📞', label: 'Mobile 2', value: '+91 9369429653', href: 'tel:+919369429653', color: 'from-purple-500 to-violet-600' },
-    { icon: '📧', label: 'Email', value: 'shahidansari0512@gmail.com', href: 'mailto:shahidansari0512@gmail.com', color: 'from-orange-500 to-red-500' },
-    { icon: '📍', label: 'Venue', value: 'Village Odajhar, Post Naseerpur, Biswan, Sitapur - 261202', type: 'text', color: 'from-pink-500 to-rose-600' },
+    { icon: '👤', label: 'Contact Person', value: 'Shahid Ansari', type: 'text', color: 'from-sky-500 to-indigo-600' },
+    { icon: '📞', label: 'Mobile 1', value: '+91 8127021765', href: 'tel:+918127021765', color: 'from-cyan-500 to-sky-600' },
+    { icon: '📞', label: 'Mobile 2', value: '+91 9369429653', href: 'tel:+919369429653', color: 'from-indigo-500 to-violet-600' },
+    { icon: '📧', label: 'Email', value: 'shahidansari0512@gmail.com', href: 'mailto:shahidansari0512@gmail.com', color: 'from-slate-500 to-slate-700' },
+    { icon: '📍', label: 'Venue', value: 'Village Odajhar, Post Naseerpur, Biswan, Sitapur - 261202', type: 'text', color: 'from-slate-500 to-slate-600' },
   ]
 
   return (
@@ -52,7 +52,7 @@ export default function Contact() {
 
         {/* Tournament Info Card */}
         <div className="rounded-2xl overflow-hidden shadow-card mb-6">
-          <div className="p-4" style={{ background: 'linear-gradient(135deg, #064e3b, #047857)' }}>
+          <div className="p-4" style={{ background: 'linear-gradient(135deg, #1e3a8a, #2563eb)' }}>
             <p className="text-white font-bold text-center">🏏 FZ Cricket Tournament 2026</p>
           </div>
           <div className="p-4 bg-white grid grid-cols-2 gap-3">

@@ -31,9 +31,9 @@ export default function Login() {
         {/* Card */}
         <div className="bg-white rounded-3xl shadow-card overflow-hidden">
           {/* Header */}
-          <div className="p-8 text-center" style={{ background: 'linear-gradient(135deg, #020c07, #064e3b)' }}>
+          <div className="p-8 text-center" style={{ background: 'linear-gradient(135deg, #1e293b, #2563eb)' }}>
             <div className="w-20 h-20 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-lg"
-              style={{ background: 'linear-gradient(135deg, #F59E0B, #D97706)' }}>
+              style={{ background: 'linear-gradient(135deg, #2563eb, #818cf8)' }}>
               <span className="text-4xl">🏏</span>
             </div>
             <h1 className="text-2xl font-black text-white">FZ Cricket</h1>
@@ -46,7 +46,7 @@ export default function Login() {
             <p className="text-gray-500 text-sm mb-6">Login to register your team and manage players</p>
 
             <button onClick={handleGoogleLogin} disabled={loading}
-              className="w-full flex items-center justify-center gap-3 bg-white border-2 border-gray-200 hover:border-primary hover:bg-green-50 text-gray-700 font-bold py-3.5 px-6 rounded-2xl transition-all shadow-sm disabled:opacity-50 group">
+              className="w-full flex items-center justify-center gap-3 bg-white border-2 border-gray-200 hover:border-primary hover:bg-sky-50 text-gray-700 font-bold py-3.5 px-6 rounded-2xl transition-all shadow-sm disabled:opacity-50 group">
               {loading ? (
                 <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
               ) : (
@@ -55,8 +55,8 @@ export default function Login() {
               <span>{loading ? 'Signing in...' : 'Continue with Google'}</span>
             </button>
 
-            <div className="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-2xl">
-              <p className="text-amber-800 text-xs font-medium text-center">
+            <div className="mt-6 p-4 bg-sky-50 border border-sky-100 rounded-2xl">
+              <p className="text-sky-800 text-xs font-medium text-center">
                 🔒 Secure login via Google — No password needed
               </p>
             </div>

@@ -5,12 +5,12 @@ import { getTeamPlayers } from '../services/api'
 const COLORS = [
   { bg: 'from-sky-500 to-indigo-600', text: 'text-sky-600', light: 'bg-sky-50' },
   { bg: 'from-cyan-500 to-sky-600', text: 'text-cyan-600', light: 'bg-cyan-50' },
-  { bg: 'from-violet-500 to-fuchsia-600', text: 'text-violet-600', light: 'bg-violet-50' },
-  { bg: 'from-amber-500 to-orange-600', text: 'text-amber-600', light: 'bg-amber-50' },
-  { bg: 'from-rose-500 to-pink-600', text: 'text-rose-600', light: 'bg-rose-50' },
-  { bg: 'from-lime-500 to-emerald-600', text: 'text-lime-600', light: 'bg-lime-50' },
+  { bg: 'from-indigo-500 to-violet-600', text: 'text-indigo-600', light: 'bg-indigo-50' },
   { bg: 'from-slate-500 to-slate-700', text: 'text-slate-700', light: 'bg-slate-50' },
-  { bg: 'from-fuchsia-500 to-purple-600', text: 'text-fuchsia-600', light: 'bg-fuchsia-50' },
+  { bg: 'from-sky-600 to-indigo-700', text: 'text-sky-700', light: 'bg-sky-50' },
+  { bg: 'from-indigo-600 to-slate-700', text: 'text-indigo-600', light: 'bg-indigo-50' },
+  { bg: 'from-slate-600 to-slate-800', text: 'text-slate-700', light: 'bg-slate-50' },
+  { bg: 'from-sky-500 to-slate-600', text: 'text-slate-600', light: 'bg-slate-50' },
 ]
 const ROLE_LABELS = { batsman: '🏏 Batsman', bowler: '🎯 Bowler', 'all-rounder': '⭐ All-Rounder', 'wicket-keeper': '🧤 Keeper' }
 
@@ -90,7 +90,7 @@ function TeamCard({ team, index }) {
 
       {/* Stats */}
       <div className="grid grid-cols-4 gap-2 mb-4">
-        {[['M', team.matchesPlayed, 'text-gray-700'], ['W', team.wins, 'text-emerald-600'], ['L', team.losses, 'text-red-500'], ['Pts', team.points, 'text-primary']].map(([k, v, cls]) => (
+        {[['M', team.matchesPlayed, 'text-gray-700'], ['W', team.wins, 'text-sky-600'], ['L', team.losses, 'text-slate-600'], ['Pts', team.points, 'text-primary']].map(([k, v, cls]) => (
           <div key={k} className="bg-gray-50 rounded-xl py-2 text-center">
             <p className={`font-black text-base ${cls}`}>{v}</p>
             <p className="text-[10px] text-gray-400 font-medium">{k}</p>
@@ -164,7 +164,7 @@ export default function Teams() {
           </div>
           <div className="h-2.5 bg-gray-200 rounded-full overflow-hidden">
             <div className="h-full rounded-full transition-all duration-500"
-              style={{ width: `${(teams.length / 8) * 100}%`, background: 'linear-gradient(90deg, #059669, #F59E0B)' }} />
+              style={{ width: `${(teams.length / 8) * 100}%`, background: 'linear-gradient(90deg, #2563eb, #4f46e5)' }} />
           </div>
         </div>
 

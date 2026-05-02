@@ -31,7 +31,7 @@ export default function Register() {
   if (!currentUser) return (
     <div className="min-h-screen flex items-center justify-center px-4 bg-gray-50">
       <div className="card max-w-md w-full text-center shadow-card p-8">
-        <div className="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-4"><span className="text-3xl">🔒</span></div>
+        <div className="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4"><span className="text-3xl">🔒</span></div>
         <h2 className="text-xl font-bold mb-2">Login Required</h2>
         <p className="text-gray-500 text-sm mb-6">You need to log in first before registering a team.</p>
         <Link to="/login" className="btn-primary w-full">Login</Link>
@@ -42,7 +42,7 @@ export default function Register() {
   if (currentUser.teamId) return (
     <div className="min-h-screen flex items-center justify-center px-4 bg-gray-50">
       <div className="card max-w-md w-full text-center shadow-card p-8">
-        <div className="w-16 h-16 bg-green-50 rounded-2xl flex items-center justify-center mx-auto mb-4"><span className="text-3xl">🏏</span></div>
+        <div className="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4"><span className="text-3xl">🏏</span></div>
         <h2 className="text-xl font-bold mb-2">Team Already Registered!</h2>
         <p className="text-gray-500 text-sm mb-6">Go to your dashboard to manage your team.</p>
         <Link to="/dashboard" className="btn-primary w-full">Go to Dashboard</Link>
@@ -53,7 +53,7 @@ export default function Register() {
   if (!registrationOpen) return (
     <div className="min-h-screen flex items-center justify-center px-4 bg-gray-50">
       <div className="card max-w-md w-full text-center shadow-card p-8">
-        <div className="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-4"><span className="text-3xl">😔</span></div>
+        <div className="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4"><span className="text-3xl">😔</span></div>
         <h2 className="text-xl font-bold mb-2">Registration Closed</h2>
         <p className="text-gray-500 text-sm mb-6">All 8 teams have already registered.</p>
         <Link to="/" className="btn-primary w-full">Go to Home</Link>
@@ -98,7 +98,7 @@ export default function Register() {
     <div className="min-h-screen bg-gray-50 py-8 px-4 pb-20 page-enter">
       <div className="max-w-lg mx-auto">
         <div className="bg-white rounded-3xl shadow-card overflow-hidden">
-          <div className="p-6" style={{ background: 'linear-gradient(135deg, #064e3b, #047857)' }}>
+          <div className="p-6" style={{ background: 'linear-gradient(135deg, #1e3a8a, #2563eb)' }}>
             <h2 className="text-xl font-bold text-white text-center">📝 Team Registration Rules</h2>
             <p className="text-center text-white/70 text-sm mt-1">Read the rules first, then register your team</p>
           </div>
@@ -111,7 +111,7 @@ export default function Register() {
             ))}
           </div>
           <div className="px-5 pb-5">
-            <div className="flex items-center gap-3 p-4 bg-amber-50 border border-amber-200 rounded-2xl mb-4">
+            <div className="flex items-center gap-3 p-4 bg-sky-50 border border-sky-100 rounded-2xl mb-4">
               <input type="checkbox" id="agree" checked={agreed} onChange={e => setAgreed(e.target.checked)} className="w-5 h-5 accent-primary cursor-pointer flex-shrink-0" />
               <label htmlFor="agree" className="text-sm font-medium text-gray-700 cursor-pointer">I have read all the rules and I agree to them.</label>
             </div>
@@ -126,7 +126,7 @@ export default function Register() {
     <div className="min-h-screen bg-gray-50 py-8 px-4 pb-20 page-enter">
       <div className="max-w-lg mx-auto">
         <div className="bg-white rounded-3xl shadow-card overflow-hidden">
-          <div className="p-6" style={{ background: 'linear-gradient(135deg, #064e3b, #047857)' }}>
+          <div className="p-6" style={{ background: 'linear-gradient(135deg, #1e3a8a, #2563eb)' }}>
             <h2 className="text-xl font-bold text-white text-center">🏏 Team Registration</h2>
             <p className="text-center text-white/70 text-sm mt-1">Registration Fee: ₹1,100 (Cash on Arrival)</p>
           </div>

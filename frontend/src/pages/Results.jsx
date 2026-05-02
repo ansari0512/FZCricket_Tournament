@@ -50,12 +50,12 @@ export default function Results() {
                 </thead>
                 <tbody>
                   {sorted.map((team, i) => (
-                    <tr key={team._id} className={`border-t ${i === 0 ? 'bg-yellow-50' : i % 2 === 0 ? 'bg-gray-50' : 'bg-white'}`}>
+                    <tr key={team._id} className={`border-t ${i === 0 ? 'bg-slate-50' : i % 2 === 0 ? 'bg-gray-50' : 'bg-white'}`}>
                       <td className="py-3 px-4 font-bold text-gray-500">{i + 1}</td>
                       <td className="py-3 px-4 font-bold">{team.teamName}</td>
                       <td className="py-3 px-4 text-center">{team.matchesPlayed}</td>
-                      <td className="py-3 px-4 text-center text-green-600 font-medium">{team.wins}</td>
-                      <td className="py-3 px-4 text-center text-red-500 font-medium">{team.losses}</td>
+                      <td className="py-3 px-4 text-center text-sky-600 font-medium">{team.wins}</td>
+                      <td className="py-3 px-4 text-center text-slate-600 font-medium">{team.losses}</td>
                       <td className="py-3 px-4 text-center font-bold text-primary">{team.points}</td>
                     </tr>
                   ))}
@@ -79,22 +79,22 @@ export default function Results() {
                 <div key={match._id} className="card hover:shadow-lg transition">
                   <div className="flex justify-between items-start mb-3">
                     <div className="flex gap-2">
-                      <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-medium">✅ Completed</span>
+                      <span className="bg-sky-100 text-sky-700 px-3 py-1 rounded-full text-xs font-medium">✅ Completed</span>
                       <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-medium">{match.matchType?.toUpperCase()}</span>
                     </div>
                     <span className="text-gray-400 text-xs">{new Date(match.matchDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <div className={`flex-1 text-center ${match.winner?._id === match.team1?._id ? 'text-green-600' : ''}`}>
+                    <div className={`flex-1 text-center ${match.winner?._id === match.team1?._id ? 'text-sky-600' : ''}`}>
                       <p className="font-bold text-lg">{match.team1?.teamName || 'TBD'}</p>
                       {match.team1Score && <p className="text-2xl font-bold">{match.team1Score.runs}/{match.team1Score.wickets}</p>}
-                      {match.winner?._id === match.team1?._id && <p className="text-xs text-green-600 font-bold mt-1">🏆 Winner</p>}
+                      {match.winner?._id === match.team1?._id && <p className="text-xs text-sky-600 font-bold mt-1">🏆 Winner</p>}
                     </div>
                     <span className="text-2xl font-bold text-gray-200 px-4">VS</span>
-                    <div className={`flex-1 text-center ${match.winner?._id === match.team2?._id ? 'text-green-600' : ''}`}>
+                    <div className={`flex-1 text-center ${match.winner?._id === match.team2?._id ? 'text-sky-600' : ''}`}>
                       <p className="font-bold text-lg">{match.team2?.teamName || 'TBD'}</p>
                       {match.team2Score && <p className="text-2xl font-bold">{match.team2Score.runs}/{match.team2Score.wickets}</p>}
-                      {match.winner?._id === match.team2?._id && <p className="text-xs text-green-600 font-bold mt-1">🏆 Winner</p>}
+                      {match.winner?._id === match.team2?._id && <p className="text-xs text-sky-600 font-bold mt-1">🏆 Winner</p>}
                     </div>
                   </div>
                   {!match.winner && <p className="text-center text-gray-400 text-xs mt-2">Match Drawn</p>}

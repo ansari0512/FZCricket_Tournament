@@ -5,23 +5,23 @@ import { getGallery } from '../services/api'
 
 function RulesModal({ onClose }) {
   const rules = [
-    { icon: '👥', color: '#10B981', title: '1. टीमें', text: 'इस टूर्नामेंट में अधिकतम 8 टीमें ही भाग ले सकती हैं।' },
-    { icon: '🏏', color: '#3B82F6', title: '2. मैच फॉर्मेट', text: 'सभी मैच 8-8 ओवर के होंगे, जबकि सेमीफाइनल और फाइनल 10-10 ओवर के होंगे।' },
-    { icon: '⚡', color: '#F59E0B', title: '3. पावर प्ले', text: 'शुरुआती 2 ओवर पावर प्ले होंगे, जिसमें सर्कल के बाहर केवल 2 खिलाड़ी ही फील्डिंग कर सकते हैं।' },
-    { icon: '🎯', color: '#EF4444', title: '4. बॉलिंग नियम', text: 'प्रत्येक बॉलर अधिकतम 2 ओवर ही गेंदबाजी कर सकता है।' },
-    { icon: '🎾', color: '#8B5CF6', title: '5. बॉल', text: 'सभी मैच Sixit टेनिस बॉल से खेले जाएंगे।' },
-    { icon: '🏘️', color: '#06B6D4', title: '6. खिलाड़ी पात्रता', text: 'केवल गांव स्तर (Village Level) के खिलाड़ी ही भाग ले सकते हैं।' },
-    { icon: '📊', color: '#6366F1', title: '7. ग्रुप स्टेज', text: '8 टीमों को 2 ग्रुप में बांटा जाएगा। हर टीम अपने ग्रुप की 3 टीमों से खेलेगी।' },
-    { icon: '🥊', color: '#3B82F6', title: '8. सेमीफाइनल', text: 'दोनों ग्रुप की टॉप 2 टीमों के बीच सेमीफाइनल खेला जाएगा।' },
-    { icon: '🏆', color: '#10B981', title: '9. फाइनल', text: 'सेमीफाइनल जीतने वाली टीमों के बीच फाइनल मैच होगा।' },
-    { icon: '💰', color: '#F59E0B', title: '10. इनाम', text: 'फाइनल जीतने वाली टीम को ₹7000 और ट्रॉफी, हारने वाली टीम को ₹3000 और ट्रॉफी।' },
-    { icon: '⭐', color: '#EC4899', title: '11. मैन ऑफ द मैच', text: 'प्रत्येक मैच में "मैन ऑफ द मैच" दिया जाएगा।' },
-    { icon: '📅', color: '#EF4444', title: '12. अंपायर निर्णय', text: 'अंपायर का फैसला अंतिम होगा।' },
+    { icon: '👥', color: '#38bdf8', title: '1. टीमें', text: 'इस टूर्नामेंट में अधिकतम 8 टीमें ही भाग ले सकती हैं।' },
+    { icon: '🏏', color: '#818cf8', title: '2. मैच फॉर्मेट', text: 'सभी मैच 8-8 ओवर के होंगे, जबकि सेमीफाइनल और फाइनल 10-10 ओवर के होंगे।' },
+    { icon: '⚡', color: '#60a5fa', title: '3. पावर प्ले', text: 'शुरुआती 2 ओवर पावर प्ले होंगे, जिसमें सर्कल के बाहर केवल 2 खिलाड़ी ही फील्डिंग कर सकते हैं।' },
+    { icon: '🎯', color: '#c7d2fe', title: '4. बॉलिंग नियम', text: 'प्रत्येक बॉलर अधिकतम 2 ओवर ही गेंदबाजी कर सकता है।' },
+    { icon: '🎾', color: '#93c5fd', title: '5. बॉल', text: 'सभी मैच Sixit टेनिस बॉल से खेले जाएंगे।' },
+    { icon: '🏘️', color: '#0ea5e9', title: '6. खिलाड़ी पात्रता', text: 'केवल गांव स्तर (Village Level) के खिलाड़ी ही भाग ले सकते हैं।' },
+    { icon: '📊', color: '#6366f1', title: '7. ग्रुप स्टेज', text: '8 टीमों को 2 ग्रुप में बांटा जाएगा। हर टीम अपने ग्रुप की 3 टीमों से खेलेगी।' },
+    { icon: '🥊', color: '#818cf8', title: '8. सेमीफाइनल', text: 'दोनों ग्रुप की टॉप 2 टीमों के बीच सेमीफाइनल खेला जाएगा।' },
+    { icon: '🏆', color: '#38bdf8', title: '9. फाइनल', text: 'सेमीफाइनल जीतने वाली टीमों के बीच फाइनल मैच होगा।' },
+    { icon: '💰', color: '#60a5fa', title: '10. इनाम', text: 'फाइनल जीतने वाली टीम को ₹7000 और ट्रॉफी, हारने वाली टीम को ₹3000 और ट्रॉफी।' },
+    { icon: '⭐', color: '#a5b4fc', title: '11. मैन ऑफ द मैच', text: 'प्रत्येक मैच में "मैन ऑफ द मैच" दिया जाएगा।' },
+    { icon: '📅', color: '#818cf8', title: '12. अंपायर निर्णय', text: 'अंपायर का फैसला अंतिम होगा।' },
   ]
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={onClose}>
       <div className="bg-white rounded-3xl w-full max-w-lg max-h-[85vh] overflow-hidden shadow-2xl" onClick={e => e.stopPropagation()}>
-        <div className="p-5 flex justify-between items-center" style={{ background: 'linear-gradient(135deg, #064e3b, #047857)' }}>
+        <div className="p-5 flex justify-between items-center" style={{ background: 'linear-gradient(135deg, #1e3a8a, #2563eb)' }}>
           <div>
             <h3 className="text-xl font-bold text-white">🏏 Tournament Rules</h3>
             <p className="text-white/70 text-xs mt-0.5">FZ Cricket Tournament 2026</p>
@@ -143,10 +143,10 @@ export default function Home() {
   }, [])
 
   if (loading) return (
-    <div className="fixed inset-0 flex flex-col items-center justify-center" style={{ background: 'linear-gradient(135deg, #020c07, #064e3b)' }}>
+    <div className="fixed inset-0 flex flex-col items-center justify-center" style={{ background: 'linear-gradient(135deg, #0f172a, #1e293b)' }}>
       <span className="text-6xl mb-4">🏏</span>
       <p className="text-white text-xl font-bold mb-6">FZ Cricket Tournament</p>
-      <div className="w-12 h-12 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin" />
+      <div className="w-12 h-12 border-4 border-sky-400 border-t-transparent rounded-full animate-spin" />
     </div>
   )
 
@@ -156,7 +156,7 @@ export default function Home() {
       {showRegRules && <RegRulesModal onClose={() => setShowRegRules(false)} />}
 
       {/* ── Hero ── */}
-      <section className="relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #020c07 0%, #064e3b 40%, #065f46 70%, #0a3d2e 100%)' }}>
+      <section className="relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 40%, #334155 70%, #0f172a 100%)' }}>
         {/* Background pattern */}
         <div className="absolute inset-0 bg-hero-pattern opacity-30" />
         {/* Big cricket emoji bg */}
@@ -176,13 +176,13 @@ export default function Home() {
         <div className="relative max-w-4xl mx-auto text-center px-4 pt-10 pb-16">
           {/* Badge */}
           <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 mb-5">
-            <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+            <span className="w-2 h-2 bg-sky-400 rounded-full animate-pulse" />
             <span className="text-white/80 text-xs font-semibold tracking-wider uppercase">Village Level Cricket</span>
           </div>
 
           <h1 className="text-3xl md:text-5xl font-black text-white mb-3 leading-tight">
             Firoz Shah Cricket<br />
-            <span style={{ background: 'linear-gradient(90deg, #F59E0B, #FCD34D)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+            <span style={{ background: 'linear-gradient(90deg, #38bdf8, #818cf8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
               Tournament 2026
             </span>
           </h1>
@@ -193,9 +193,9 @@ export default function Home() {
           {/* Stats */}
           <div className="flex flex-wrap justify-center gap-3 mb-8">
             {[
-              { val: teams.length, label: 'Teams Registered', color: '#F59E0B' },
-              { val: `${8 - teams.length}`, label: 'Spots Left', color: '#4ade80' },
-              { val: matches.filter(m => m.status === 'completed').length, label: 'Matches Played', color: '#60a5fa' },
+              { val: teams.length, label: 'Teams Registered', color: '#38bdf8' },
+              { val: `${8 - teams.length}`, label: 'Spots Left', color: '#60a5fa' },
+              { val: matches.filter(m => m.status === 'completed').length, label: 'Matches Played', color: '#818cf8' },
             ].map((s, i) => (
               <div key={i} className="stat-card min-w-[100px]">
                 <p className="text-3xl font-black" style={{ color: s.color }}>{s.val}</p>
@@ -211,8 +211,8 @@ export default function Home() {
                 Register Your Team 🚀
               </Link>
             ) : (
-              <div className="bg-red-500/20 border border-red-400/40 rounded-full px-6 py-3">
-                <p className="text-red-300 font-bold text-sm">🔒 Registration Closed</p>
+              <div className="bg-slate-900/20 border border-slate-700/40 rounded-full px-6 py-3">
+                <p className="text-slate-200 font-bold text-sm">🔒 Registration Closed</p>
               </div>
             )}
             <button onClick={() => setShowRules(true)}
@@ -229,12 +229,12 @@ export default function Home() {
 
       {/* ── Live Match Banner ── */}
       {liveMatch && (
-        <section className="bg-gradient-to-r from-red-600 to-red-500 py-4 px-4">
+        <section className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 py-4 px-4">
           <div className="max-w-2xl mx-auto">
             <div className="flex items-center justify-center gap-2 mb-3">
-              <span className="w-2.5 h-2.5 bg-white rounded-full animate-pulse" />
+              <span className="w-2.5 h-2.5 bg-sky-400 rounded-full animate-pulse" />
               <span className="font-black text-white text-sm tracking-widest uppercase">Live Match</span>
-              <span className="w-2.5 h-2.5 bg-white rounded-full animate-pulse" />
+              <span className="w-2.5 h-2.5 bg-sky-400 rounded-full animate-pulse" />
             </div>
             <div className="bg-white/15 backdrop-blur rounded-2xl p-4 flex flex-col sm:flex-row justify-between items-center text-white gap-4">
               <div className="flex-1 text-center">
@@ -262,9 +262,9 @@ export default function Home() {
           <p className="section-subtitle">Win big at FZ Cricket Tournament 2026</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {[
-              { icon: '🎟️', title: 'Entry Fee', amount: '₹1,100', sub: 'Per Team', bg: 'from-emerald-500 to-teal-600', glow: 'rgba(16,185,129,0.3)' },
-              { icon: '🏆', title: 'Winner', amount: '₹7,000', sub: '1st Place + Trophy', bg: 'from-yellow-400 to-orange-500', glow: 'rgba(245,158,11,0.4)' },
-              { icon: '🥈', title: 'Runner-up', amount: '₹3,000', sub: '2nd Place + Trophy', bg: 'from-violet-500 to-purple-600', glow: 'rgba(139,92,246,0.3)' },
+              { icon: '🎟️', title: 'Entry Fee', amount: '₹1,100', sub: 'Per Team', bg: 'from-sky-500 to-indigo-600', glow: 'rgba(56,189,248,0.24)' },
+              { icon: '🏆', title: 'Winner', amount: '₹7,000', sub: '1st Place + Trophy', bg: 'from-indigo-500 to-violet-600', glow: 'rgba(99,102,241,0.24)' },
+              { icon: '🥈', title: 'Runner-up', amount: '₹3,000', sub: '2nd Place + Trophy', bg: 'from-slate-500 to-slate-700', glow: 'rgba(71,85,105,0.24)' },
             ].map((p, i) => (
               <div key={i} className={`bg-gradient-to-br ${p.bg} text-white rounded-2xl p-6 text-center hover:scale-105 transition-all duration-300`}
                 style={{ boxShadow: `0 10px 30px ${p.glow}` }}>
@@ -300,12 +300,12 @@ export default function Home() {
                 const colors = [
                   { bg: 'from-sky-500 to-indigo-600', light: 'bg-sky-50' },
                   { bg: 'from-cyan-500 to-sky-600', light: 'bg-cyan-50' },
-                  { bg: 'from-violet-500 to-fuchsia-600', light: 'bg-violet-50' },
-                  { bg: 'from-amber-500 to-orange-600', light: 'bg-amber-50' },
-                  { bg: 'from-rose-500 to-pink-600', light: 'bg-rose-50' },
-                  { bg: 'from-lime-500 to-emerald-600', light: 'bg-lime-50' },
+                  { bg: 'from-indigo-500 to-violet-600', light: 'bg-indigo-50' },
                   { bg: 'from-slate-500 to-slate-700', light: 'bg-slate-50' },
-                  { bg: 'from-fuchsia-500 to-purple-600', light: 'bg-fuchsia-50' },
+                  { bg: 'from-cyan-600 to-sky-700', light: 'bg-cyan-50' },
+                  { bg: 'from-slate-600 to-slate-800', light: 'bg-slate-50' },
+                  { bg: 'from-indigo-600 to-slate-700', light: 'bg-indigo-50' },
+                  { bg: 'from-sky-600 to-indigo-700', light: 'bg-sky-50' },
                 ]
                 const c = colors[i % colors.length]
                 return (
@@ -316,7 +316,7 @@ export default function Home() {
                     <p className="font-bold text-sm truncate">{team.teamName}</p>
                     <p className="text-xs text-gray-400 truncate">📍 {team.city}</p>
                     <div className="mt-3 pt-3 border-t border-gray-100 grid grid-cols-3 gap-1 text-center">
-                      {[['W', team.wins, 'text-green-600'], ['L', team.losses, 'text-red-500'], ['Pts', team.points, 'text-primary font-bold']].map(([k, v, cls]) => (
+                      {[['W', team.wins, 'text-sky-600'], ['L', team.losses, 'text-slate-600'], ['Pts', team.points, 'text-primary font-bold']].map(([k, v, cls]) => (
                         <div key={k}>
                           <p className={`text-sm font-bold ${cls}`}>{v}</p>
                           <p className="text-[10px] text-gray-400">{k}</p>
