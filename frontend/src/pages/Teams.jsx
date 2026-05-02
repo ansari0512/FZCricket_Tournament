@@ -3,14 +3,14 @@ import { useApp } from '../context/AppContext'
 import { getTeamPlayers } from '../services/api'
 
 const COLORS = [
-  { bg: 'from-emerald-500 to-teal-600', text: 'text-emerald-600', light: 'bg-emerald-50' },
-  { bg: 'from-blue-500 to-indigo-600', text: 'text-blue-600', light: 'bg-blue-50' },
-  { bg: 'from-purple-500 to-violet-600', text: 'text-purple-600', light: 'bg-purple-50' },
-  { bg: 'from-orange-500 to-red-500', text: 'text-orange-600', light: 'bg-orange-50' },
-  { bg: 'from-pink-500 to-rose-600', text: 'text-pink-600', light: 'bg-pink-50' },
-  { bg: 'from-cyan-500 to-blue-500', text: 'text-cyan-600', light: 'bg-cyan-50' },
-  { bg: 'from-amber-500 to-yellow-500', text: 'text-amber-600', light: 'bg-amber-50' },
-  { bg: 'from-red-500 to-pink-600', text: 'text-red-600', light: 'bg-red-50' },
+  { bg: 'from-sky-500 to-indigo-600', text: 'text-sky-600', light: 'bg-sky-50' },
+  { bg: 'from-cyan-500 to-sky-600', text: 'text-cyan-600', light: 'bg-cyan-50' },
+  { bg: 'from-violet-500 to-fuchsia-600', text: 'text-violet-600', light: 'bg-violet-50' },
+  { bg: 'from-amber-500 to-orange-600', text: 'text-amber-600', light: 'bg-amber-50' },
+  { bg: 'from-rose-500 to-pink-600', text: 'text-rose-600', light: 'bg-rose-50' },
+  { bg: 'from-lime-500 to-emerald-600', text: 'text-lime-600', light: 'bg-lime-50' },
+  { bg: 'from-slate-500 to-slate-700', text: 'text-slate-700', light: 'bg-slate-50' },
+  { bg: 'from-fuchsia-500 to-purple-600', text: 'text-fuchsia-600', light: 'bg-fuchsia-50' },
 ]
 const ROLE_LABELS = { batsman: '🏏 Batsman', bowler: '🎯 Bowler', 'all-rounder': '⭐ All-Rounder', 'wicket-keeper': '🧤 Keeper' }
 

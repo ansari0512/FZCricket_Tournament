@@ -298,14 +298,14 @@ export default function Home() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {teams.map((team, i) => {
                 const colors = [
-                  { bg: 'from-emerald-500 to-teal-600', light: 'bg-emerald-50' },
-                  { bg: 'from-blue-500 to-indigo-600', light: 'bg-blue-50' },
-                  { bg: 'from-purple-500 to-violet-600', light: 'bg-purple-50' },
-                  { bg: 'from-orange-500 to-red-500', light: 'bg-orange-50' },
-                  { bg: 'from-pink-500 to-rose-600', light: 'bg-pink-50' },
-                  { bg: 'from-cyan-500 to-blue-500', light: 'bg-cyan-50' },
-                  { bg: 'from-amber-500 to-yellow-500', light: 'bg-amber-50' },
-                  { bg: 'from-red-500 to-pink-600', light: 'bg-red-50' },
+                  { bg: 'from-sky-500 to-indigo-600', light: 'bg-sky-50' },
+                  { bg: 'from-cyan-500 to-sky-600', light: 'bg-cyan-50' },
+                  { bg: 'from-violet-500 to-fuchsia-600', light: 'bg-violet-50' },
+                  { bg: 'from-amber-500 to-orange-600', light: 'bg-amber-50' },
+                  { bg: 'from-rose-500 to-pink-600', light: 'bg-rose-50' },
+                  { bg: 'from-lime-500 to-emerald-600', light: 'bg-lime-50' },
+                  { bg: 'from-slate-500 to-slate-700', light: 'bg-slate-50' },
+                  { bg: 'from-fuchsia-500 to-purple-600', light: 'bg-fuchsia-50' },
                 ]
                 const c = colors[i % colors.length]
                 return (
