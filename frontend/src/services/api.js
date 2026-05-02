@@ -17,32 +17,29 @@ export const CLOUDINARY_PRESET = import.meta.env.VITE_CLOUDINARY_PRESET || ''
 export const CLOUDINARY_PLAYERS_PRESET = import.meta.env.VITE_CLOUDINARY_PLAYERS_PRESET || ''
 export const CLOUDINARY_PAYMENTS_PRESET = import.meta.env.VITE_CLOUDINARY_PAYMENTS_PRESET || 'fzcricket_payments'
 
-export const uploadImage = async (file, folder = null, onProgress) => {
+const cloudinaryUpload = async (file, preset, folder, onProgress) => {
   const fd = new FormData()
   fd.append('file', file)
-  fd.append('upload_preset', CLOUDINARY_PLAYERS_PRESET)
+  fd.append('upload_preset', preset)
   if (folder) fd.append('folder', `fzcricket/${folder}`)
   const res = await axios.post(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, fd, {
-    onUploadProgress: (progressEvent) => {
-      const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total)
-      if (onProgress) onProgress(percent)
+    onUploadProgress: (e) => {
+      if (onProgress) onProgress(Math.round((e.loaded * 100) / e.total))
     }
   })
   return res.data.secure_url
 }
 
-export const uploadGalleryImage = async (file, onProgress) => {
-  const fd = new FormData()
-  fd.append('file', file)
-  fd.append('upload_preset', CLOUDINARY_PRESET)
-  const res = await axios.post(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, fd, {
-    onUploadProgress: (progressEvent) => {
-      const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total)
-      if (onProgress) onProgress(percent)
-    }
-  })
-  return res.data.secure_url
-}
+export const uploadImage = (file, folder, onProgress) =>
+  cloudinaryUpload(file, CLOUDINARY_PLAYERS_PRESET, folder, onProgress)
+
+export const uploadGalleryImage = (file, onProgress) =>
+  cloudinaryUpload(file, CLOUDINARY_PRESET, null, onProgress)
+
+export const uploadPaymentScreenshot = (file, onProgress) =>
+  cloudinaryUpload(file, CLOUDINARY_PAYMENTS_PRESET, 'payments', onProgress)
+
+export const SOCKET_URL = (import.meta.env.VITE_API_URL || 'https://fzcricket-backend.onrender.com/api').replace('/api', '')
 
 export const getPaymentConfig = () => API.get('/config/payment')
 

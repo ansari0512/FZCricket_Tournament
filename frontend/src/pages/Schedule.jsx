@@ -1,6 +1,7 @@
 import { useApp } from '../context/AppContext'
 import { useEffect, useState } from 'react'
 import io from 'socket.io-client'
+import { SOCKET_URL } from '../services/api'
 
 export default function Schedule() {
   const { matches, loading } = useApp()
@@ -13,7 +14,7 @@ export default function Schedule() {
   }, [matches])
   
   useEffect(() => {
-    const socket = io(import.meta.env.VITE_API_URL || 'https://fzcricket-backend.onrender.com', {
+    const socket = io(SOCKET_URL, {
       transports: ['websocket'],
       reconnection: true,
       reconnectionAttempts: 5
@@ -56,7 +57,7 @@ export default function Schedule() {
               Live Matches
             </h2>
             <div className="space-y-4">
-              {live.map(match => (
+              {liveMatches.map(match => (
                 <div key={match._id} className="card border-2 border-red-400 hover:shadow-lg transition">
                   <div className="flex justify-between items-start mb-3">
                     <div className="flex gap-2">

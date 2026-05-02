@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { adminLogin, getAdminUsers, deleteAdminUser, getAllTeams, getTeam, updateTeam, deleteTeam, getTeamPlayers, deletePlayer, getMatches, updateMatchStatus, updateMatchScore, createMatch, deleteMatch, getGallery, addGalleryPhoto, deleteGalleryPhoto } from '../services/api'
+import { adminLogin, getAdminUsers, deleteAdminUser, getAllTeams, getTeam, updateTeam, deleteTeam, getTeamPlayers, deletePlayer, getMatches, updateMatchStatus, updateMatchScore, createMatch, deleteMatch, getGallery, addGalleryPhoto, deleteGalleryPhoto, getPaymentConfig, SOCKET_URL } from '../services/api'
 import toast from 'react-hot-toast'
 import io from 'socket.io-client'
 
@@ -127,8 +127,8 @@ function PlayerModal({ player, onClose, onPrev, onNext }) {
             <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
               <span className="text-2xl">📍</span>
               <div><p className="text-xs text-gray-500">Address</p><p className="font-bold">{player.address}</p></div>
-             </div>
-          </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -254,9 +254,8 @@ export default function Admin() {
       const [t, u, m, g] = await Promise.all([getAllTeams(), getAdminUsers(), getMatches(), getGallery()])
       setTeams(t.data); setUsers(u.data); setMatches(m.data); setGallery(g.data)
       // Fetch UPI config
-      const res = await fetch('/api/config/payment')
-      const upi = await res.json()
-      setUpiConfig(upi)
+      const res = await getPaymentConfig()
+      setUpiConfig(res.data)
     } catch (error) {
       console.error('Failed to load admin data:', error)
     }
@@ -268,7 +267,7 @@ export default function Admin() {
 
    useEffect(() => {
      if (!loggedIn) return
-     const socket = io(import.meta.env.VITE_API_URL || 'https://fzcricket-backend.onrender.com', {
+     const socket = io(SOCKET_URL, {
        transports: ['websocket'],
        reconnection: true,
        reconnectionAttempts: 5

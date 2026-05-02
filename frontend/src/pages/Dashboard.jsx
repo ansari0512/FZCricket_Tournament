@@ -46,19 +46,18 @@ function PlayerModal({ player, onClose, onPrev, onNext }) {
   )
 }
 
-function PaymentSection({ team, onScreenshotUploaded }) {
+function PaymentSection({ team, onScreenshotUploaded, upiConfig }) {
   const [showQR, setShowQR] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
   const [uploaded, setUploaded] = useState(!!team.paymentScreenshot)
   const [copied, setCopied] = useState('')
 
+  const getUPIID = (type) => upiConfig[type] || ''
+
   const openUPI = (upiId) => {
-    const url = `upi://pay?pa=${upiId}&pn=FZCricket&am=300&cu=INR&tn=FZCricket%20Registration`
-    // Mobile pe app open karo
-    window.location.href = url
-    // Fallback: 2 sec baad agar app nahi khula toh UPI ID copy karo
-    setTimeout(() => {}, 2000)
+    if (!upiId) return
+    window.location.href = `upi://pay?pa=${upiId}&pn=FZCricket&am=300&cu=INR&tn=FZCricket%20Registration`
   }
 
   const copyUPI = (upiId) => {
@@ -506,6 +505,7 @@ export default function Dashboard() {
               {team.status === 'approved' && (
                 <PaymentSection
                   team={team}
+                  upiConfig={upiConfig}
                   onScreenshotUploaded={(url) => setTeam({ ...team, paymentScreenshot: url })}
                 />
               )}

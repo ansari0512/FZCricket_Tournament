@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import { onAuthStateChanged, signOut } from 'firebase/auth'
 import { auth } from '../firebase'
-import { getTeams, getMatches, googleLogin, getMe } from '../services/api'
+import { getTeams, getAllTeams, getMatches, googleLogin, getMe } from '../services/api'
 
 const AppContext = createContext()
 

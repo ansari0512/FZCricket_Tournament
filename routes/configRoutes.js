@@ -13,27 +13,26 @@ router.get('/', verifyAdmin, async (req, res) => {
   }
 });
 
-// GET /api/config/payment - Get payment config (UPI IDs) - Public (no auth needed)
+// GET /api/config/payment - Get payment config (UPI IDs) - Public
 router.get('/payment', async (req, res) => {
   try {
-    const paymentConfig = await Config.find({ 
-      key: { $in: ['UPI_GPAY', 'UPI_PHONEPE', 'UPI_PAYTM'] } 
+    const paymentConfig = await Config.find({
+      key: { $in: ['UPI_GPAY', 'UPI_PHONEPE', 'UPI_PAYTM'] }
     });
-    
-    const configMap = {};
-    paymentConfig.forEach(c => {
-      configMap[c.key] = c.value;
-    });
-    
+
+    const configMap = {}
+    paymentConfig.forEach(c => { configMap[c.key] = c.value })
+
+    // DB mein nahi hai toh .env se fallback
     res.json({
-      gpay: configMap['UPI_GPAY'] || '',
-      phonepe: configMap['UPI_PHONEPE'] || '',
-      paytm: configMap['UPI_PAYTM'] || ''
-    });
+      gpay: configMap['UPI_GPAY'] || process.env.UPI_GPAY || '',
+      phonepe: configMap['UPI_PHONEPE'] || process.env.UPI_PHONEPE || '',
+      paytm: configMap['UPI_PAYTM'] || process.env.UPI_PAYTM || ''
+    })
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: err.message })
   }
-});
+})
 
 // POST /api/config - Create or update config (Admin only)
 router.post('/', verifyAdmin, async (req, res) => {
