@@ -35,7 +35,7 @@ function RulesModal({ onClose }) {
               <span className="text-xl flex-shrink-0">{r.icon}</span>
               <div>
                 <p className="font-bold text-sm text-gray-800">{r.title}</p>
-                <p className="text-gray-500 text-xs mt-0.5 leading-relaxed">{r.text}</p>
+                <p className="text-gray-500 text-xs md:text-sm mt-0.5 leading-relaxed">{r.text}</p>
               </div>
             </div>
           ))}
@@ -236,10 +236,10 @@ export default function Home() {
               <span className="font-black text-white text-sm tracking-widest uppercase">Live Match</span>
               <span className="w-2.5 h-2.5 bg-white rounded-full animate-pulse" />
             </div>
-            <div className="bg-white/15 backdrop-blur rounded-2xl p-4 flex justify-between items-center text-white">
+            <div className="bg-white/15 backdrop-blur rounded-2xl p-4 flex flex-col sm:flex-row justify-between items-center text-white gap-4">
               <div className="flex-1 text-center">
                 <p className="font-bold text-sm">{liveMatch.team1?.teamName}</p>
-                <p className="text-3xl font-black mt-1">{liveMatch.team1Score?.runs ?? 0}<span className="text-lg text-white/70">/{liveMatch.team1Score?.wickets ?? 0}</span></p>
+                <p className="text-2xl md:text-3xl font-black mt-1">{liveMatch.team1Score?.runs ?? 0}<span className="text-base md:text-lg text-white/70">/{liveMatch.team1Score?.wickets ?? 0}</span></p>
               </div>
               <div className="px-4">
                 <div className="bg-white/20 rounded-xl px-3 py-1.5">
@@ -248,7 +248,7 @@ export default function Home() {
               </div>
               <div className="flex-1 text-center">
                 <p className="font-bold text-sm">{liveMatch.team2?.teamName}</p>
-                <p className="text-3xl font-black mt-1">{liveMatch.team2Score?.runs ?? 0}<span className="text-lg text-white/70">/{liveMatch.team2Score?.wickets ?? 0}</span></p>
+                <p className="text-2xl md:text-3xl font-black mt-1">{liveMatch.team2Score?.runs ?? 0}<span className="text-base md:text-lg text-white/70">/{liveMatch.team2Score?.wickets ?? 0}</span></p>
               </div>
             </div>
           </div>

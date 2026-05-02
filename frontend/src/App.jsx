@@ -36,7 +36,7 @@ function AppContent() {
   )
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen bg-gray-50 flex flex-col" style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
       <Navbar />
       <main className="flex-1">
         <Suspense fallback={<PageLoader />}>
