@@ -11,23 +11,29 @@ const items = [
 export default function BottomNav() {
   const { pathname } = useLocation()
   return (
-    <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 shadow-2xl"
-      style={{background: 'linear-gradient(135deg, #064e3b 0%, #065f46 50%, #047857 100%)'}}>
-      <div className="flex justify-around py-2 px-2">
-        {items.map(item => (
-          <Link key={item.to} to={item.to}
-            className={`flex flex-col items-center py-1.5 px-3 rounded-xl transition-all ${
-              pathname === item.to
-                ? 'bg-yellow-400 text-gray-900 shadow-md scale-105'
-                : 'text-white/70 hover:text-white'
-            }`}>
-            <span className="text-xl">{item.icon}</span>
-            <span className={`text-[10px] mt-0.5 font-medium ${pathname === item.to ? 'text-gray-900 font-bold' : ''}`}>
-              {item.label}
-            </span>
-          </Link>
-        ))}
+    <div className="md:hidden fixed bottom-0 left-0 right-0 z-50"
+      style={{ background: 'linear-gradient(135deg, #020c07 0%, #064e3b 60%, #065f46 100%)', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+      {/* Top accent */}
+      <div className="h-px w-full" style={{ background: 'linear-gradient(90deg, transparent, #F59E0B, transparent)' }} />
+      <div className="flex justify-around py-2 px-1">
+        {items.map(item => {
+          const active = pathname === item.to
+          return (
+            <Link key={item.to} to={item.to}
+              className={`flex flex-col items-center py-1.5 px-3 rounded-xl transition-all duration-200 min-w-[56px] ${
+                active ? 'scale-105' : 'opacity-60 hover:opacity-90'
+              }`}
+              style={active ? { background: 'linear-gradient(135deg, #F59E0B, #D97706)' } : {}}>
+              <span className="text-lg leading-none">{item.icon}</span>
+              <span className={`text-[10px] mt-0.5 font-semibold leading-none ${active ? 'text-gray-900' : 'text-white'}`}>
+                {item.label}
+              </span>
+            </Link>
+          )
+        })}
       </div>
+      {/* Safe area for iOS */}
+      <div className="h-safe-area-inset-bottom" />
     </div>
   )
 }

@@ -29,34 +29,34 @@ export default function Register() {
   const [loading, setLoading] = useState(false)
 
   if (!currentUser) return (
-    <div className="min-h-screen flex items-center justify-center px-4">
-      <div className="card max-w-md w-full text-center shadow-xl">
-        <span className="text-6xl">🔒</span>
-        <h2 className="text-2xl font-bold mt-4">Login Required</h2>
-        <p className="text-gray-500 mt-2">Team register karne ke liye pehle login karo।</p>
-        <Link to="/login" className="btn-primary w-full mt-4 block text-center">Login Karo</Link>
+    <div className="min-h-screen flex items-center justify-center px-4 bg-gray-50">
+      <div className="card max-w-md w-full text-center shadow-card p-8">
+        <div className="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-4"><span className="text-3xl">🔒</span></div>
+        <h2 className="text-xl font-bold mb-2">Login Required</h2>
+        <p className="text-gray-500 text-sm mb-6">Team register karne ke liye pehle login karo।</p>
+        <Link to="/login" className="btn-primary w-full">Login Karo</Link>
       </div>
     </div>
   )
 
   if (currentUser.teamId) return (
-    <div className="min-h-screen flex items-center justify-center px-4">
-      <div className="card max-w-md w-full text-center shadow-xl">
-        <span className="text-6xl">🏏</span>
-        <h2 className="text-2xl font-bold mt-4">Team Already Registered!</h2>
-        <p className="text-gray-500 mt-2">Dashboard pe jaake apni team manage karo।</p>
-        <Link to="/dashboard" className="btn-primary w-full mt-4 block text-center">Dashboard Pe Jao</Link>
+    <div className="min-h-screen flex items-center justify-center px-4 bg-gray-50">
+      <div className="card max-w-md w-full text-center shadow-card p-8">
+        <div className="w-16 h-16 bg-green-50 rounded-2xl flex items-center justify-center mx-auto mb-4"><span className="text-3xl">🏏</span></div>
+        <h2 className="text-xl font-bold mb-2">Team Already Registered!</h2>
+        <p className="text-gray-500 text-sm mb-6">Dashboard pe jaake apni team manage karo।</p>
+        <Link to="/dashboard" className="btn-primary w-full">Dashboard Pe Jao</Link>
       </div>
     </div>
   )
 
   if (!registrationOpen) return (
-    <div className="min-h-screen flex items-center justify-center px-4">
-      <div className="card max-w-md w-full text-center shadow-xl">
-        <span className="text-6xl">😔</span>
-        <h2 className="text-2xl font-bold mt-4">Registration Closed</h2>
-        <p className="text-gray-500 mt-2">Sabhi 8 teams register ho chuki hain।</p>
-        <Link to="/" className="btn-primary w-full mt-4 block text-center">Home Pe Jao</Link>
+    <div className="min-h-screen flex items-center justify-center px-4 bg-gray-50">
+      <div className="card max-w-md w-full text-center shadow-card p-8">
+        <div className="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-4"><span className="text-3xl">😔</span></div>
+        <h2 className="text-xl font-bold mb-2">Registration Closed</h2>
+        <p className="text-gray-500 text-sm mb-6">Sabhi 8 teams register ho chuki hain।</p>
+        <Link to="/" className="btn-primary w-full">Home Pe Jao</Link>
       </div>
     </div>
   )
@@ -94,127 +94,68 @@ export default function Register() {
     setLoading(false)
   }
 
-  // Step 1: Rules
   if (step === 'rules') return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4 pb-20">
+    <div className="min-h-screen bg-gray-50 py-8 px-4 pb-20 page-enter">
       <div className="max-w-lg mx-auto">
-        <div className="card shadow-xl">
-          <div className="cricket-gradient text-white p-5 rounded-t-2xl -mx-5 -mt-5 mb-5">
-            <h2 className="text-xl font-bold text-center">📝 Team Registration Rules</h2>
-            <p className="text-center text-white/80 text-sm mt-1">Team register karne se pehle yeh rules padho</p>
+        <div className="bg-white rounded-3xl shadow-card overflow-hidden">
+          <div className="p-6" style={{ background: 'linear-gradient(135deg, #064e3b, #047857)' }}>
+            <h2 className="text-xl font-bold text-white text-center">📝 Team Registration Rules</h2>
+            <p className="text-center text-white/70 text-sm mt-1">Pehle yeh rules padho, phir register karo</p>
           </div>
-
-          <div className="space-y-3 mb-6">
+          <div className="p-5 space-y-2.5 mb-2">
             {RULES.map((rule, i) => (
-              <div key={i} className="flex gap-3 p-3 bg-blue-50 border-l-4 border-blue-500 rounded-xl">
-                <span className="font-bold text-blue-700 flex-shrink-0 text-sm">{i + 1}.</span>
-                <p className="text-gray-700 text-sm">{rule}</p>
+              <div key={i} className="flex gap-3 p-3 bg-blue-50 rounded-xl border border-blue-100">
+                <span className="w-6 h-6 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">{i + 1}</span>
+                <p className="text-gray-700 text-sm leading-relaxed">{rule}</p>
               </div>
             ))}
           </div>
-
-          <div className="flex items-center gap-3 p-4 bg-yellow-50 border border-yellow-200 rounded-xl mb-4">
-            <input
-              type="checkbox"
-              id="agree"
-              checked={agreed}
-              onChange={e => setAgreed(e.target.checked)}
-              className="w-5 h-5 accent-primary cursor-pointer"
-            />
-            <label htmlFor="agree" className="text-sm font-medium text-gray-700 cursor-pointer">
-              मैंने सभी नियम पढ़ लिए हैं और मैं इनसे सहमत हूं।
-            </label>
+          <div className="px-5 pb-5">
+            <div className="flex items-center gap-3 p-4 bg-amber-50 border border-amber-200 rounded-2xl mb-4">
+              <input type="checkbox" id="agree" checked={agreed} onChange={e => setAgreed(e.target.checked)} className="w-5 h-5 accent-primary cursor-pointer flex-shrink-0" />
+              <label htmlFor="agree" className="text-sm font-medium text-gray-700 cursor-pointer">मैंने सभी नियम पढ़ लिए हैं और मैं इनसे सहमत हूं।</label>
+            </div>
+            <button onClick={() => setStep('form')} disabled={!agreed} className="btn-primary w-full disabled:opacity-40">आगे बढ़ें →</button>
           </div>
-
-          <button
-            onClick={() => setStep('form')}
-            disabled={!agreed}
-            className="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            आगे बढ़ें →
-          </button>
         </div>
       </div>
     </div>
   )
 
-  // Step 2: Form
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4 pb-20">
+    <div className="min-h-screen bg-gray-50 py-8 px-4 pb-20 page-enter">
       <div className="max-w-lg mx-auto">
-        <div className="card shadow-xl">
-          <div className="cricket-gradient text-white p-5 rounded-t-2xl -mx-5 -mt-5 mb-6">
-            <h2 className="text-xl font-bold text-center">🏏 Team Registration</h2>
-            <p className="text-center text-white/80 text-sm mt-1">Registration Fee: ₹1,100 (Cash on Arrival)</p>
+        <div className="bg-white rounded-3xl shadow-card overflow-hidden">
+          <div className="p-6" style={{ background: 'linear-gradient(135deg, #064e3b, #047857)' }}>
+            <h2 className="text-xl font-bold text-white text-center">🏏 Team Registration</h2>
+            <p className="text-center text-white/70 text-sm mt-1">Registration Fee: ₹1,100 (Cash on Arrival)</p>
           </div>
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="text-sm font-medium text-gray-700 block mb-1">Team का नाम *</label>
-              <input
-                type="text"
-                placeholder="Team Name"
-                value={form.teamName}
-                onChange={e => setForm({ ...form, teamName: e.target.value })}
-                className="input"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="text-sm font-medium text-gray-700 block mb-1">Team का Address (गांव/शहर) *</label>
-              <input
-                type="text"
-                placeholder="Village / City"
-                value={form.address}
-                onChange={e => setForm({ ...form, address: e.target.value })}
-                className="input"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="text-sm font-medium text-gray-700 block mb-1">आपका नाम (Register करने वाले का) *</label>
-              <input
-                type="text"
-                placeholder="Your Name"
-                value={form.registrantName}
-                onChange={e => setForm({ ...form, registrantName: e.target.value })}
-                className="input"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="text-sm font-medium text-gray-700 block mb-1">Mobile Number *</label>
-              <input
-                type="tel"
-                placeholder="10 digit mobile number"
-                value={form.mobile}
-                onChange={e => setForm({ ...form, mobile: e.target.value })}
-                className="input no-upper"
-                maxLength={10}
-                required
-              />
-            </div>
-
-            <div className="flex gap-3 pt-2">
-              <button
-                type="button"
-                onClick={() => setStep('rules')}
-                className="btn-secondary flex-1"
-              >
-                ← वापस
-              </button>
-              <button
-                type="submit"
-                disabled={loading}
-                className="btn-primary flex-1"
-              >
-                {loading ? 'Registering...' : 'Register Team →'}
-              </button>
-            </div>
-          </form>
+          <div className="p-6">
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {[
+                { label: 'Team का नाम *', key: 'teamName', placeholder: 'Team Name', type: 'text' },
+                { label: 'Team का Address (गांव/शहर) *', key: 'address', placeholder: 'Village / City', type: 'text' },
+                { label: 'आपका नाम (Captain) *', key: 'registrantName', placeholder: 'Your Name', type: 'text' },
+              ].map(f => (
+                <div key={f.key}>
+                  <label className="text-sm font-semibold text-gray-700 block mb-1.5">{f.label}</label>
+                  <input type={f.type} placeholder={f.placeholder} value={form[f.key]}
+                    onChange={e => setForm({ ...form, [f.key]: e.target.value })} className="input" required />
+                </div>
+              ))}
+              <div>
+                <label className="text-sm font-semibold text-gray-700 block mb-1.5">Mobile Number *</label>
+                <input type="tel" placeholder="10 digit mobile number" value={form.mobile}
+                  onChange={e => setForm({ ...form, mobile: e.target.value })} className="input no-upper" maxLength={10} required />
+              </div>
+              <div className="flex gap-3 pt-2">
+                <button type="button" onClick={() => setStep('rules')} className="btn-secondary flex-1">← वापस</button>
+                <button type="submit" disabled={loading} className="btn-primary flex-1">
+                  {loading ? 'Registering...' : 'Register Team →'}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     </div>
