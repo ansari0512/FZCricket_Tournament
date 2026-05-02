@@ -106,7 +106,7 @@ function PaymentSection({ team, onScreenshotUploaded, upiConfig }) {
           <span className="font-bold text-primary">₹300</span>
         </div>
         <div className="flex justify-between">
-          <span className="text-gray-600">Match day pe:</span>
+          <span className="text-gray-600">On match day:</span>
           <span className="font-bold text-orange-500">₹800</span>
         </div>
         <div className="flex justify-between border-t pt-1">
@@ -399,7 +399,7 @@ export default function Dashboard() {
     if (!playerForm.name.trim()) return setError('Player name is required')
     if (!playerForm.address.trim()) return setError('Player address is required')
     if (!playerForm.photo) return setError('Player photo is required')
-    if (players.length >= 15) return setError('Maximum 15 players allowed hain')
+    if (players.length >= 15) return setError('Maximum 15 players allowed')
     setUploading(true); setError('')
     try {
       const photoUrl = await uploadImage(playerForm.photo, team.teamName.replace(/\s+/g, '_'))
@@ -420,7 +420,7 @@ export default function Dashboard() {
   }
 
   const handleSubmitTeam = async () => {
-    if (players.length < 11) return setError('Minimum 11 players required hain')
+    if (players.length < 11) return setError('Minimum 11 players required')
     if (!confirm('Are you sure you want to submit your team? Admin will review it.')) return
     setSubmitting(true)
     try {
@@ -461,7 +461,7 @@ export default function Dashboard() {
 
         {/* My Team */}
         <div className="card">
-          <h3 className="font-bold text-lg mb-4">🏏 Meri Team</h3>
+          <h3 className="font-bold text-lg mb-4">🏏 My Team</h3>
           {team ? (
             <div>
               <div className="flex justify-between items-start mb-3">
@@ -472,7 +472,7 @@ export default function Dashboard() {
                 </div>
                 <div className="flex flex-col items-end gap-2">
                   <span className={team.status === 'approved' ? 'badge-approved' : team.status === 'rejected' ? 'badge-rejected' : 'badge-pending'}>
-                    {team.status === 'approved' ? '✅ Approved' : team.status === 'rejected' ? '❌ Rejected' : isSubmitted ? '📋 Review Mein' : '✏️ Draft'}
+                    {team.status === 'approved' ? '✅ Approved' : team.status === 'rejected' ? '❌ Rejected' : isSubmitted ? '📋 Under Review' : '✏️ Draft'}
                   </span>
                   {canEdit && (
                     <button onClick={() => setEditTeam(!editTeam)} className="text-xs text-primary font-medium">
@@ -495,7 +495,7 @@ export default function Dashboard() {
               {/* Rejection reason */}
               {team.status === 'rejected' && team.rejectReason && (
                 <div className="bg-red-50 border border-red-200 rounded-xl p-3 mb-3">
-                  <p className="text-sm font-bold text-red-700 mb-1">❌ Team Reject Hui — Karan:</p>
+                  <p className="text-sm font-bold text-red-700 mb-1">❌ Team Rejected — Reason:</p>
                   <p className="text-sm text-red-600">{team.rejectReason}</p>
                   <p className="text-xs text-gray-500 mt-2">Edit above and resubmit your team.</p>
                 </div>

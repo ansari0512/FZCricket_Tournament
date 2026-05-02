@@ -71,7 +71,7 @@ export default function Results() {
           {completed.length === 0 ? (
             <div className="text-center py-16 text-gray-400">
               <p className="text-5xl mb-3">🏏</p>
-              <p>Abhi koi match complete nahi hua</p>
+              <p>No matches completed yet</p>
             </div>
           ) : (
             <div className="space-y-4">

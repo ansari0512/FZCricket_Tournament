@@ -66,7 +66,7 @@ export default function Register() {
     if (!form.teamName.trim()) return toast.error('Team name is required')
     if (!form.address.trim()) return toast.error('Address is required')
     if (!form.registrantName.trim()) return toast.error('Your name is required')
-    if (!/^[0-9]{10}$/.test(form.mobile)) return toast.error('Valid 10 digit mobile number daalo')
+    if (!/^[0-9]{10}$/.test(form.mobile)) return toast.error('Please enter a valid 10 digit mobile number')
 
     setLoading(true)
     try {
@@ -81,7 +81,7 @@ export default function Register() {
       // Update user with teamId after team registration
       const updatedUser = await refreshUser()
       if (updatedUser) {
-        toast.success('Team register ho gayi! Admin review karega।')
+        toast.success('Team registered successfully! Admin will review it.')
         navigate('/dashboard')
       } else {
         // Fallback - navigate with teamId
@@ -113,9 +113,9 @@ export default function Register() {
           <div className="px-5 pb-5">
             <div className="flex items-center gap-3 p-4 bg-amber-50 border border-amber-200 rounded-2xl mb-4">
               <input type="checkbox" id="agree" checked={agreed} onChange={e => setAgreed(e.target.checked)} className="w-5 h-5 accent-primary cursor-pointer flex-shrink-0" />
-              <label htmlFor="agree" className="text-sm font-medium text-gray-700 cursor-pointer">मैंने सभी नियम पढ़ लिए हैं और मैं इनसे सहमत हूं।</label>
+              <label htmlFor="agree" className="text-sm font-medium text-gray-700 cursor-pointer">I have read all the rules and I agree to them.</label>
             </div>
-            <button onClick={() => setStep('form')} disabled={!agreed} className="btn-primary w-full disabled:opacity-40">आगे बढ़ें →</button>
+            <button onClick={() => setStep('form')} disabled={!agreed} className="btn-primary w-full disabled:opacity-40">Proceed →</button>
           </div>
         </div>
       </div>
@@ -149,7 +149,7 @@ export default function Register() {
                   onChange={e => setForm({ ...form, mobile: e.target.value })} className="input no-upper" maxLength={10} required />
               </div>
               <div className="flex gap-3 pt-2">
-                <button type="button" onClick={() => setStep('rules')} className="btn-secondary flex-1">← वापस</button>
+                <button type="button" onClick={() => setStep('rules')} className="btn-secondary flex-1">← Back</button>
                 <button type="submit" disabled={loading} className="btn-primary flex-1">
                   {loading ? 'Registering...' : 'Register Team →'}
                 </button>
