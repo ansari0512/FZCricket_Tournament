@@ -14,11 +14,24 @@ router.post('/google-login', async (req, res) => {
 
     let user = await User.findOne({ firebaseUid })
     if (!user) {
+      // New user - create record
       user = new User({ firebaseUid, email, name: name || '', photo: photo || '' })
       await user.save()
     } else {
+      // Existing user - update basic info, KEEP teamId if exists
       user.name = name || user.name
       user.photo = photo || user.photo
+      
+      // IMPORTANT: If user has a teamId, verify it still exists
+      if (user.teamId) {
+        const Team = require('../models/Team')
+        const team = await Team.findById(user.teamId)
+        if (!team) {
+          // Team was deleted, clear teamId
+          user.teamId = undefined
+        }
+      }
+      
       await user.save()
     }
 
