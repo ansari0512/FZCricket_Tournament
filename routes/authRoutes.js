@@ -23,7 +23,7 @@ router.post('/google-login', async (req, res) => {
     }
 
     // Generate JWT token
-    const token = jwt.sign({ userId: user._id.toString(), firebaseUid, email }, JWT_SECRET, { expiresIn: '7d' })
+    const token = jwt.sign({ userId: user._id.toString(), firebaseUid, email, role: 'user' }, JWT_SECRET, { expiresIn: '7d' })
     res.json({ message: 'Login successful', user, token })
   } catch (err) {
     res.status(500).json({ error: err.message })

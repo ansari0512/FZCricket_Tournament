@@ -5,9 +5,25 @@ const API = axios.create({
 })
 
 API.interceptors.request.use((config) => {
-  const adminToken = localStorage.getItem('adminToken')
-  const userToken = localStorage.getItem('fzToken')
-  const token = adminToken || userToken
+  // Use adminToken for admin endpoints, fzToken for user endpoints
+  const url = config.url || ''
+  const method = (config.method || 'get').toUpperCase()
+  const isAdminEndpoint = url.includes('/admin/') || 
+                          url.startsWith('/auth/admin/') ||
+                          url === '/teams/all' ||
+                          url === '/payment/all' ||
+                          url === '/config' ||
+                          url === '/score/update' ||
+                          url === '/matches/generate-schedule' ||
+                          url.startsWith('/matches/create') ||
+                          (url.startsWith('/matches/') && (url.includes('/status') || url.includes('/score') || url.includes('/delete'))) ||
+                          (url.startsWith('/players/') && (method === 'DELETE' || url.includes('/delete'))) ||
+                          url === '/gallery' && method === 'POST' ||
+                          (url.startsWith('/gallery/') && (method === 'DELETE' || url.includes('/delete'))) ||
+                          (url.startsWith('/teams/') && method === 'DELETE')
+  const token = isAdminEndpoint 
+    ? localStorage.getItem('adminToken')
+    : localStorage.getItem('fzToken')
   if (token) config.headers.Authorization = `Bearer ${token}`
   return config
 })
