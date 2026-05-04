@@ -138,7 +138,7 @@
   animation: marquee-move 10s linear infinite, shimmer 2s linear infinite;
 }
 @keyframes marquee-move {
-  0%   { transform: translateX(60vw); }
+  0%   { transform: translateX(100%); }
   100% { transform: translateX(-100%); }
 }
 @keyframes shimmer {
