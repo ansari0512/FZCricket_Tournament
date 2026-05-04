@@ -18,26 +18,18 @@ router.post('/google-login', async (req, res) => {
       user = new User({ firebaseUid, email, name: name || '', photo: photo || '' })
       await user.save()
     } else {
-      // Existing user - update basic info, KEEP teamId if exists
+      // Existing user - update basic info
       user.name = name || user.name
       user.photo = photo || user.photo
-      
-      // IMPORTANT: If user has a teamId, verify it still exists
-      if (user.teamId) {
-        const Team = require('../models/Team')
-        const team = await Team.findById(user.teamId)
-        if (!team) {
-          // Team was deleted, clear teamId
-          user.teamId = undefined
-        }
-      }
-      
       await user.save()
     }
 
+    // Populate team details before generating token
+    const userWithTeam = await User.findById(user._id).populate('teamId', 'teamName status paymentDone captainName city')
+
     // Generate JWT token
-    const token = jwt.sign({ userId: user._id.toString(), firebaseUid, email, role: 'user' }, JWT_SECRET, { expiresIn: '7d' })
-    res.json({ message: 'Login successful', user, token })
+    const token = jwt.sign({ userId: userWithTeam._id.toString(), firebaseUid, email, role: 'user' }, JWT_SECRET, { expiresIn: '7d' })
+    res.json({ message: 'Login successful', user: userWithTeam, token })
   } catch (err) {
     res.status(500).json({ error: err.message })
   }
@@ -46,7 +38,8 @@ router.post('/google-login', async (req, res) => {
 // Get current user
 router.get('/me', verifyUser, async (req, res) => {
   try {
-    const user = await User.findById(req.user.userId)
+    // Populate team details
+    const user = await User.findById(req.user.userId).populate('teamId', 'teamName status paymentDone captainName city')
     if (!user) return res.status(404).json({ message: 'User not found' })
     res.json(user)
   } catch (err) {
