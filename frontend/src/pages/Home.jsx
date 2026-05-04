@@ -167,9 +167,9 @@ export default function Home() {
         {/* Marquee */}
         <div className="relative border-b border-white/10 py-2">
           <div className="marquee-container">
-            <div className="marquee-banner">
-              🏏 &nbsp; Team Registration: 10 Apr – 20 Apr 2026 &nbsp; • &nbsp; Tournament Start: 21 April 2026 &nbsp; • &nbsp; Village Odajhar, Sitapur &nbsp; 🏏
-            </div>
+             <div className="marquee-banner">
+               🏏 &nbsp; Team Registration: 10–20 Apr 2026 &nbsp; • &nbsp; Tournament Start: 21 Apr 2026 &nbsp; 🏏
+             </div>
           </div>
         </div>
 
