@@ -92,8 +92,9 @@ export const AppProvider = ({ children }) => {
 
   // Socket setup separate effect
   useEffect(() => {
-    const socket = io(`${import.meta.env.VITE_API_URL || 'https://fzcricket-backend.onrender.com'}`)
-    
+    const socketUrl = (import.meta.env.VITE_API_URL || 'https://fzcricket-backend.onrender.com/api').replace('/api', '')
+    const socket = io(socketUrl)
+
     socket.on('connect', () => console.log('WebSocket connected'))
     socket.on('dataUpdate', (update) => {
       console.log('Data update:', update.type)
@@ -101,9 +102,10 @@ export const AppProvider = ({ children }) => {
       fetchData()
     })
     socket.on('disconnect', () => console.log('WebSocket disconnected'))
-    
+
     return () => socket.disconnect()
   }, [])
+
   const logout = async () => {
     await signOut(auth)
     localStorage.removeItem('fzToken')
