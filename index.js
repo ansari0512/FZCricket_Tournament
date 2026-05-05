@@ -119,7 +119,7 @@ io.on('connection', (socket) => {
 // Broadcast update to all connected clients
 const broadcastUpdate = (type, data) => {
   io.emit('dataUpdate', { type, data, timestamp: Date.now() });
-  console.log(Broadcasted  update to all clients);
+  console.log("Broadcasted update to all clients");
 };
 
 const PORT = process.env.PORT || 5000;
