@@ -151,6 +151,21 @@ router.put('/:id/status', verifyAdmin, async (req, res) => {
 
     if (status === 'completed') {
       await applyTeamResult(match, match.winner, 1);
+      
+      // Update first match date for both teams and trigger remaining payment
+      const team1 = await Team.findById(match.team1);
+      const team2 = await Team.findById(match.team2);
+      
+      if (team1 && !team1.firstMatchDate) {
+        team1.firstMatchDate = match.matchDate;
+        // Mark that remaining payment (800) is now due
+        await team1.save();
+      }
+      if (team2 && !team2.firstMatchDate) {
+        team2.firstMatchDate = match.matchDate;
+        // Mark that remaining payment (800) is now due
+        await team2.save();
+      }
     }
 
     res.json(match);
@@ -183,7 +198,45 @@ router.delete('/:id', verifyAdmin, async (req, res) => {
 });
 
 router.post('/generate-schedule', verifyAdmin, async (req, res) => {
-  res.status(410).json({ message: 'Auto schedule disabled. Please create matches manually.' });
+  try {
+    const { matchType, overs, venue } = req.body;
+    
+    // Get all approved teams with payment done
+    const teams = await Team.find({ status: 'approved', paymentDone: true }).sort({ registrationDate: 1 });
+    
+    if (teams.length < 2) {
+      return res.status(400).json({ message: 'At least 2 approved teams with payment required to generate schedule' });
+    }
+    
+    const existingMatches = await Match.countDocuments();
+    const generatedMatches = [];
+    
+    // Generate round-robin matches (each team plays every other team once)
+    for (let i = 0; i < teams.length; i++) {
+      for (let j = i + 1; j < teams.length; j++) {
+        existingMatches++;
+        const match = new Match({
+          matchId: `MATCH-${existingMatches}`,
+          team1: teams[i]._id,
+          team2: teams[j]._id,
+          matchType: matchType || 'group',
+          overs: overs || 8,
+          venue: venue || 'Odajhar Village',
+          status: 'scheduled',
+          matchDate: new Date(Date.now() + (existingMatches * 7 * 24 * 60 * 60 * 1000)) // 1 week apart
+        });
+        await match.save();
+        generatedMatches.push(match);
+      }
+    }
+    
+    res.status(201).json({ 
+      message: `Schedule generated successfully with ${generatedMatches.length} matches`,
+      matches: generatedMatches 
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 module.exports = router;

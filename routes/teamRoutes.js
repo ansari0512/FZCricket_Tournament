@@ -7,7 +7,9 @@ const User = require('../models/User');
 const { verifyAdmin, verifyUser, verifyAuth } = require('../middleware/auth');
 
 const MAX_TEAMS = 8;
-const REGISTRATION_FEE = 300;
+const REGISTRATION_FEE = 1100; // Total fee: 300 advance + 800 on first match
+const ADVANCE_PAYMENT = 300;
+const REMAINING_PAYMENT = 800;
 
 router.get('/count', async (req, res) => {
   try {
@@ -84,12 +86,23 @@ router.post('/register', verifyUser, async (req, res) => {
     if (!currentUser) return res.status(404).json({ message: 'User not found' });
     if (currentUser.teamId) return res.status(400).json({ message: 'Your team is already registered' });
 
-    const team = new Team({ teamName, captainName, captainPhone, city, userId: currentUser._id, status: 'pending' });
+    const team = new Team({ 
+      teamName, captainName, captainPhone, city, 
+      userId: currentUser._id, 
+      status: 'pending',
+      advancePaymentDone: false,
+      remainingPaymentDone: false 
+    });
     await team.save();
 
     await User.findByIdAndUpdate(currentUser._id, { teamId: team._id });
 
-    res.status(201).json({ message: 'Team registered successfully', team });
+    res.status(201).json({ 
+      message: 'Team registered successfully. Please pay ₹300 advance fee to complete registration.', 
+      team,
+      advancePaymentDue: ADVANCE_PAYMENT,
+      totalFee: REGISTRATION_FEE
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -114,6 +127,32 @@ router.put('/:id', verifyAuth, async (req, res) => {
     }
     const { status, rejectReason, paymentDone } = updateData;
 
+    // Track payment parts
+    if (paymentDone && !existingTeam.advancePaymentDone) {
+      updateData.advancePaymentDone = true;
+      updateData.paymentScreenshot = req.body.paymentScreenshot || existingTeam.paymentScreenshot;
+    }
+    if (paymentDone && existingTeam.advancePaymentDone && !existingTeam.remainingPaymentDone) {
+      updateData.remainingPaymentDone = true;
+      updateData.paymentDone = true;
+    }
+
+    // Track payment parts - when approved and advance payment done, remaining becomes due
+    if (status === 'approved' && existingTeam.advancePaymentDone && !existingTeam.remainingPaymentDone) {
+      updateData.remainingPaymentDue = true;
+    }
+
+    // If paymentDone is being set to true, check which payment it is
+    if (paymentDone && !existingTeam.paymentDone) {
+      if (!existingTeam.advancePaymentDone) {
+        updateData.advancePaymentDone = true;
+        updateData.remainingPaymentDone = false;
+      } else if (existingTeam.advancePaymentDone && !existingTeam.remainingPaymentDone) {
+        updateData.remainingPaymentDone = true;
+        updateData.paymentDone = true; // Full payment complete
+      }
+    }
+
     const team = await Team.findByIdAndUpdate(req.params.id, updateData, { new: true });
     if (!team) return res.status(404).json({ message: 'Team not found' });
 
@@ -121,7 +160,7 @@ router.put('/:id', verifyAuth, async (req, res) => {
     if (team.userId) {
       let msg = '', type = 'info';
       if (status === 'approved') {
-        msg = `🎉 Congratulations! Your team "${team.teamName}" has been approved! Please pay the ₹300 registration fee.`;
+        msg = `🎉 Congratulations! Your team "${team.teamName}" has been approved! Please pay ₹300 advance fee to complete registration.`;
         type = 'success';
       } else if (status === 'rejected') {
         msg = `❌ Your team "${team.teamName}" has been rejected. Reason: ${rejectReason || 'Not specified'}`;
@@ -132,8 +171,6 @@ router.put('/:id', verifyAuth, async (req, res) => {
       } else if (req.body.paymentScreenshot) {
         msg = `📸 Payment screenshot for "${team.teamName}" has been uploaded. Please verify.`;
         type = 'info';
-        // Notify admin about payment screenshot - admin user lookup
-        // (No separate admin notification system, so logging for now)
         console.log(`[ADMIN ALERT] Team ${team.teamName} has uploaded a payment screenshot`);
       }
       if (msg) {

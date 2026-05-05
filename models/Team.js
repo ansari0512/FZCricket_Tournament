@@ -47,6 +47,27 @@ const teamSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
+  // Payment tracking fields - Total: 1100 (300 advance + 800 on first match)
+  advancePayment: {
+    type: Number,
+    default: 300
+  },
+  remainingPayment: {
+    type: Number,
+    default: 800
+  },
+  advancePaymentDone: {
+    type: Boolean,
+    default: false
+  },
+  remainingPaymentDone: {
+    type: Boolean,
+    default: false
+  },
+  firstMatchDate: {
+    type: Date,
+    default: null
+  },
 
   status: {
     type: String,
