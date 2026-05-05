@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect } from 'react'
 import { onAuthStateChanged, signOut } from 'firebase/auth'
 import { auth } from '../firebase'
 import { getTeams, getAllTeams, getMatches, googleLogin, getMe } from '../services/api'
+import { useCallback } from 'react'
 import { io } from 'socket.io-client'
 
 const AppContext = createContext()
@@ -15,7 +16,7 @@ export const AppProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null)
   const [authLoading, setAuthLoading] = useState(true)
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       const [teamsRes, matchesRes, allTeamsRes] = await Promise.all([getTeams(), getMatches(), getAllTeams()])
       setTeams(teamsRes.data)
@@ -27,7 +28,7 @@ export const AppProvider = ({ children }) => {
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
   useEffect(() => {
     fetchData()
@@ -86,29 +87,23 @@ export const AppProvider = ({ children }) => {
       }
       setAuthLoading(false)
     })
-    return () => {
-      unsubscribe()
-      socket.disconnect()
-    }
+    return unsubscribe
+  }, [])
 
-    // Setup WebSocket for auto-refresh
+  // Socket setup separate effect
+  useEffect(() => {
     const socket = io(`${import.meta.env.VITE_API_URL || 'https://fzcricket-backend.onrender.com'}`)
     
-    socket.on('connect', () => {
-      console.log('WebSocket connected')
-    })
-    
+    socket.on('connect', () => console.log('WebSocket connected'))
     socket.on('dataUpdate', (update) => {
-      console.log('Data update received:', update.type)
+      console.log('Data update:', update.type)
       refreshUser()
       fetchData()
     })
+    socket.on('disconnect', () => console.log('WebSocket disconnected'))
     
-    socket.on('disconnect', () => {
-      console.log('WebSocket disconnected')
-    })
-
-  }, [refreshUser, fetchData])
+    return () => socket.disconnect()
+  }, [])
   const logout = async () => {
     await signOut(auth)
     localStorage.removeItem('fzToken')
@@ -116,7 +111,7 @@ export const AppProvider = ({ children }) => {
     setCurrentUser(null)
   }
 
-  const refreshUser = async () => {
+  const refreshUser = useCallback(async () => {
     try {
       const res = await getMe()
       localStorage.setItem('fzUser', JSON.stringify(res.data))
@@ -125,7 +120,7 @@ export const AppProvider = ({ children }) => {
     } catch (err) {
       console.error('refreshUser error:', err)
     }
-  }
+  }, [])
 
   const registrationOpen = approvedPaidTeamsCount < 8
 
