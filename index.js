@@ -49,7 +49,7 @@ app.use(cors({
 }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-app.use(mongoSanitize()); // NoSQL injection se bachao
+app.use(mongoSanitize());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 if (!process.env.MONGODB_URI) {
@@ -78,15 +78,12 @@ app.get('/api/health', (req, res) => {
 });
 
 const connectedClients = new Set();
-
-// Add admin clients for broadcasting
 const adminClients = new Set();
 
 io.on('connection', (socket) => {
   console.log('New client connected:', socket.id);
   connectedClients.add(socket.id);
 
-  // Register as admin client for updates
   socket.on('registerAdmin', () => {
     adminClients.add(socket.id);
     console.log('Admin client registered:', socket.id);
@@ -119,7 +116,7 @@ io.on('connection', (socket) => {
 // Broadcast update to all connected clients
 const broadcastUpdate = (type, data) => {
   io.emit('dataUpdate', { type, data, timestamp: Date.now() });
-  console.log('Broadcasted  update to all clients');
+  console.log('Broadcasted update to all clients');
 };
 
 const PORT = process.env.PORT || 5000;
