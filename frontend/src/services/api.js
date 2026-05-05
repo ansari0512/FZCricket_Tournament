@@ -1,32 +1,54 @@
 import axios from 'axios'
+import { auth } from '../firebase' // 🔥 important
 
 const API = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'https://fzcricket-backend.onrender.com/api',
 })
 
-API.interceptors.request.use((config) => {
-  // Use adminToken for admin endpoints, fzToken for user endpoints
-  const url = config.url || ''
-  const method = (config.method || 'get').toUpperCase()
-  const isAdminEndpoint = url.includes('/admin/') || 
-                          url.startsWith('/auth/admin/') ||
-                          url === '/teams/all' ||
-                          url === '/payment/all' ||
-                          url === '/config' ||
-                          url === '/score/update' ||
-                          url === '/matches/generate-schedule' ||
-                          url.startsWith('/matches/create') ||
-                          (url.startsWith('/matches/') && (url.includes('/status') || url.includes('/score') || url.includes('/delete'))) ||
-                          (url.startsWith('/players/') && (method === 'DELETE' || url.includes('/delete'))) ||
-                          url === '/gallery' && method === 'POST' ||
-                          (url.startsWith('/gallery/') && (method === 'DELETE' || url.includes('/delete'))) ||
-                          (url.startsWith('/teams/') && method === 'DELETE')
-  const token = isAdminEndpoint 
-    ? localStorage.getItem('adminToken')
-    : localStorage.getItem('fzToken')
-  if (token) config.headers.Authorization = `Bearer ${token}`
-  return config
-})
+// 🔥 FINAL INTERCEPTOR (FIXED)
+API.interceptors.request.use(
+  async (config) => {
+    const url = config.url || ''
+    const method = (config.method || 'get').toUpperCase()
+
+    const isAdminEndpoint =
+      url.includes('/admin/') ||
+      url.startsWith('/auth/admin/') ||
+      url === '/teams/all' ||
+      url === '/payment/all' ||
+      url === '/config' ||
+      url === '/score/update' ||
+      url === '/matches/generate-schedule' ||
+      url.startsWith('/matches/create') ||
+      (url.startsWith('/matches/') && (url.includes('/status') || url.includes('/score') || url.includes('/delete'))) ||
+      (url.startsWith('/players/') && (method === 'DELETE' || url.includes('/delete'))) ||
+      (url === '/gallery' && method === 'POST') ||
+      (url.startsWith('/gallery/') && (method === 'DELETE' || url.includes('/delete'))) ||
+      (url.startsWith('/teams/') && method === 'DELETE')
+
+    let token = null
+
+    // ✅ USER TOKEN (Firebase)
+    if (!isAdminEndpoint) {
+      const user = auth.currentUser
+      if (user) {
+        token = await user.getIdToken()
+      }
+    }
+
+    // ✅ ADMIN TOKEN
+    if (isAdminEndpoint) {
+      token = localStorage.getItem('adminToken')
+    }
+
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+    }
+
+    return config
+  },
+  (error) => Promise.reject(error)
+)
 
 export const CLOUDINARY_CLOUD = import.meta.env.VITE_CLOUDINARY_CLOUD || ''
 export const CLOUDINARY_PRESET = import.meta.env.VITE_CLOUDINARY_PRESET || ''
@@ -38,11 +60,17 @@ const cloudinaryUpload = async (file, preset, folder, onProgress) => {
   fd.append('file', file)
   fd.append('upload_preset', preset)
   if (folder) fd.append('folder', `fzcricket/${folder}`)
-  const res = await axios.post(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, fd, {
-    onUploadProgress: (e) => {
-      if (onProgress) onProgress(Math.round((e.loaded * 100) / e.total))
+
+  const res = await axios.post(
+    `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`,
+    fd,
+    {
+      onUploadProgress: (e) => {
+        if (onProgress) onProgress(Math.round((e.loaded * 100) / e.total))
+      },
     }
-  })
+  )
+
   return res.data.secure_url
 }
 
