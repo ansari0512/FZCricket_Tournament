@@ -79,9 +79,18 @@ app.get('/api/health', (req, res) => {
 
 const connectedClients = new Set();
 
+// Add admin clients for broadcasting
+const adminClients = new Set();
+
 io.on('connection', (socket) => {
   console.log('New client connected:', socket.id);
   connectedClients.add(socket.id);
+
+  // Register as admin client for updates
+  socket.on('registerAdmin', () => {
+    adminClients.add(socket.id);
+    console.log('Admin client registered:', socket.id);
+  });
 
   socket.on('joinMatch', (matchId) => {
     socket.join(`match-${matchId}`);
@@ -102,9 +111,16 @@ io.on('connection', (socket) => {
 
   socket.on('disconnect', () => {
     connectedClients.delete(socket.id);
+    adminClients.delete(socket.id);
     console.log('Client disconnected:', socket.id);
   });
 });
+
+// Broadcast update to all connected clients
+const broadcastUpdate = (type, data) => {
+  io.emit('dataUpdate', { type, data, timestamp: Date.now() });
+  console.log(Broadcasted  update to all clients);
+};
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
