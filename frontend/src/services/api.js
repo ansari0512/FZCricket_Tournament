@@ -1,45 +1,32 @@
 import axios from 'axios'
-import { auth } from '../firebase' // 🔥 important
 
 const API = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'https://fzcricket-backend.onrender.com/api',
 })
 
-// 🔥 FINAL INTERCEPTOR (FIXED)
+// ✅ INTERCEPTOR — JWT token attach karo har request mein
 API.interceptors.request.use(
-  async (config) => {
+  (config) => {
     const url = config.url || ''
     const method = (config.method || 'get').toUpperCase()
 
     const isAdminEndpoint =
       url.includes('/admin/') ||
-      url.startsWith('/auth/admin/') ||
       url === '/teams/all' ||
-      url === '/payment/all' ||
       url === '/config' ||
-      url === '/score/update' ||
-      url === '/matches/generate-schedule' ||
       url.startsWith('/matches/create') ||
-      (url.startsWith('/matches/') && (url.includes('/status') || url.includes('/score') || url.includes('/delete'))) ||
-      (url.startsWith('/players/') && (method === 'DELETE' || url.includes('/delete'))) ||
+      url.startsWith('/matches/generate') ||
+      (url.startsWith('/matches/') && (url.includes('/status') || url.includes('/score'))) ||
+      (url.startsWith('/matches/') && method === 'DELETE') ||
+      (url.startsWith('/players/') && method === 'DELETE') ||
       (url === '/gallery' && method === 'POST') ||
-      (url.startsWith('/gallery/') && (method === 'DELETE' || url.includes('/delete'))) ||
+      (url.startsWith('/gallery/') && method === 'DELETE') ||
       (url.startsWith('/teams/') && method === 'DELETE')
 
-    let token = null
-
-    // ✅ USER TOKEN (Firebase)
-    if (!isAdminEndpoint) {
-      const user = auth.currentUser
-      if (user) {
-        token = await user.getIdToken()
-      }
-    }
-
-    // ✅ ADMIN TOKEN
-    if (isAdminEndpoint) {
-      token = localStorage.getItem('adminToken')
-    }
+    // Admin token use karo admin endpoints ke liye
+    const token = isAdminEndpoint
+      ? localStorage.getItem('adminToken')
+      : localStorage.getItem('fzToken') // ✅ JWT token — Firebase token nahi
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`

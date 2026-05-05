@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import { onAuthStateChanged, signOut } from 'firebase/auth'
 import { auth } from '../firebase'
-import { getTeams, getAllTeams, getMatches, googleLogin, getMe } from '../services/api'
+import { getTeams, getMatches, googleLogin, getMe } from '../services/api'
 import { useCallback } from 'react'
 import { io } from 'socket.io-client'
 
@@ -9,8 +9,6 @@ const AppContext = createContext()
 
 export const AppProvider = ({ children }) => {
   const [teams, setTeams] = useState([])
-  const [allTeamsCount, setAllTeamsCount] = useState(0)
-  const [approvedPaidTeamsCount, setApprovedPaidTeamsCount] = useState(0)
   const [matches, setMatches] = useState([])
   const [loading, setLoading] = useState(true)
   const [currentUser, setCurrentUser] = useState(null)
@@ -18,10 +16,8 @@ export const AppProvider = ({ children }) => {
 
   const fetchData = useCallback(async () => {
     try {
-      const [teamsRes, matchesRes, allTeamsRes] = await Promise.all([getTeams(), getMatches(), getAllTeams()])
+      const [teamsRes, matchesRes] = await Promise.all([getTeams(), getMatches()])
       setTeams(teamsRes.data)
-      setAllTeamsCount(teamsRes.data.length)
-      setApprovedPaidTeamsCount(allTeamsRes.data.length)
       setMatches(matchesRes.data)
     } catch {
       setTeams([]); setMatches([])
@@ -54,29 +50,15 @@ export const AppProvider = ({ children }) => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         try {
-          const res = await googleLogin({
-            firebaseUid: firebaseUser.uid,
-            email: firebaseUser.email,
-            name: firebaseUser.displayName,
-            photo: firebaseUser.photoURL
-          })
-          // Save JWT token
+          // ✅ Firebase ID token bhejo — backend yahi verify karta hai
+          const idToken = await firebaseUser.getIdToken()
+          const res = await googleLogin({ token: idToken })
+          // ✅ JWT token save karo
           localStorage.setItem('fzToken', res.data.token)
-          // Get fresh user data from backend
-          const meRes = await fetch(`${import.meta.env.VITE_API_URL || 'https://fzcricket-backend.onrender.com/api'}/auth/me`, {
-            headers: { Authorization: `Bearer ${res.data.token}` }
-          })
-          if (meRes.ok) {
-            const userData = await meRes.json()
-            localStorage.setItem('fzUser', JSON.stringify(userData))
-            setCurrentUser(userData)
-          } else {
-            localStorage.setItem('fzUser', JSON.stringify(res.data.user))
-            setCurrentUser(res.data.user)
-          }
+          localStorage.setItem('fzUser', JSON.stringify(res.data.user))
+          setCurrentUser(res.data.user)
         } catch (err) {
           console.error('Auth error:', err)
-          // localStorage se fallback
           const saved = localStorage.getItem('fzUser')
           if (saved) setCurrentUser(JSON.parse(saved))
         }
@@ -124,7 +106,8 @@ export const AppProvider = ({ children }) => {
     }
   }, [])
 
-  const registrationOpen = approvedPaidTeamsCount < 8
+  // getTeams() sirf approved+paymentDone teams return karta hai
+  const registrationOpen = teams.length < 8
 
   return (
     <AppContext.Provider value={{ teams, matches, loading, authLoading, currentUser, logout, fetchData, registrationOpen, refreshUser }}>
