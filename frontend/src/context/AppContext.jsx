@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect } from 'react'
 import { onAuthStateChanged, signOut } from 'firebase/auth'
 import { auth } from '../firebase'
 import { getTeams, getAllTeams, getMatches, googleLogin, getMe } from '../services/api'
+import { io } from 'socket.io-client'
 
 const AppContext = createContext()
 
@@ -85,9 +86,29 @@ export const AppProvider = ({ children }) => {
       }
       setAuthLoading(false)
     })
-    return () => unsubscribe()
-  }, [])
+    return () => {
+      unsubscribe()
+      socket.disconnect()
+    }
 
+    // Setup WebSocket for auto-refresh
+    const socket = io(`${import.meta.env.VITE_API_URL || 'https://fzcricket-backend.onrender.com'}`)
+    
+    socket.on('connect', () => {
+      console.log('WebSocket connected')
+    })
+    
+    socket.on('dataUpdate', (update) => {
+      console.log('Data update received:', update.type)
+      refreshUser()
+      fetchData()
+    })
+    
+    socket.on('disconnect', () => {
+      console.log('WebSocket disconnected')
+    })
+
+  }, [refreshUser, fetchData])
   const logout = async () => {
     await signOut(auth)
     localStorage.removeItem('fzToken')
