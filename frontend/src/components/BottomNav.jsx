@@ -25,7 +25,7 @@ export default function BottomNav() {
               }`}
               style={active ? { background: 'linear-gradient(135deg, #2563eb, #4f46e5)' } : {}}>
               <span className="text-lg leading-none">{item.icon}</span>
-              <span className={`text-[10px] mt-0.5 font-semibold leading-none ${active ? 'text-gray-900' : 'text-white'}`}>
+              <span className={`text-[10px] mt-0.5 font-semibold leading-none ${active ? 'text-white' : 'text-white/60'}`}>
                 {item.label}
               </span>
             </Link>

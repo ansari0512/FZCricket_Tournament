@@ -173,7 +173,7 @@ function PaymentSection({ team, onScreenshotUploaded, upiConfig }) {
 
       {uploaded ? (
         <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 text-center">
-          <p className="text-slate-900 font-bold text-sm">✅ Screenshot upload ho gaya!</p>
+          <p className="text-slate-900 font-bold text-sm">✅ Screenshot uploaded successfully!</p>
           <p className="text-xs text-gray-500 mt-1">Waiting for admin verification...</p>
           <label className="mt-2 text-xs text-primary cursor-pointer block">
             Upload Again
@@ -308,7 +308,7 @@ export default function Dashboard() {
   const [error, setError] = useState('')
   const [previewIndex, setPreviewIndex] = useState(null)
   const [notifRefresh, setNotifRefresh] = useState(0)
-  const [fileKey, setFileKey] = useState(0) // photo input reset ke liye
+  const [fileKey, setFileKey] = useState(0) // reset photo input
   const [upiConfig, setUpiConfig] = useState({ gpay: '', phonepe: '', paytm: '' })
 
   const teamId = currentUser?.teamId?._id || currentUser?.teamId || null

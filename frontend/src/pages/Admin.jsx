@@ -412,7 +412,7 @@ export default function Admin() {
                     <div>
                       <p className="font-bold">{user.name || user.email}</p>
                       <p className="text-sm text-gray-500">{user.email}</p>
-                      <p className="text-xs mt-1">{user.teamId ? <button onClick={() => handleViewUserTeam(user.teamId)} className="text-sky-600 font-medium hover:underline">✅ Team Registered → Dekho</button> : <span className="text-slate-600">⏳ No Team</span>}</p>
+                      <p className="text-xs mt-1">{user.teamId ? <button onClick={() => handleViewUserTeam(user.teamId)} className="text-sky-600 font-medium hover:underline">✅ Team Registered → View</button> : <span className="text-slate-600">⏳ No Team Registered</span>}</p>
                     </div>
                     <div className="flex gap-2">
                       <button onClick={() => handleDeleteUser(user._id, user.name || user.email)} className="text-xs bg-slate-100 text-slate-700 px-3 py-1.5 rounded-lg">Delete</button>
@@ -611,7 +611,7 @@ export default function Admin() {
               <div className="p-4">
                 <p className="font-bold text-sm mb-3">Players ({userTeamModal.players.length}/15)</p>
                 {userTeamModal.players.length === 0 ? (
-                  <p className="text-center text-gray-400 py-6">Abhi koi player add nahi kiya</p>
+                  <p className="text-center text-gray-400 py-6">No players added yet.</p>
                 ) : (
                   <div className="space-y-2">
                     {userTeamModal.players.map(p => (

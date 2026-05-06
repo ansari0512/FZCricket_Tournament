@@ -133,9 +133,9 @@ export default function Register() {
           <div className="p-6">
             <form onSubmit={handleSubmit} className="space-y-4">
               {[
-                { label: 'Team का नाम *', key: 'teamName', placeholder: 'Team Name', type: 'text' },
-                { label: 'Team का Address (गांव/शहर) *', key: 'address', placeholder: 'Village / City', type: 'text' },
-                { label: 'आपका नाम (Captain) *', key: 'registrantName', placeholder: 'Your Name', type: 'text' },
+                { label: 'Team Name *', key: 'teamName', placeholder: 'Team Name', type: 'text' },
+                { label: 'Village / City *', key: 'address', placeholder: 'Village / City', type: 'text' },
+                { label: 'Captain Name *', key: 'registrantName', placeholder: 'Your Name', type: 'text' },
               ].map(f => (
                 <div key={f.key}>
                   <label className="text-sm font-semibold text-gray-700 block mb-1.5">{f.label}</label>
