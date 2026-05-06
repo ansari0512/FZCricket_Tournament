@@ -459,7 +459,7 @@ export default function Admin() {
                       {team.paymentScreenshot && !team.paymentDone && (
                         <a href={team.paymentScreenshot} target="_blank" rel="noreferrer" className="btn-info-sm">📸 View Screenshot</a>
                       )}
-                      <button onClick={() => loadPlayers(team._id)} className="btn-info-sm">👥 Players</button>
+                      <button onClick={() => loadPlayers(team._id)} className="btn-info-sm">🏏 Team</button>
                       <button onClick={() => handleDeleteTeam(team._id, team.teamName)} className="btn-danger-sm">🗑️ Delete</button>
                     </div>
                   </div>
