@@ -20,7 +20,10 @@ const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS
   : ['https://fz-cricket-tournament.vercel.app', 'http://localhost:5173'];
 
 // Security
-app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+  crossOriginOpenerPolicy: false  // Google login popup ke liye zaroori
+}));
 
 // Rate limit
 const limiter = rateLimit({
