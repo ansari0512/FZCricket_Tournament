@@ -311,22 +311,23 @@ export default function Dashboard() {
   const [fileKey, setFileKey] = useState(0) // photo input reset ke liye
   const [upiConfig, setUpiConfig] = useState({ gpay: '', phonepe: '', paytm: '' })
 
+  const teamId = currentUser?.teamId?._id || currentUser?.teamId || null
+
   useEffect(() => {
     if (!currentUser) { navigate('/login'); return }
     const load = async () => {
-      const teamId = currentUser.teamId?._id || currentUser.teamId || location.state?.teamId
-      if (teamId && typeof teamId === 'string') {
+      const tid = typeof teamId === 'string' ? teamId : (location.state?.teamId || null)
+      if (tid) {
         try {
-          const [teamRes, playersRes] = await Promise.all([getTeam(teamId), getTeamPlayers(teamId)])
+          const [teamRes, playersRes] = await Promise.all([getTeam(tid), getTeamPlayers(tid)])
           setTeam(teamRes.data.team)
           setEditTeamData({ teamName: teamRes.data.team.teamName, captainName: teamRes.data.team.captainName, captainPhone: teamRes.data.team.captainPhone, city: teamRes.data.team.city })
           setPlayers(playersRes.data)
           setNotifRefresh(n => n + 1)
-          // Save fresh user data to localStorage
           const savedUser = localStorage.getItem('fzUser')
           if (savedUser) {
             const parsed = JSON.parse(savedUser)
-            localStorage.setItem('fzUser', JSON.stringify({ ...parsed, teamId }))
+            localStorage.setItem('fzUser', JSON.stringify({ ...parsed, teamId: tid }))
           }
         } catch {
           await refreshUser()
@@ -338,9 +339,9 @@ export default function Dashboard() {
       setLoading(false)
     }
     load()
-  }, [currentUser?._id, currentUser?.teamId?._id || currentUser?.teamId]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [currentUser?._id, teamId]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Auto refresh - check every 10 seconds when team is pending/submitted
+  // Auto refresh
   useEffect(() => {
     if (!team || !teamId) return
     if (team.status === 'approved' || team.status === 'rejected') return
@@ -375,12 +376,6 @@ export default function Dashboard() {
     }
     if (currentUser) fetchUPIs()
   }, [currentUser])
-
-  const getUPIID = (type) => {
-    return upiConfig[type] || ''
-  }
-
-  const teamId = currentUser.teamId?._id || currentUser.teamId
 
   const handleUpdateTeam = async (e) => {
     e.preventDefault()
