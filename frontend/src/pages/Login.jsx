@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { signInWithPopup } from 'firebase/auth'
+import { signInWithPopup, signInWithRedirect, getRedirectResult } from 'firebase/auth'
 import { auth, googleProvider } from '../firebase'
 import { useApp } from '../context/AppContext'
 import toast from 'react-hot-toast'
@@ -10,19 +10,28 @@ export default function Login() {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
 
-  // currentUser set hone ka wait karo, phir navigate karo
   useEffect(() => {
     if (!authLoading && currentUser) {
       navigate('/dashboard')
     }
   }, [currentUser, authLoading, navigate])
 
+  // Redirect result handle karo page load pe
+  useEffect(() => {
+    getRedirectResult(auth).catch(() => {})
+  }, [])
+
   const handleGoogleLogin = async () => {
     setLoading(true)
     try {
+      // Pehle popup try karo, fail ho toh redirect
       await signInWithPopup(auth, googleProvider)
-      // navigate AppContext ke currentUser set hone ke baad useEffect se hoga
     } catch (err) {
+      if (err.code === 'auth/popup-blocked' || err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') {
+        // Popup block hua — redirect use karo
+        await signInWithRedirect(auth, googleProvider)
+        return
+      }
       console.error('Login error:', err)
       toast.error('Login failed. Please try again.')
       setLoading(false)

@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react'
-import { onAuthStateChanged, signOut } from 'firebase/auth'
+import { onAuthStateChanged, signOut, getRedirectResult } from 'firebase/auth'
 import { auth } from '../firebase'
 import { getTeams, getMatches, googleLogin, getMe } from '../services/api'
 import { useCallback } from 'react'
@@ -28,6 +28,9 @@ export const AppProvider = ({ children }) => {
 
   useEffect(() => {
     fetchData()
+
+    // Redirect result handle karo (signInWithRedirect ke baad)
+    getRedirectResult(auth).catch(() => {})
 
     // First load user from localStorage (instant)
     const savedUser = localStorage.getItem('fzUser')
