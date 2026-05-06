@@ -444,13 +444,16 @@ export default function Dashboard() {
         <div className="card">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-3">
-              {currentUser.photo && <img src={currentUser.photo} className="w-10 h-10 rounded-full" alt="profile" />}
+              {currentUser.photo
+                ? <img src={currentUser.photo} className="w-12 h-12 rounded-full ring-2 ring-primary/20" alt="profile" />
+                : <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-lg">👤</div>
+              }
               <div>
-                <h2 className="text-xl font-bold">👋 {currentUser.name || currentUser.email}</h2>
-                <p className="text-gray-500 text-sm">{currentUser.email}</p>
+                <h2 className="text-lg font-bold text-gray-800">{currentUser.name || currentUser.email}</h2>
+                <p className="text-gray-400 text-xs">{currentUser.email}</p>
               </div>
             </div>
-            <button onClick={logout} className="text-slate-700 font-medium text-sm">Logout</button>
+            <button onClick={logout} className="text-xs text-red-500 hover:text-red-700 font-semibold border border-red-100 hover:border-red-200 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg transition-all">Sign Out</button>
           </div>
         </div>
 
@@ -458,7 +461,17 @@ export default function Dashboard() {
 
         {/* My Team */}
         <div className="card">
-          <h3 className="font-bold text-lg mb-4">🏏 My Team</h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-bold text-lg">🏏 My Team</h3>
+            {team && <span className={`text-xs font-bold px-3 py-1 rounded-full ${
+              team.status === 'approved' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' :
+              team.status === 'rejected' ? 'bg-red-50 text-red-700 border border-red-200' :
+              isSubmitted ? 'bg-amber-50 text-amber-700 border border-amber-200' :
+              'bg-gray-100 text-gray-600 border border-gray-200'
+            }`}>
+              {team.status === 'approved' ? '✅ Approved' : team.status === 'rejected' ? '❌ Rejected' : isSubmitted ? '📋 Under Review' : '✏️ Draft'}
+            </span>}
+          </div>
           {team ? (
             <div>
               <div className="flex justify-between items-start mb-3">
@@ -468,11 +481,8 @@ export default function Dashboard() {
                   <p className="text-gray-400 text-xs">📍 {team.city}</p>
                 </div>
                 <div className="flex flex-col items-end gap-2">
-                  <span className={team.status === 'approved' ? 'badge-approved' : team.status === 'rejected' ? 'badge-rejected' : 'badge-pending'}>
-                    {team.status === 'approved' ? '✅ Approved' : team.status === 'rejected' ? '❌ Rejected' : isSubmitted ? '📋 Under Review' : '✏️ Draft'}
-                  </span>
                   {canEdit && (
-                    <button onClick={() => setEditTeam(!editTeam)} className="text-xs text-primary font-medium">
+                    <button onClick={() => setEditTeam(!editTeam)} className="text-xs text-primary font-semibold border border-primary/20 bg-primary/5 hover:bg-primary/10 px-3 py-1.5 rounded-lg transition-all">
                       {editTeam ? 'Cancel' : '✏️ Edit Team'}
                     </button>
                   )}
@@ -551,14 +561,17 @@ export default function Dashboard() {
           )}
         </div>
 
-        {/* Add Players - sirf tab jab canEdit ho */}
+        {/* Add Players */}
         {team && canEdit && (
           <div className="card">
-            <h3 className="font-bold mb-1">➕ Add Players ({players.length}/15)</h3>
-            <p className="text-sm text-gray-500 mb-4">
-              Minimum 11 players are required to submit your team.
-                {players.length >= 11 && players.length < 15 && <span className="text-sky-600 font-medium"> You can submit now!</span>}
-              </p>
+            <div className="flex items-center justify-between mb-1">
+              <h3 className="font-bold">➕ Add Players</h3>
+              <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-primary/10 text-primary">{players.length}/15</span>
+            </div>
+            <p className="text-sm text-gray-400 mb-4">
+              Minimum 11 players required to submit.
+              {players.length >= 11 && players.length < 15 && <span className="text-emerald-600 font-semibold"> Ready to submit!</span>}
+            </p>
 
             {error && <div className="bg-slate-50 text-slate-800 px-3 py-2 rounded-xl mb-3 text-sm">{error}</div>}
             {players.length < 15 && (

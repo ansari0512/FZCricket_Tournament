@@ -222,7 +222,7 @@ function AdminPlayerCard({ player, onDelete, onPreview }) {
             <p className="text-xs text-gray-500">Jersey #{player.jerseyNumber}</p>
             {player.address && <p className="text-xs text-gray-400">📍 {player.address}</p>}
           </div>
-          <button onClick={() => onDelete(player._id)} className="text-slate-700 text-sm bg-slate-100 px-3 py-1.5 rounded-lg flex-shrink-0">Delete</button>
+          <button onClick={() => onDelete(player._id)} className="btn-danger-sm flex-shrink-0">Delete</button>
         </div>
       </div>
     </>
@@ -392,8 +392,11 @@ export default function Admin() {
     <div className="py-6 px-4 pb-24">
       <div className="w-full max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold">Admin Dashboard</h2>
-          <button onClick={() => { localStorage.removeItem('adminToken'); setLoggedIn(false) }} className="text-slate-700 font-medium text-sm">Logout</button>
+          <div>
+            <h2 className="text-2xl font-bold">Admin Dashboard</h2>
+            <p className="text-gray-400 text-xs mt-0.5">FZ Cricket Tournament 2026</p>
+          </div>
+          <button onClick={() => { localStorage.removeItem('adminToken'); setLoggedIn(false) }} className="text-xs text-red-500 hover:text-red-700 font-semibold border border-red-100 hover:border-red-200 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg transition-all">Sign Out</button>
         </div>
 
         <div className="space-y-2">
@@ -415,7 +418,7 @@ export default function Admin() {
                       <p className="text-xs mt-1">{user.teamId ? <button onClick={() => handleViewUserTeam(user.teamId)} className="text-sky-600 font-medium hover:underline">✅ Team Registered → View</button> : <span className="text-slate-600">⏳ No Team Registered</span>}</p>
                     </div>
                     <div className="flex gap-2">
-                      <button onClick={() => handleDeleteUser(user._id, user.name || user.email)} className="text-xs bg-slate-100 text-slate-700 px-3 py-1.5 rounded-lg">Delete</button>
+                      <button onClick={() => handleDeleteUser(user._id, user.name || user.email)} className="btn-danger-sm">Delete</button>
                     </div>
                   </div>
                 ))}
@@ -448,16 +451,16 @@ export default function Admin() {
                       <span className={team.status === 'approved' ? 'badge-approved' : team.status === 'rejected' ? 'badge-rejected' : 'badge-pending'}>{team.status}</span>
                     </div>
                     <div className="flex flex-wrap gap-2 mt-3">
-                      {team.status === 'pending' && <button onClick={() => handleApprove(team._id, team.teamName)} className="text-xs bg-sky-100 text-sky-700 px-3 py-1.5 rounded-lg font-medium">✅ Approve</button>}
-                      {team.status === 'pending' && <button onClick={() => handleReject(team)} className="text-xs bg-slate-100 text-slate-700 px-3 py-1.5 rounded-lg font-medium">❌ Reject</button>}
-                      {team.status === 'rejected' && <button onClick={() => handleApprove(team._id, team.teamName)} className="text-xs bg-sky-100 text-sky-700 px-3 py-1.5 rounded-lg font-medium">✅ Approve</button>}
-                      {team.status === 'approved' && !team.paymentDone && <button onClick={() => handlePayment(team._id, team.teamName)} className="text-xs bg-blue-100 text-blue-700 px-3 py-1.5 rounded-lg font-medium">₹ Confirm Payment</button>}
-                      {team.paymentDone && <span className="text-xs bg-sky-100 text-sky-700 px-3 py-1.5 rounded-lg font-medium">✅ Paid</span>}
+                      {team.status === 'pending' && <button onClick={() => handleApprove(team._id, team.teamName)} className="btn-success-sm">✅ Approve</button>}
+                      {team.status === 'pending' && <button onClick={() => handleReject(team)} className="btn-danger-sm">❌ Reject</button>}
+                      {team.status === 'rejected' && <button onClick={() => handleApprove(team._id, team.teamName)} className="btn-success-sm">✅ Approve</button>}
+                      {team.status === 'approved' && !team.paymentDone && <button onClick={() => handlePayment(team._id, team.teamName)} className="btn-info-sm">₹ Confirm Payment</button>}
+                      {team.paymentDone && <span className="btn-success-sm">✅ Paid</span>}
                       {team.paymentScreenshot && !team.paymentDone && (
-                        <a href={team.paymentScreenshot} target="_blank" rel="noreferrer" className="text-xs bg-blue-100 text-blue-700 px-3 py-1.5 rounded-lg font-medium">📸 View Screenshot</a>
+                        <a href={team.paymentScreenshot} target="_blank" rel="noreferrer" className="btn-info-sm">📸 View Screenshot</a>
                       )}
-                      <button onClick={() => loadPlayers(team._id)} className="text-xs bg-blue-100 text-blue-700 px-3 py-1.5 rounded-lg font-medium">👥 Players</button>
-                      <button onClick={() => handleDeleteTeam(team._id, team.teamName)} className="text-xs bg-slate-100 text-slate-700 px-3 py-1.5 rounded-lg font-medium">🗑️ Delete</button>
+                      <button onClick={() => loadPlayers(team._id)} className="btn-info-sm">👥 Players</button>
+                      <button onClick={() => handleDeleteTeam(team._id, team.teamName)} className="btn-danger-sm">🗑️ Delete</button>
                     </div>
                   </div>
                 ))}
@@ -509,10 +512,10 @@ export default function Admin() {
                       <span className={`text-xs px-2 py-1 rounded-full ${match.status === 'in-progress' ? 'bg-sky-100 text-sky-700' : match.status === 'completed' ? 'bg-indigo-100 text-indigo-700' : 'bg-gray-100 text-gray-600'}`}>{match.status}</span>
                     </div>
                     <div className="flex gap-2 flex-wrap">
-                      {match.status === 'scheduled' && <button onClick={() => handleMatchStatus(match._id, 'in-progress')} className="text-xs bg-blue-100 text-blue-700 px-3 py-1.5 rounded-lg">▶ Start</button>}
-                      {match.status === 'in-progress' && <button onClick={() => { setScoreModal(match); setScoreData({ t1runs: match.team1Score?.runs || '', t1wickets: match.team1Score?.wickets || '', t2runs: match.team2Score?.runs || '', t2wickets: match.team2Score?.wickets || '', winnerId: '' }) }} className="text-xs bg-sky-100 text-sky-700 px-3 py-1.5 rounded-lg">📊 Update Score</button>}
-                      {match.status === 'in-progress' && <button onClick={() => handleMatchStatus(match._id, 'completed')} className="text-xs bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg">⏹ End</button>}
-                      <button onClick={() => handleDeleteMatch(match._id)} className="text-xs bg-slate-100 text-slate-700 px-3 py-1.5 rounded-lg">🗑️ Delete</button>
+                      {match.status === 'scheduled' && <button onClick={() => handleMatchStatus(match._id, 'in-progress')} className="btn-success-sm">▶ Start Match</button>}
+                      {match.status === 'in-progress' && <button onClick={() => { setScoreModal(match); setScoreData({ t1runs: match.team1Score?.runs || '', t1wickets: match.team1Score?.wickets || '', t2runs: match.team2Score?.runs || '', t2wickets: match.team2Score?.wickets || '', winnerId: '' }) }} className="btn-info-sm">📊 Update Score</button>}
+                      {match.status === 'in-progress' && <button onClick={() => handleMatchStatus(match._id, 'completed')} className="btn-warning-sm">⏹ End Match</button>}
+                      <button onClick={() => handleDeleteMatch(match._id)} className="btn-danger-sm">🗑️ Delete</button>
                     </div>
                   </div>
                 ))}
