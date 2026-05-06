@@ -111,8 +111,20 @@
 
   /* ── Stats Card ── */
   .stat-card {
-    @apply rounded-2xl px-5 py-4 text-center border border-white/10 backdrop-blur-sm;
-    background: rgba(255,255,255,0.08);
+    @apply rounded-3xl px-5 py-6 text-center border border-white/10 backdrop-blur-sm;
+    background: rgba(255,255,255,0.12);
+  }
+
+  .dashboard-panel {
+    @apply rounded-3xl border border-gray-200 bg-white shadow-card overflow-hidden;
+  }
+
+  .dashboard-panel-header {
+    @apply w-full text-left px-5 py-4 font-semibold text-sm flex justify-between items-center transition bg-gray-100 hover:bg-gray-200;
+  }
+
+  .dashboard-panel-header.active {
+    @apply bg-primary text-white;
   }
 
   /* ── Table ── */

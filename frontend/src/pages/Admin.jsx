@@ -233,7 +233,7 @@ export default function Admin() {
   const [loggedIn, setLoggedIn] = useState(!!localStorage.getItem('adminToken'))
   const [password, setPassword] = useState('')
   const [showPass, setShowPass] = useState(false)
-  const [activeTab, setActiveTab] = useState('')
+  const [activeTab, setActiveTab] = useState('Teams')
   const [teams, setTeams] = useState([])
   const [users, setUsers] = useState([])
   const [matches, setMatches] = useState([])
@@ -246,9 +246,14 @@ export default function Admin() {
   const [uploading, setUploading] = useState(false)
   const [caption, setCaption] = useState('')
   const [previewIndex, setPreviewIndex] = useState(null)
-  const [userTeamModal, setUserTeamModal] = useState(null) // {team, players}
+  const [userTeamModal, setUserTeamModal] = useState(null)
   const [upiConfig, setUpiConfig] = useState({ gpay: '', phonepe: '', paytm: '' })
   const [adminAlerts, setAdminAlerts] = useState({ newUsers: 0, newTeams: 0 })
+
+  const pendingTeams = teams.filter(t => t.status === 'pending').length
+  const approvedTeams = teams.filter(t => t.status === 'approved').length
+  const totalMatches = matches.length
+  const completedMatches = matches.filter(m => m.status === 'completed').length
 
   const loadData = async () => {
     try {
@@ -400,18 +405,43 @@ export default function Admin() {
    return (
     <div className="py-6 px-4 pb-24">
       <div className="w-full max-w-6xl mx-auto">
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h2 className="text-2xl font-bold">Admin Dashboard</h2>
-            <p className="text-gray-400 text-xs mt-0.5">FZ Cricket Tournament 2026</p>
+        <div className="grid gap-4 md:grid-cols-[1fr_auto] items-start mb-6">
+          <div className="rounded-[2rem] overflow-hidden border border-gray-200 bg-white shadow-card p-6">
+            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+              <div>
+                <p className="text-xs uppercase tracking-[0.35em] text-sky-700 font-bold mb-2">Admin Control</p>
+                <h2 className="text-3xl font-bold">Dashboard Overview</h2>
+                <p className="text-gray-500 mt-2">FZ Cricket Tournament • 2026 season</p>
+              </div>
+              <button onClick={() => { localStorage.removeItem('adminToken'); setLoggedIn(false) }} className="text-sm text-white font-semibold bg-red-600 hover:bg-red-700 px-4 py-2 rounded-xl transition-all shadow-sm">
+                Sign Out
+              </button>
+            </div>
+            <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+              <div className="stat-card">
+                <p className="text-xs uppercase tracking-[0.18em] text-gray-500">Pending Teams</p>
+                <p className="text-3xl font-bold mt-3">{pendingTeams}</p>
+              </div>
+              <div className="stat-card">
+                <p className="text-xs uppercase tracking-[0.18em] text-gray-500">Approved Teams</p>
+                <p className="text-3xl font-bold mt-3">{approvedTeams}</p>
+              </div>
+              <div className="stat-card">
+                <p className="text-xs uppercase tracking-[0.18em] text-gray-500">Matches</p>
+                <p className="text-3xl font-bold mt-3">{totalMatches}</p>
+              </div>
+              <div className="stat-card">
+                <p className="text-xs uppercase tracking-[0.18em] text-gray-500">Users</p>
+                <p className="text-3xl font-bold mt-3">{users.length}</p>
+              </div>
+            </div>
           </div>
-          <button onClick={() => { localStorage.removeItem('adminToken'); setLoggedIn(false) }} className="text-xs text-red-500 hover:text-red-700 font-semibold border border-red-100 hover:border-red-200 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg transition-all">Sign Out</button>
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-4">
 
           {/* Users */}
-          <div className="rounded-xl overflow-hidden border border-gray-200">
+          <div className="dashboard-panel">
             <button onClick={() => { toggle('Users'); setAdminAlerts(prev => ({ ...prev, newUsers: 0 })) }}
               className={`w-full text-left px-4 py-3 font-medium text-sm flex justify-between items-center transition ${activeTab === 'Users' ? 'cricket-gradient text-white' : 'bg-gray-100 hover:bg-gray-200'}`}>
               <span className="flex items-center gap-2">
@@ -440,7 +470,7 @@ export default function Admin() {
           </div>
 
           {/* Teams */}
-          <div className="rounded-xl overflow-hidden border border-gray-200">
+          <div className="dashboard-panel">
             <button onClick={() => { toggle('Teams'); setAdminAlerts(prev => ({ ...prev, newTeams: 0 })) }}
               className={`w-full text-left px-4 py-3 font-medium text-sm flex justify-between items-center transition ${activeTab === 'Teams' ? 'cricket-gradient text-white' : 'bg-gray-100 hover:bg-gray-200'}`}>
               <span className="flex items-center gap-2">
@@ -486,7 +516,7 @@ export default function Admin() {
 
           {/* Players */}
           {activeTab === 'Players' && (
-            <div className="rounded-xl overflow-hidden border border-gray-200">
+            <div className="dashboard-panel">
               <div className="cricket-gradient text-white px-4 py-3 text-sm font-medium flex justify-between items-center">
                 👤 Players ({selectedPlayers.length})
                 <button onClick={() => setActiveTab('Teams')} className="text-white text-xs">← Back</button>
@@ -510,7 +540,7 @@ export default function Admin() {
           )}
 
           {/* Matches */}
-          <div className="rounded-xl overflow-hidden border border-gray-200">
+          <div className="dashboard-panel">
             <button onClick={() => toggle('Matches')}
               className={`w-full text-left px-4 py-3 font-medium text-sm flex justify-between items-center transition ${activeTab === 'Matches' ? 'cricket-gradient text-white' : 'bg-gray-100 hover:bg-gray-200'}`}>
               🏆 Matches <span>{activeTab === 'Matches' ? '▲' : '▼'}</span>
@@ -540,7 +570,7 @@ export default function Admin() {
           </div>
 
           {/* Schedule */}
-          <div className="rounded-xl overflow-hidden border border-gray-200">
+          <div className="dashboard-panel">
             <button onClick={() => toggle('Schedule')}
               className={`w-full text-left px-4 py-3 font-medium text-sm flex justify-between items-center transition ${activeTab === 'Schedule' ? 'cricket-gradient text-white' : 'bg-gray-100 hover:bg-gray-200'}`}>
               📅 Schedule <span>{activeTab === 'Schedule' ? '▲' : '▼'}</span>
@@ -577,7 +607,7 @@ export default function Admin() {
           </div>
 
           {/* Gallery */}
-          <div className="rounded-xl overflow-hidden border border-gray-200">
+          <div className="dashboard-panel">
             <button onClick={() => toggle('Gallery')}
               className={`w-full text-left px-4 py-3 font-medium text-sm flex justify-between items-center transition ${activeTab === 'Gallery' ? 'cricket-gradient text-white' : 'bg-gray-100 hover:bg-gray-200'}`}>
               📸 Gallery <span>{activeTab === 'Gallery' ? '▲' : '▼'}</span>
