@@ -499,15 +499,6 @@ export default function Dashboard() {
                 </form>
               )}
 
-              {/* Rejection reason */}
-              {team.status === 'rejected' && team.rejectReason && (
-                <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 mb-3">
-                  <p className="text-sm font-bold text-slate-900 mb-1">❌ Team Rejected — Reason:</p>
-                  <p className="text-sm text-slate-700">{team.rejectReason}</p>
-                  <p className="text-xs text-gray-500 mt-2">Edit above and resubmit your team.</p>
-                </div>
-              )}
-
               {/* Payment section */}
               {team.status === 'approved' && (
                 <PaymentSection
@@ -608,14 +599,6 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* Submitted message */}
-        {isSubmitted && team.status !== 'approved' && (
-          <div className="card bg-blue-50 border border-blue-200 text-center">
-            <p className="text-2xl mb-2">📋</p>
-            <p className="font-bold text-blue-700">Team Under Review</p>
-            <p className="text-sm text-gray-500 mt-1">Admin is reviewing your team. You'll receive a notification soon.</p>
-          </div>
-        )}
 
       </div>
     </div>
