@@ -120,11 +120,19 @@
   }
 
   .dashboard-panel-header {
-    @apply w-full text-left px-5 py-4 font-semibold text-sm flex justify-between items-center transition bg-gray-100 hover:bg-gray-200;
+    @apply w-full text-left px-5 py-4 font-semibold text-sm flex justify-between items-center transition bg-slate-50 border-b border-gray-100;
   }
 
-  .dashboard-panel-header.active {
-    @apply bg-primary text-white;
+  .tab-pill {
+    @apply group flex items-center gap-3 rounded-full border border-gray-200 bg-white px-4 py-3 text-left transition-all duration-200 text-slate-700;
+  }
+
+  .tab-pill:hover {
+    @apply bg-slate-100;
+  }
+
+  .tab-pill-active {
+    @apply bg-primary text-white border-transparent shadow-lg;
   }
 
   /* ── Table ── */

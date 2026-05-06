@@ -308,7 +308,7 @@ export default function Admin() {
      }
    }, [loggedIn])
 
-  const toggle = (tab) => setActiveTab(activeTab === tab ? '' : tab)
+  const toggle = (tab) => setActiveTab(tab)
 
   const handleLogin = async (e) => {
     e.preventDefault()
@@ -438,20 +438,42 @@ export default function Admin() {
           </div>
         </div>
 
+        <div className="mb-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+            {[
+              { key: 'Users', icon: '👥', label: 'Users', value: users.length },
+              { key: 'Teams', icon: '🏏', label: 'Teams', value: teams.length },
+              { key: 'Matches', icon: '🏆', label: 'Matches', value: totalMatches },
+              { key: 'Schedule', icon: '📅', label: 'Schedule', value: matches.filter(m => m.status === 'scheduled').length },
+              { key: 'Gallery', icon: '📸', label: 'Gallery', value: gallery.length }
+            ].map(tab => (
+              <button key={tab.key} onClick={() => toggle(tab.key)}
+                className={`tab-pill ${activeTab === tab.key ? 'tab-pill-active' : ''}`}>
+                <span>{tab.icon}</span>
+                <div className="text-left">
+                  <p className="text-sm font-semibold leading-tight">{tab.label}</p>
+                  <p className="text-xs text-slate-500">{tab.value} items</p>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+
         <div className="space-y-4">
 
           {/* Users */}
-          <div className="dashboard-panel">
-            <button onClick={() => { toggle('Users'); setAdminAlerts(prev => ({ ...prev, newUsers: 0 })) }}
-              className={`w-full text-left px-4 py-3 font-medium text-sm flex justify-between items-center transition ${activeTab === 'Users' ? 'cricket-gradient text-white' : 'bg-gray-100 hover:bg-gray-200'}`}>
-              <span className="flex items-center gap-2">
-                👥 Users
-                {adminAlerts.newUsers > 0 && <span className="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full animate-pulse">{adminAlerts.newUsers} New</span>}
-              </span>
-              <span>{activeTab === 'Users' ? '▲' : '▼'}</span>
-            </button>
-            {activeTab === 'Users' && (
-              <div className="p-3 space-y-3">
+          <div className={`dashboard-panel ${activeTab !== 'Users' ? 'hidden' : ''}`}>
+            <div className="dashboard-panel-header">
+              <div className="flex items-center gap-3">
+                <span className="text-lg">👥</span>
+                <div>
+                  <p className="text-sm font-semibold">Users</p>
+                  <p className="text-xs text-gray-500">Manage registered users and team assignments</p>
+                </div>
+              </div>
+              <span className="text-xs text-gray-500">{users.length} total</span>
+            </div>
+            <div className="p-4 space-y-3">
                 {users.length === 0 ? <p className="text-center text-gray-400 py-10">No users yet</p> :
                 users.map(user => (
                   <div key={user._id} className="card flex justify-between items-center">
@@ -466,26 +488,21 @@ export default function Admin() {
                   </div>
                 ))}
               </div>
-            )}
           </div>
 
           {/* Teams */}
-          <div className="dashboard-panel">
-            <button onClick={() => { toggle('Teams'); setAdminAlerts(prev => ({ ...prev, newTeams: 0 })) }}
-              className={`w-full text-left px-4 py-3 font-medium text-sm flex justify-between items-center transition ${activeTab === 'Teams' ? 'cricket-gradient text-white' : 'bg-gray-100 hover:bg-gray-200'}`}>
-              <span className="flex items-center gap-2">
-                🏏 Teams
-                {adminAlerts.newTeams > 0 && <span className="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full animate-pulse">{adminAlerts.newTeams} New</span>}
-                {teams.filter(t => t.submitted && t.paymentScreenshot && !t.paymentDone).length > 0 && (
-                  <span className="bg-amber-500 text-white text-xs px-2 py-0.5 rounded-full">
-                    {teams.filter(t => t.submitted && t.paymentScreenshot && !t.paymentDone).length} Payment
-                  </span>
-                )}
-              </span>
-              <span className="ml-auto">{activeTab === 'Teams' ? '▲' : '▼'}</span>
-            </button>
-            {activeTab === 'Teams' && (
-              <div className="p-3 space-y-3">
+          <div className={`dashboard-panel ${activeTab !== 'Teams' ? 'hidden' : ''}`}>
+            <div className="dashboard-panel-header">
+              <div className="flex items-center gap-3">
+                <span className="text-lg">🏏</span>
+                <div>
+                  <p className="text-sm font-semibold">Teams</p>
+                  <p className="text-xs text-gray-500">Approve teams, confirm payments and review details</p>
+                </div>
+              </div>
+              <span className="text-xs text-gray-500">{teams.filter(t => t.submitted).length} submitted</span>
+            </div>
+            <div className="p-4 space-y-3">
                 {teams.filter(t => t.submitted).length === 0 ? <p className="text-center text-gray-400 py-10">No submitted teams yet</p> :
                 teams.filter(t => t.submitted).map(team => (
                   <div key={team._id} className="card">
@@ -511,17 +528,22 @@ export default function Admin() {
                   </div>
                 ))}
               </div>
-            )}
           </div>
 
           {/* Players */}
           {activeTab === 'Players' && (
             <div className="dashboard-panel">
-              <div className="cricket-gradient text-white px-4 py-3 text-sm font-medium flex justify-between items-center">
-                👤 Players ({selectedPlayers.length})
-                <button onClick={() => setActiveTab('Teams')} className="text-white text-xs">← Back</button>
+              <div className="dashboard-panel-header">
+                <div className="flex items-center gap-3">
+                  <span className="text-lg">👤</span>
+                  <div>
+                    <p className="text-sm font-semibold">Players</p>
+                    <p className="text-xs text-gray-500">Review individual roster details</p>
+                  </div>
+                </div>
+                <button onClick={() => setActiveTab('Teams')} className="text-xs text-slate-600 hover:text-slate-900 transition">← Back</button>
               </div>
-              <div className="p-3 space-y-2">
+              <div className="p-4 space-y-2">
                 {selectedPlayers.length === 0 ? <p className="text-center text-gray-400 py-10">No players</p> :
                 selectedPlayers.map((p, i) => (
                   <AdminPlayerCard key={p._id} player={p} onDelete={handleDeletePlayer}
@@ -540,13 +562,18 @@ export default function Admin() {
           )}
 
           {/* Matches */}
-          <div className="dashboard-panel">
-            <button onClick={() => toggle('Matches')}
-              className={`w-full text-left px-4 py-3 font-medium text-sm flex justify-between items-center transition ${activeTab === 'Matches' ? 'cricket-gradient text-white' : 'bg-gray-100 hover:bg-gray-200'}`}>
-              🏆 Matches <span>{activeTab === 'Matches' ? '▲' : '▼'}</span>
-            </button>
-            {activeTab === 'Matches' && (
-              <div className="p-3 space-y-3">
+          <div className={`dashboard-panel ${activeTab !== 'Matches' ? 'hidden' : ''}`}>
+            <div className="dashboard-panel-header">
+              <div className="flex items-center gap-3">
+                <span className="text-lg">🏆</span>
+                <div>
+                  <p className="text-sm font-semibold">Matches</p>
+                  <p className="text-xs text-gray-500">Track match status and update scores</p>
+                </div>
+              </div>
+              <span className="text-xs text-gray-500">{matches.length} matches</span>
+            </div>
+            <div className="p-4 space-y-3">
                 {matches.length === 0 ? <p className="text-center text-gray-400 py-10">No matches. Generate schedule first.</p> :
                 matches.map(match => (
                   <div key={match._id} className="card">
@@ -566,17 +593,21 @@ export default function Admin() {
                   </div>
                 ))}
               </div>
-            )}
           </div>
 
           {/* Schedule */}
-          <div className="dashboard-panel">
-            <button onClick={() => toggle('Schedule')}
-              className={`w-full text-left px-4 py-3 font-medium text-sm flex justify-between items-center transition ${activeTab === 'Schedule' ? 'cricket-gradient text-white' : 'bg-gray-100 hover:bg-gray-200'}`}>
-              📅 Schedule <span>{activeTab === 'Schedule' ? '▲' : '▼'}</span>
-            </button>
-            {activeTab === 'Schedule' && (
-              <div className="p-4 space-y-4">
+          <div className={`dashboard-panel ${activeTab !== 'Schedule' ? 'hidden' : ''}`}>
+            <div className="dashboard-panel-header">
+              <div className="flex items-center gap-3">
+                <span className="text-lg">📅</span>
+                <div>
+                  <p className="text-sm font-semibold">Schedule</p>
+                  <p className="text-xs text-gray-500">Create and manage upcoming matches</p>
+                </div>
+              </div>
+              <span className="text-xs text-gray-500">{matches.filter(m => m.status==='scheduled').length} scheduled</span>
+            </div>
+            <div className="p-4 space-y-4">
 
                 {/* Manual Match Create */}
                 <div className="card bg-gray-50">
@@ -603,17 +634,21 @@ export default function Admin() {
                   </div>
                 )}
               </div>
-            )}
           </div>
 
           {/* Gallery */}
-          <div className="dashboard-panel">
-            <button onClick={() => toggle('Gallery')}
-              className={`w-full text-left px-4 py-3 font-medium text-sm flex justify-between items-center transition ${activeTab === 'Gallery' ? 'cricket-gradient text-white' : 'bg-gray-100 hover:bg-gray-200'}`}>
-              📸 Gallery <span>{activeTab === 'Gallery' ? '▲' : '▼'}</span>
-            </button>
-            {activeTab === 'Gallery' && (
-              <div className="p-3">
+          <div className={`dashboard-panel ${activeTab !== 'Gallery' ? 'hidden' : ''}`}>
+            <div className="dashboard-panel-header">
+              <div className="flex items-center gap-3">
+                <span className="text-lg">📸</span>
+                <div>
+                  <p className="text-sm font-semibold">Gallery</p>
+                  <p className="text-xs text-gray-500">Upload and review event media</p>
+                </div>
+              </div>
+              <span className="text-xs text-gray-500">{gallery.length} photos</span>
+            </div>
+            <div className="p-4">
                 <div className="card mb-4">
                   <h3 className="font-bold mb-3">📸 Upload Photo</h3>
                   <input type="text" placeholder="Caption (optional)" value={caption} onChange={e => setCaption(e.target.value)} className="input mb-3" />
@@ -635,7 +670,7 @@ export default function Admin() {
                 )}
                 <UPIConfigPanel config={upiConfig} onUpdate={loadData} />
               </div>
-            )}
+
           </div>
 
         </div>
