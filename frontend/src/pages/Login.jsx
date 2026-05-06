@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { signInWithPopup } from 'firebase/auth'
 import { auth, googleProvider } from '../firebase'
@@ -6,27 +6,34 @@ import { useApp } from '../context/AppContext'
 import toast from 'react-hot-toast'
 
 export default function Login() {
-  const { currentUser } = useApp()
+  const { currentUser, authLoading } = useApp()
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
 
-  if (currentUser) {
-    navigate('/dashboard')
-    return null
-  }
+  // currentUser set hone ka wait karo, phir navigate karo
+  useEffect(() => {
+    if (!authLoading && currentUser) {
+      navigate('/dashboard')
+    }
+  }, [currentUser, authLoading, navigate])
 
   const handleGoogleLogin = async () => {
     setLoading(true)
     try {
       await signInWithPopup(auth, googleProvider)
-      toast.success('Login successful!')
-      navigate('/dashboard')
+      // navigate AppContext ke currentUser set hone ke baad useEffect se hoga
     } catch (err) {
       console.error('Login error:', err)
       toast.error('Login failed. Please try again.')
+      setLoading(false)
     }
-    setLoading(false)
   }
+
+  if (authLoading) return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+    </div>
+  )
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
