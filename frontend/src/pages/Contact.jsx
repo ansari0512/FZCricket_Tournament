@@ -38,14 +38,18 @@ export default function Contact() {
             const isWhatsApp = item.label === 'WhatsApp Group'
             return (
               <a key={i} href={item.href} target={isWhatsApp ? '_blank' : '_self'} rel={isWhatsApp ? 'noopener noreferrer' : ''} className="group">
-                <div className={`rounded-lg p-4 shadow-sm hover:shadow-md transition-all border ${
+                <div className={`rounded-lg p-4 shadow-sm hover:shadow-md transition-all border flex flex-col items-center text-center ${
                   isWhatsApp 
                     ? 'bg-green-50 border-green-200 hover:border-green-400' 
                     : 'bg-white border-gray-200 hover:border-blue-300'
                 }`}>
-                  <p className="text-2xl mb-2">{item.icon}</p>
-                  <p className="text-xs text-gray-500 font-semibold mb-1">{item.label}</p>
-                  <p className={`text-sm font-bold ${
+                  <p className="text-3xl mb-3">{item.icon}</p>
+                  <p className={`font-bold mb-1 ${
+                    isWhatsApp 
+                      ? 'text-green-700 text-base' 
+                      : 'text-gray-800 text-base'
+                  }`}>{item.label}</p>
+                  <p className={`text-sm font-semibold ${
                     isWhatsApp 
                       ? 'text-green-600 group-hover:text-green-700' 
                       : 'text-blue-600 group-hover:text-blue-700'
