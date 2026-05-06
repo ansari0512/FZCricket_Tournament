@@ -1,50 +1,59 @@
 const admin = require('firebase-admin')
 const path = require('path')
+const fs = require('fs')
 
 if (!admin.apps.length) {
-  let credential
+  let serviceAccount = null
 
+  // 1. Try env var first
   if (process.env.FIREBASE_SERVICE_ACCOUNT) {
     try {
-      let serviceAccountStr = process.env.FIREBASE_SERVICE_ACCOUNT
-      
-      // Fix escaped newlines
-      serviceAccountStr = serviceAccountStr.replace(/\\n/g, '\n')
-      serviceAccountStr = serviceAccountStr.replace(/\\r/g, '\r')
-      serviceAccountStr = serviceAccountStr.replace(/\\t/g, '\t')
-      
-      const serviceAccount = JSON.parse(serviceAccountStr)
-      
-      if (serviceAccount.private_key && typeof serviceAccount.private_key === 'string') {
+      let str = process.env.FIREBASE_SERVICE_ACCOUNT
+        .replace(/\\n/g, '\n')
+        .replace(/\\r/g, '')
+        .replace(/\\t/g, '')
+      serviceAccount = JSON.parse(str)
+      if (serviceAccount.private_key) {
         serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n')
       }
-      
-      credential = admin.credential.cert(serviceAccount)
-      console.log('Firebase Admin initialized from env var')
+      console.log('Firebase: loaded from env var')
     } catch (err) {
-      console.warn('Firebase env var parse failed, trying file:', err.message)
-      // Fallback to file
-      try {
-        const serviceAccount = require(path.join(__dirname, '../firebase-service-account.json'))
-        credential = admin.credential.cert(serviceAccount)
-        console.log('Firebase Admin initialized from file')
-      } catch (fileErr) {
-        console.error('Firebase service account file not found:', fileErr.message)
-        process.exit(1)
-      }
-    }
-  } else {
-    try {
-      const serviceAccount = require(path.join(__dirname, '../firebase-service-account.json'))
-      credential = admin.credential.cert(serviceAccount)
-      console.log('Firebase Admin initialized from file')
-    } catch (err) {
-      console.error('Firebase service account not found:', err.message)
-      process.exit(1)
+      console.warn('Firebase env var parse failed:', err.message)
     }
   }
 
-  admin.initializeApp({ credential })
+  // 2. Try Render secret file path
+  if (!serviceAccount) {
+    const renderPath = '/etc/secrets/firebase-service-account.json'
+    if (fs.existsSync(renderPath)) {
+      try {
+        serviceAccount = JSON.parse(fs.readFileSync(renderPath, 'utf8'))
+        console.log('Firebase: loaded from Render secret file')
+      } catch (err) {
+        console.warn('Firebase Render secret file parse failed:', err.message)
+      }
+    }
+  }
+
+  // 3. Try local project file
+  if (!serviceAccount) {
+    const localPath = path.join(__dirname, '../firebase-service-account.json')
+    if (fs.existsSync(localPath)) {
+      try {
+        serviceAccount = JSON.parse(fs.readFileSync(localPath, 'utf8'))
+        console.log('Firebase: loaded from local file')
+      } catch (err) {
+        console.warn('Firebase local file parse failed:', err.message)
+      }
+    }
+  }
+
+  if (!serviceAccount) {
+    console.error('Firebase: no valid service account found')
+    process.exit(1)
+  }
+
+  admin.initializeApp({ credential: admin.credential.cert(serviceAccount) })
   console.log('Firebase Admin initialized successfully')
 }
 
