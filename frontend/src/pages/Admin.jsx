@@ -406,34 +406,23 @@ export default function Admin() {
     <div className="py-6 px-4 pb-24">
       <div className="w-full max-w-6xl mx-auto">
         <div className="grid gap-4 md:grid-cols-[1fr_auto] items-start mb-6">
-          <div className="rounded-[2rem] overflow-hidden border border-gray-200 bg-white shadow-card p-6">
-            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+          <div className="rounded-2xl border border-gray-200 bg-white shadow-card px-4 py-3">
+            <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs uppercase tracking-[0.35em] text-sky-700 font-bold mb-2">Admin Control</p>
-                <h2 className="text-3xl font-bold">Dashboard Overview</h2>
-                <p className="text-gray-500 mt-2">FZ Cricket Tournament • 2026 season</p>
+                <p className="text-xs uppercase tracking-widest text-sky-700 font-bold">Admin Control</p>
+                <h2 className="text-lg font-bold leading-tight">Dashboard Overview</h2>
               </div>
-              <button onClick={() => { localStorage.removeItem('adminToken'); setLoggedIn(false) }} className="text-sm text-white font-semibold bg-red-600 hover:bg-red-700 px-4 py-2 rounded-xl transition-all shadow-sm">
+              <button onClick={() => { localStorage.removeItem('adminToken'); setLoggedIn(false) }} className="text-xs text-white font-semibold bg-red-600 hover:bg-red-700 px-3 py-1.5 rounded-xl transition-all">
                 Sign Out
               </button>
             </div>
-            <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-              <div className="stat-card">
-                <p className="text-xs uppercase tracking-[0.18em] text-gray-500">Pending Teams</p>
-                <p className="text-3xl font-bold mt-3">{pendingTeams}</p>
-              </div>
-              <div className="stat-card">
-                <p className="text-xs uppercase tracking-[0.18em] text-gray-500">Approved Teams</p>
-                <p className="text-3xl font-bold mt-3">{approvedTeams}</p>
-              </div>
-              <div className="stat-card">
-                <p className="text-xs uppercase tracking-[0.18em] text-gray-500">Matches</p>
-                <p className="text-3xl font-bold mt-3">{totalMatches}</p>
-              </div>
-              <div className="stat-card">
-                <p className="text-xs uppercase tracking-[0.18em] text-gray-500">Users</p>
-                <p className="text-3xl font-bold mt-3">{users.length}</p>
-              </div>
+            <div className="mt-3 grid grid-cols-4 gap-2">
+              {[['Pending', pendingTeams], ['Approved', approvedTeams], ['Matches', totalMatches], ['Users', users.length]].map(([label, val]) => (
+                <div key={label} className="bg-gray-50 rounded-xl py-2 text-center">
+                  <p className="text-xl font-black text-primary">{val}</p>
+                  <p className="text-[10px] text-gray-400 font-medium">{label}</p>
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -448,7 +437,11 @@ export default function Admin() {
               { key: 'Gallery', icon: '📸', label: 'Gallery', value: gallery.length }
             ].map(tab => (
               <button key={tab.key} onClick={() => toggle(tab.key)}
-                className={`tab-pill ${activeTab === tab.key ? 'tab-pill-active' : ''}`}>
+                className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-sm font-semibold transition-all ${
+                  activeTab === tab.key
+                    ? 'bg-gray-900 text-white border-gray-900'
+                    : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-100'
+                }`}>
                 <span>{tab.icon}</span>
                 <div className="text-left">
                   <p className="text-sm font-semibold leading-tight">{tab.label}</p>
