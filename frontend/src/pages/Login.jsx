@@ -1,14 +1,38 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { signInWithPopup } from 'firebase/auth'
+import { signInWithPopup, onAuthStateChanged } from 'firebase/auth'
 import { auth, googleProvider } from '../firebase'
 import { useApp } from '../context/AppContext'
+import { googleLogin } from '../services/api'
 import toast from 'react-hot-toast'
 
 export default function Login() {
   const { currentUser, authLoading } = useApp()
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
+  const [autoLoginAttempted, setAutoLoginAttempted] = useState(false)
+
+  // Auto-login if user already signed in with Google
+  useEffect(() => {
+    if (authLoading || autoLoginAttempted) return
+    
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (firebaseUser && !currentUser) {
+        try {
+          await googleLogin({
+            firebaseUid: firebaseUser.uid,
+            email: firebaseUser.email,
+            name: firebaseUser.displayName,
+            photo: firebaseUser.photoURL
+          })
+        } catch (err) {
+          console.error('Auto-login failed:', err)
+        }
+      }
+      setAutoLoginAttempted(true)
+    })
+    return () => unsubscribe()
+  }, [authLoading, currentUser, autoLoginAttempted])
 
   useEffect(() => {
     if (!authLoading && currentUser) {
