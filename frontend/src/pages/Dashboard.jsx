@@ -350,6 +350,25 @@ export default function Dashboard() {
     load()
   }, [currentUser?._id, teamId]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Socket listener for real-time updates
+  useEffect(() => {
+    if (!teamId) return
+    const { SOCKET_URL } = require('../services/api')
+    const { io } = require('socket.io-client')
+    const socket = io(SOCKET_URL)
+    socket.on('dataUpdate', async () => {
+      try {
+        const [teamRes, playersRes] = await Promise.all([getTeam(teamId), getTeamPlayers(teamId)])
+        setTeam(teamRes.data.team)
+        setPlayers(playersRes.data)
+        setNotifRefresh(n => n + 1)
+      } catch (err) {
+        console.error('Socket refresh failed:', err)
+      }
+    })
+    return () => socket.disconnect()
+  }, [teamId])
+
   // Auto refresh
   useEffect(() => {
     if (!team || !teamId) return

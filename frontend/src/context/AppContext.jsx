@@ -74,23 +74,6 @@ export const AppProvider = ({ children }) => {
     return () => unsubscribe()
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Socket
-  useEffect(() => {
-    const socketUrl = (import.meta.env.VITE_API_URL || 'https://fzcricket-backend.onrender.com/api').replace('/api', '')
-    const socket = io(socketUrl)
-    socket.on('connect', () => console.log('WebSocket connected'))
-    socket.on('dataUpdate', () => { fetchData(); refreshUser() })
-    socket.on('disconnect', () => console.log('WebSocket disconnected'))
-    return () => socket.disconnect()
-  }, [fetchData])
-
-  const logout = async () => {
-    await signOut(auth)
-    localStorage.removeItem('fzToken')
-    localStorage.removeItem('fzUser')
-    setCurrentUser(null)
-  }
-
   const refreshUser = useCallback(async () => {
     try {
       const res = await getMe()
@@ -101,6 +84,23 @@ export const AppProvider = ({ children }) => {
       console.error('refreshUser error:', err)
     }
   }, [])
+
+  const logout = async () => {
+    await signOut(auth)
+    localStorage.removeItem('fzToken')
+    localStorage.removeItem('fzUser')
+    setCurrentUser(null)
+  }
+
+  // Socket
+  useEffect(() => {
+    const socketUrl = (import.meta.env.VITE_API_URL || 'https://fzcricket-backend.onrender.com/api').replace('/api', '')
+    const socket = io(socketUrl)
+    socket.on('connect', () => console.log('WebSocket connected'))
+    socket.on('dataUpdate', () => { fetchData(); refreshUser() })
+    socket.on('disconnect', () => console.log('WebSocket disconnected'))
+    return () => socket.disconnect()
+  }, [fetchData, refreshUser])
 
   const registrationOpen = teams.length < 8
 
