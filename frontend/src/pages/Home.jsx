@@ -15,7 +15,7 @@ function RulesModal({ onClose }) {
     { icon: '🥊', color: '#818cf8', title: '8. सेमीफाइनल', text: 'दोनों ग्रुप की टॉप 2 टीमों के बीच सेमीफाइनल खेला जाएगा।' },
     { icon: '🏆', color: '#38bdf8', title: '9. फाइनल', text: 'सेमीयफाइनल जीतने वाली टीमों के बीच फाइनल मैच होगा।' },
     { icon: '💰', color: '#60a5fa', title: '10. इनाम', text: 'फाइनल जीतने वाली टीम को ₹7000 और ट्रॉफी, हारने वाली टीम को ₹3000 और ट्रॉफी।' },
-    { icon: '⭐', color: '#a5b4fc', title: '11. मैन ऑफ द मैच', text: 'प्रत्येक मैच में \"मैन ऑयफ द मैच\" दिया जाएगा।' },
+    { icon: '⭐', color: '#a5b4fc', title: '11. मैन ऑफ द मैच', text: 'प्रत्येक मैच में "मैन ऑयफ द मैच" दिया जाएगा।' },
     { icon: '📅', color: '#818cf8', title: '12. अंपायर निर्णय', text: 'अंपायर का फैसला अंतिम होगा।' },
   ]
   return (
@@ -106,7 +106,6 @@ function GallerySlider({ photos }) {
           className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white w-9 h-9 rounded-full flex items-center justify-center text-xl transition-all opacity-0 group-hover:opacity-100">›</button>
         <div className="absolute top-3 right-3 bg-black/50 text-white text-xs px-2.5 py-1 rounded-full font-medium">{current + 1}/{photos.length}</div>
         <div className="absolute bottom-10 right-3 bg-black/40 text-white text-xs px-2 py-1 rounded-full">🔍 Tap to zoom</div>
-        {/* Dots */}
         <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
           {photos.map((_, i) => (
             <button key={i} onClick={e => { e.stopPropagation(); setCurrent(i) }}
@@ -155,16 +154,12 @@ export default function Home() {
       {showRules && <RulesModal onClose={() => setShowRules(false)} />}
       {showRegRules && <RegRulesModal onClose={() => setShowRegRules(false)} />}
 
-      {/* ── Hero ── */}
       <section className="relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 40%, #334155 70%, #0f172a 100%)' }}>
-        {/* Background pattern */}
         <div className="absolute inset-0 bg-hero-pattern opacity-30" />
-        {/* Big cricket emoji bg */}
         <div className="absolute inset-0 flex items-center justify-center select-none pointer-events-none">
           <span className="text-[200px] opacity-[0.04]">🏏</span>
         </div>
 
-        {/* Marquee */}
         <div className="relative border-b border-white/10 py-2">
           <div className="marquee-container">
              <div className="marquee-banner">
@@ -174,7 +169,6 @@ export default function Home() {
         </div>
 
         <div className="relative max-w-4xl mx-auto text-center px-4 pt-6 pb-12">
-          {/* Title - Moved Up */}
           <h1 className="text-3xl md:text-5xl font-black text-white mb-6 leading-tight">
             Firoz Shah Cricket<br />
             <span style={{ background: 'linear-gradient(90deg, #38bdf8, #818cf8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
@@ -182,13 +176,11 @@ export default function Home() {
             </span>
           </h1>
 
-          {/* Tournament Info - 2 Lines */}
           <div className="space-y-2 mb-8">
             <p className="font-bold text-base" style={{ color: '#4ade80' }}>🗓️ Tournament Start: 21 April 2026</p>
             <p className="font-bold text-base text-white/80">8 Teams  •  8 Overs  •  15 Players</p>
           </div>
 
-          {/* Stats - Compact */}
           <div className="flex flex-wrap justify-center gap-4 mb-8">
             {[
               { val: teams.length, label: 'Teams Registered', color: '#38bdf8' },
@@ -202,7 +194,6 @@ export default function Home() {
             ))}
           </div>
 
-          {/* CTA Buttons */}
           <div className="flex flex-wrap justify-center gap-3 mb-6">
             {registrationOpen ? (
               <Link to="/register" className="btn-gold text-base px-8 py-3 shadow-glow-gold">
@@ -215,21 +206,20 @@ export default function Home() {
             )}
           </div>
 
-          {/* Rules - One Line */}
-          <div className="flex flex-wrap justify-center gap-3">
+          <div className="flex flex-wrap justify-center items-center gap-2">
             <button onClick={() => setShowRules(true)}
-              className="bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold py-2 px-4 rounded-full text-sm transition-all">
+              className="bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold py-2 px-4 rounded-full text-xs md:text-sm transition-all whitespace-nowrap">
               📋 Tournament Rules
             </button>
+            <span className="text-white/30">•</span>
             <button onClick={() => setShowRegRules(true)}
-              className="bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold py-2 px-4 rounded-full text-sm transition-all">
+              className="bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold py-2 px-4 rounded-full text-xs md:text-sm transition-all whitespace-nowrap">
               📝 Registration Rules
             </button>
           </div>
         </div>
       </section>
 
-      {/* ── Gallery ── */}
       {gallery.length > 0 && (
         <section className="py-12 px-4 bg-gray-50">
           <div className="max-w-4xl mx-auto">
@@ -240,7 +230,6 @@ export default function Home() {
         </section>
       )}
 
-      {/* ── Live Match Banner ── */}
       {liveMatch && (
         <section className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 py-4 px-4">
           <div className="max-w-2xl mx-auto">
@@ -268,7 +257,6 @@ export default function Home() {
         </section>
       )}
 
-      {/* ── Prize Money ── */}
       <section className="py-12 px-4">
         <div className="max-w-4xl mx-auto">
           <p className="section-title">💰 Prize Money</p>
@@ -291,7 +279,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── Teams ── */}
       {teams.length > 0 && (
         <section className="py-12 px-4 bg-gray-50">
           <div className="max-w-6xl mx-auto">
@@ -333,7 +320,6 @@ export default function Home() {
         </section>
       )}
 
-      {/* ── Upcoming Matches ── */}
       {matches.filter(m => m.status === 'scheduled').length > 0 && (
         <section className="py-12 px-4">
           <div className="max-w-4xl mx-auto">
