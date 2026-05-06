@@ -314,8 +314,8 @@ export default function Dashboard() {
   useEffect(() => {
     if (!currentUser) { navigate('/login'); return }
     const load = async () => {
-      const teamId = currentUser.teamId || location.state?.teamId
-      if (teamId) {
+      const teamId = currentUser.teamId?._id || currentUser.teamId || location.state?.teamId
+      if (teamId && typeof teamId === 'string') {
         try {
           const [teamRes, playersRes] = await Promise.all([getTeam(teamId), getTeamPlayers(teamId)])
           setTeam(teamRes.data.team)
@@ -338,15 +338,15 @@ export default function Dashboard() {
       setLoading(false)
     }
     load()
-  }, [currentUser?._id, currentUser?.teamId]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [currentUser?._id, currentUser?.teamId?._id || currentUser?.teamId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Auto refresh - check every 10 seconds when team is pending/submitted
   useEffect(() => {
-    if (!team || !currentUser?.teamId) return
+    if (!team || !teamId) return
     if (team.status === 'approved' || team.status === 'rejected') return
     const interval = setInterval(async () => {
       try {
-        const res = await getTeam(currentUser.teamId)
+        const res = await getTeam(teamId)
         const freshTeam = res.data.team
         if (freshTeam.status !== team.status || freshTeam.paymentDone !== team.paymentDone) {
           setTeam(freshTeam)
@@ -357,7 +357,7 @@ export default function Dashboard() {
       }
     }, 10000)
     return () => clearInterval(interval)
-  }, [team?.status, team?.paymentDone, currentUser?.teamId]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [team?.status, team?.paymentDone, teamId]) // eslint-disable-line react-hooks/exhaustive-deps
   // Fetch UPI config for payments
   useEffect(() => {
     const fetchUPIs = async () => {
@@ -380,10 +380,12 @@ export default function Dashboard() {
     return upiConfig[type] || ''
   }
 
+  const teamId = currentUser.teamId?._id || currentUser.teamId
+
   const handleUpdateTeam = async (e) => {
     e.preventDefault()
     try {
-      const res = await updateTeam(currentUser.teamId, {
+      const res = await updateTeam(teamId, {
         teamName: editTeamData.teamName.toUpperCase(),
         captainName: editTeamData.captainName.toUpperCase(),
         captainPhone: editTeamData.captainPhone,
@@ -403,7 +405,7 @@ export default function Dashboard() {
     setUploading(true); setError('')
     try {
       const photoUrl = await uploadImage(playerForm.photo, team.teamName.replace(/\s+/g, '_'))
-      const res = await registerPlayer(currentUser.teamId, {
+      const res = await registerPlayer(teamId, {
         name: playerForm.name.toUpperCase(),
         role: playerForm.role,
         address: playerForm.address.toUpperCase(),
@@ -424,8 +426,8 @@ export default function Dashboard() {
     if (!confirm('Are you sure you want to submit your team? Admin will review it.')) return
     setSubmitting(true)
     try {
-      await updateTeam(currentUser.teamId, { submitted: true, status: 'pending' })
-      const res = await getTeam(currentUser.teamId)
+      await updateTeam(teamId, { submitted: true, status: 'pending' })
+      const res = await getTeam(teamId)
       setTeam(res.data.team)
       toast.success('Team submitted successfully! Admin will review it.')
     } catch { toast.error('Submission failed') }
