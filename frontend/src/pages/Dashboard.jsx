@@ -214,10 +214,10 @@ function NotificationsPanel({ onRefresh }) {
   }
   if (notifs.length === 0) return null
   return (
-    <div className="card">
+    <div className="mb-4 pb-4 border-b">
       <div className="flex justify-between items-center mb-3">
-        <h3 className="font-bold">🔔 Notifications {unread > 0 && <span className="bg-primary text-white text-xs px-2 py-0.5 rounded-full ml-1">{unread}</span>}</h3>
-        {unread > 0 && <button onClick={markRead} className="text-sm text-primary">Mark all read</button>}
+        <p className="font-bold text-sm">🔔 Notifications {unread > 0 && <span className="bg-primary text-white text-xs px-2 py-0.5 rounded-full ml-1">{unread}</span>}</p>
+        {unread > 0 && <button onClick={markRead} className="text-xs text-primary">Mark all read</button>}
       </div>
       <div className="space-y-2">
         {notifs.map((n, i) => (
@@ -457,8 +457,6 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <NotificationsPanel onRefresh={notifRefresh} />
-
         {/* My Team */}
         <div className="card">
           <div className="flex items-center justify-between mb-4">
@@ -472,6 +470,8 @@ export default function Dashboard() {
               {team.status === 'approved' ? '✅ Approved' : team.status === 'rejected' ? '❌ Rejected' : isSubmitted ? '📋 Under Review' : '✏️ Draft'}
             </span>}
           </div>
+          <NotificationsPanel onRefresh={notifRefresh} />
+
           {team ? (
             <div>
               <div className="flex justify-between items-start mb-3">
