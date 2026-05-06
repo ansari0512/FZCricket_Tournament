@@ -206,7 +206,7 @@ export default function Home() {
 
           <div className="flex flex-wrap justify-center items-center gap-1">
             <button onClick={() => setShowRules(true)}
-              className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-bold py-2 px-4 rounded-full text-xs md:text-sm transition-all whitespace-nowrap shadow-lg">
+              className="bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-bold py-2 px-4 rounded-full text-xs md:text-sm transition-all whitespace-nowrap shadow-lg">
               📋 Tournament Rules
             </button>
             <span className="text-white/40 text-lg">•</span>
@@ -248,7 +248,7 @@ export default function Home() {
               </div>
               <div className="flex-1 text-center">
                 <p className="font-bold text-sm">{liveMatch.team2?.teamName}</p>
-                <p className="text-2xl md:text-3xl font-black mt-1">{liveMatch.team2Score?.runs ?? 0}<span className="text-base md:text-lg text-white/70">/{liveMatch.team2Score?.wickets ?? 0}</span></p>
+                <p className="text-2xl md:text-3xl font-black mt-1">{liveMatch.team2Score?.runs ?? 0}<span className="text-base md:text-lg text-white/70\">/{liveMatch.team2Score?.wickets ?? 0}</span></p>
               </div>
             </div>
           </div>
