@@ -8,7 +8,10 @@ const API = axios.create({
 API.interceptors.request.use((config) => {
   const adminToken = localStorage.getItem('adminToken')
   const userToken = localStorage.getItem('fzToken')
-  const token = adminToken || userToken
+  // User-only routes pe sirf fzToken use karo
+  const userOnlyRoutes = ['/auth/notifications', '/auth/me']
+  const isUserOnly = userOnlyRoutes.some(r => config.url?.includes(r))
+  const token = isUserOnly ? userToken : (adminToken || userToken)
   if (token) config.headers.Authorization = `Bearer ${token}`
   return config
 })
