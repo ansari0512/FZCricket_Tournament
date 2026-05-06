@@ -4,7 +4,7 @@ export default function Contact() {
   const contacts = [
     { icon: '📞', label: 'Mobile 1', value: '+91 8127021765', href: 'tel:+918127021765' },
     { icon: '📞', label: 'Mobile 2', value: '+91 9369429653', href: 'tel:+919369429653' },
-    { icon: '📧', label: 'Email', value: 'shahidansari0512@gmail.com', href: 'mailto:shahidansari0512@gmail.com' },
+    { icon: '💬', label: 'WhatsApp Group', value: 'Join Group', href: 'https://chat.whatsapp.com/CR4Wx8QgHbJFaTnDkuTkxu' },
   ]
 
   const details = [
@@ -34,15 +34,26 @@ export default function Contact() {
       <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
         {/* Quick Contact */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          {contacts.map((item, i) => (
-            <a key={i} href={item.href} className="group">
-              <div className="bg-white rounded-lg p-4 shadow-sm hover:shadow-md transition-all border border-gray-200 hover:border-blue-300">
-                <p className="text-2xl mb-2">{item.icon}</p>
-                <p className="text-xs text-gray-500 font-semibold mb-1">{item.label}</p>
-                <p className="text-sm font-bold text-blue-600 group-hover:text-blue-700">{item.value}</p>
-              </div>
-            </a>
-          ))}
+          {contacts.map((item, i) => {
+            const isWhatsApp = item.label === 'WhatsApp Group'
+            return (
+              <a key={i} href={item.href} target={isWhatsApp ? '_blank' : '_self'} rel={isWhatsApp ? 'noopener noreferrer' : ''} className="group">
+                <div className={`rounded-lg p-4 shadow-sm hover:shadow-md transition-all border ${
+                  isWhatsApp 
+                    ? 'bg-green-50 border-green-200 hover:border-green-400' 
+                    : 'bg-white border-gray-200 hover:border-blue-300'
+                }`}>
+                  <p className="text-2xl mb-2">{item.icon}</p>
+                  <p className="text-xs text-gray-500 font-semibold mb-1">{item.label}</p>
+                  <p className={`text-sm font-bold ${
+                    isWhatsApp 
+                      ? 'text-green-600 group-hover:text-green-700' 
+                      : 'text-blue-600 group-hover:text-blue-700'
+                  }`}>{item.value}</p>
+                </div>
+              </a>
+            )
+          })}
         </div>
 
         {/* Details */}
