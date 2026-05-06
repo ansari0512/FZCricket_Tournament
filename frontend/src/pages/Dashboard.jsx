@@ -457,8 +457,6 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <NotificationsPanel onRefresh={notifRefresh} />
-
         {/* My Team */}
         <div className="card">
           <div className="flex items-center justify-between mb-4">
@@ -472,6 +470,7 @@ export default function Dashboard() {
               {team.status === 'approved' ? '✅ Approved' : team.status === 'rejected' ? '❌ Rejected' : isSubmitted ? '📋 Under Review' : '✏️ Draft'}
             </span>}
           </div>
+          <NotificationsPanel onRefresh={notifRefresh} />
 
           {team ? (
             <div>
