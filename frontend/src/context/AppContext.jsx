@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react'
-import { onAuthStateChanged, signOut, getRedirectResult } from 'firebase/auth'
+import { onAuthStateChanged, signOut } from 'firebase/auth'
 import { auth } from '../firebase'
 import { getTeams, getMatches, googleLogin, getMe } from '../services/api'
 import { useCallback } from 'react'
@@ -26,20 +26,6 @@ export const AppProvider = ({ children }) => {
     }
   }, [])
 
-  const handleFirebaseUser = useCallback(async (firebaseUser) => {
-    try {
-      const idToken = await firebaseUser.getIdToken(true) // force refresh
-      const res = await googleLogin({ token: idToken })
-      localStorage.setItem('fzToken', res.data.token)
-      localStorage.setItem('fzUser', JSON.stringify(res.data.user))
-      setCurrentUser(res.data.user)
-    } catch (err) {
-      console.error('Auth error:', err)
-      const saved = localStorage.getItem('fzUser')
-      if (saved) setCurrentUser(JSON.parse(saved))
-    }
-  }, [])
-
   useEffect(() => {
     fetchData()
 
@@ -60,18 +46,24 @@ export const AppProvider = ({ children }) => {
       }
     }
 
-    // Redirect result handle karo (signInWithRedirect ke baad)
-    getRedirectResult(auth)
-      .then(result => {
-        if (result?.user) {
-          handleFirebaseUser(result.user)
-        }
-      })
-      .catch(() => {})
-
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
-        await handleFirebaseUser(firebaseUser)
+        try {
+          // firebaseUid, email, name, photo bhejo — backend verify karega
+          const res = await googleLogin({
+            firebaseUid: firebaseUser.uid,
+            email: firebaseUser.email,
+            name: firebaseUser.displayName,
+            photo: firebaseUser.photoURL
+          })
+          localStorage.setItem('fzToken', res.data.token)
+          localStorage.setItem('fzUser', JSON.stringify(res.data.user))
+          setCurrentUser(res.data.user)
+        } catch (err) {
+          console.error('Auth error:', err)
+          const saved = localStorage.getItem('fzUser')
+          if (saved) setCurrentUser(JSON.parse(saved))
+        }
       } else {
         localStorage.removeItem('fzToken')
         localStorage.removeItem('fzUser')
@@ -79,24 +71,18 @@ export const AppProvider = ({ children }) => {
       }
       setAuthLoading(false)
     })
-    return unsubscribe
+    return () => unsubscribe()
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Socket setup separate effect
+  // Socket
   useEffect(() => {
     const socketUrl = (import.meta.env.VITE_API_URL || 'https://fzcricket-backend.onrender.com/api').replace('/api', '')
     const socket = io(socketUrl)
-
     socket.on('connect', () => console.log('WebSocket connected'))
-    socket.on('dataUpdate', (update) => {
-      console.log('Data update:', update.type)
-      refreshUser()
-      fetchData()
-    })
+    socket.on('dataUpdate', () => { fetchData() })
     socket.on('disconnect', () => console.log('WebSocket disconnected'))
-
     return () => socket.disconnect()
-  }, [])
+  }, [fetchData])
 
   const logout = async () => {
     await signOut(auth)
@@ -116,7 +102,6 @@ export const AppProvider = ({ children }) => {
     }
   }, [])
 
-  // getTeams() sirf approved+paymentDone teams return karta hai
   const registrationOpen = teams.length < 8
 
   return (
