@@ -2,8 +2,8 @@ import { Link } from 'react-router-dom'
 
 export default function Contact() {
   const contacts = [
-    { icon: '📞', label: 'Mobile 1', value: '+91 8127021765', href: 'tel:+918127021765' },
-    { icon: '📞', label: 'Mobile 2', value: '+91 9369429653', href: 'tel:+919369429653' },
+    { icon: '📞', label: 'Saddam Husain', value: '+91 8127021765', href: 'tel:+918127021765' },
+    { icon: '📞', label: 'Mohd Sufiyan', value: '+91 9369429653', href: 'tel:+919369429653' },
     { icon: '💬', label: 'WhatsApp Group', value: 'Join Group', href: 'https://chat.whatsapp.com/CR4Wx8QgHbJFaTnDkuTkxu' },
   ]
 
