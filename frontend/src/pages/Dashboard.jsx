@@ -486,10 +486,9 @@ export default function Dashboard() {
             <div>
               <div className="flex justify-between items-start mb-3">
                 <div>
-                  <p className="font-bold text-xl">{team.teamName}</p>
+                  <p className="font-bold text-xl bg-gradient-to-r from-sky-600 to-indigo-600 bg-clip-text text-transparent">{team.teamName}</p>
                   <p className="text-gray-400 text-xs">📍 {team.city}</p>
-                  <p className="text-gray-500 text-sm">📞 {team.captainPhone}</p>
-                  <p className="text-gray-500 text-sm">👤 {team.captainName}</p>
+                  <p className="text-gray-500 text-sm">📞 {team.captainPhone} &nbsp;•&nbsp; 👤 {team.captainName}</p>
                 </div>
                 <div className="flex flex-col items-end gap-2">
                   {canEdit && (
