@@ -12,15 +12,6 @@ export default function Contact() {
     { label: 'Venue', value: 'Village Odajhar, Post Naseerpur, Biswan, Sitapur - 261202', icon: '📍' },
   ]
 
-  const tournament = [
-    { label: 'Start', value: '21 Apr 2026' },
-    { label: 'Registration', value: '10–20 Apr' },
-    { label: 'Format', value: '8 Overs' },
-    { label: 'Teams', value: '8 Max' },
-    { label: 'Prize', value: '₹7,000' },
-    { label: 'Fee', value: '₹1,100' },
-  ]
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white pb-20 page-enter">
       {/* Header */}
@@ -93,31 +84,6 @@ export default function Contact() {
               </div>
             ))}
           </div>
-        </div>
-
-        {/* Tournament Info */}
-        <div className="bg-gradient-to-br from-blue-600 to-blue-500 rounded-2xl shadow-lg overflow-hidden text-white">
-          <div className="p-6">
-            <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
-              <span>🏏</span> FZ Cricket Tournament 2026
-            </h2>
-            <p className="text-blue-100 mb-6 text-sm">Village level cricket tournament with exciting prizes</p>
-            <div className="grid grid-cols-3 gap-3">
-              {tournament.map((item, i) => (
-                <div key={i} className="bg-white/15 backdrop-blur-sm rounded-lg p-3 text-center border border-white/20">
-                  <p className="text-xs text-blue-100 font-semibold mb-1 uppercase">{item.label}</p>
-                  <p className="font-bold text-base">{item.value}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Admin Link */}
-        <div className="text-center">
-          <Link to="/admin" className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition-all shadow-md hover:shadow-lg">
-            <span>🔐</span> Admin Panel
-          </Link>
         </div>
       </div>
     </div>
