@@ -248,6 +248,7 @@ export default function Admin() {
   const [previewIndex, setPreviewIndex] = useState(null)
   const [userTeamModal, setUserTeamModal] = useState(null) // {team, players}
   const [upiConfig, setUpiConfig] = useState({ gpay: '', phonepe: '', paytm: '' })
+  const [adminAlerts, setAdminAlerts] = useState({ newUsers: 0, newTeams: 0 })
 
   const loadData = async () => {
     try {
@@ -283,8 +284,16 @@ export default function Admin() {
 
      socket.on('matchStatusChange', (data) => {
        setMatches(prev => prev.map(m => m._id === data.matchId ? { ...m, ...data } : m))
-       // Teams stats update
-       if (data.status === 'completed') {
+       if (data.status === 'completed') loadData()
+     })
+
+     socket.on('adminAlert', (data) => {
+       if (data.type === 'newUser') {
+         setAdminAlerts(prev => ({ ...prev, newUsers: prev.newUsers + 1 }))
+         loadData()
+       }
+       if (data.type === 'newTeam') {
+         setAdminAlerts(prev => ({ ...prev, newTeams: prev.newTeams + 1 }))
          loadData()
        }
      })
@@ -403,9 +412,13 @@ export default function Admin() {
 
           {/* Users */}
           <div className="rounded-xl overflow-hidden border border-gray-200">
-            <button onClick={() => toggle('Users')}
+            <button onClick={() => { toggle('Users'); setAdminAlerts(prev => ({ ...prev, newUsers: 0 })) }}
               className={`w-full text-left px-4 py-3 font-medium text-sm flex justify-between items-center transition ${activeTab === 'Users' ? 'cricket-gradient text-white' : 'bg-gray-100 hover:bg-gray-200'}`}>
-              👥 Users <span>{activeTab === 'Users' ? '▲' : '▼'}</span>
+              <span className="flex items-center gap-2">
+                👥 Users
+                {adminAlerts.newUsers > 0 && <span className="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full animate-pulse">{adminAlerts.newUsers} New</span>}
+              </span>
+              <span>{activeTab === 'Users' ? '▲' : '▼'}</span>
             </button>
             {activeTab === 'Users' && (
               <div className="p-3 space-y-3">
@@ -428,14 +441,17 @@ export default function Admin() {
 
           {/* Teams */}
           <div className="rounded-xl overflow-hidden border border-gray-200">
-            <button onClick={() => toggle('Teams')}
+            <button onClick={() => { toggle('Teams'); setAdminAlerts(prev => ({ ...prev, newTeams: 0 })) }}
               className={`w-full text-left px-4 py-3 font-medium text-sm flex justify-between items-center transition ${activeTab === 'Teams' ? 'cricket-gradient text-white' : 'bg-gray-100 hover:bg-gray-200'}`}>
-              🏏 Teams
-              {teams.filter(t => t.submitted && t.paymentScreenshot && !t.paymentDone).length > 0 && (
-                <span className="bg-primary text-white text-xs px-2 py-0.5 rounded-full ml-2">
-                  {teams.filter(t => t.submitted && t.paymentScreenshot && !t.paymentDone).length} Payment Pending
-                </span>
-              )}
+              <span className="flex items-center gap-2">
+                🏏 Teams
+                {adminAlerts.newTeams > 0 && <span className="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full animate-pulse">{adminAlerts.newTeams} New</span>}
+                {teams.filter(t => t.submitted && t.paymentScreenshot && !t.paymentDone).length > 0 && (
+                  <span className="bg-amber-500 text-white text-xs px-2 py-0.5 rounded-full">
+                    {teams.filter(t => t.submitted && t.paymentScreenshot && !t.paymentDone).length} Payment
+                  </span>
+                )}
+              </span>
               <span className="ml-auto">{activeTab === 'Teams' ? '▲' : '▼'}</span>
             </button>
             {activeTab === 'Teams' && (

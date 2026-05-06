@@ -13,6 +13,7 @@ router.post('/google-login', async (req, res) => {
     if (!firebaseUid || !email) return res.status(400).json({ message: 'Firebase UID and email required' })
 
     let user = await User.findOne({ firebaseUid })
+    const isNewUser = !user
     if (!user) {
       user = new User({ firebaseUid, email, name: name || '', photo: photo || '' })
       await user.save()
@@ -29,6 +30,13 @@ router.post('/google-login', async (req, res) => {
       JWT_SECRET,
       { expiresIn: '7d' }
     )
+
+    // Notify admin if new user
+    if (isNewUser) {
+      const io = req.app.get('io')
+      if (io) io.emit('adminAlert', { type: 'newUser', message: `New user joined: ${name || email}`, user: { name: name || '', email, photo: photo || '', createdAt: new Date() } })
+    }
+
     res.json({ message: 'Login successful', user: userWithTeam, token })
   } catch (err) {
     res.status(500).json({ error: err.message })

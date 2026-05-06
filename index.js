@@ -87,6 +87,9 @@ app.get("/api/health", (req, res) => {
 });
 
 
+// Make io accessible in routes
+app.set('io', io);
+
 // ✅ API ROUTES
 app.use('/api/teams', require('./routes/teamRoutes'));
 app.use('/api/matches', require('./routes/matchRoutes'));

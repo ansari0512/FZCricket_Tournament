@@ -97,6 +97,10 @@ router.post('/register', verifyUser, async (req, res) => {
 
     await User.findByIdAndUpdate(currentUser._id, { teamId: team._id });
 
+    // Notify admin about new team
+    const io = req.app.get('io')
+    if (io) io.emit('adminAlert', { type: 'newTeam', message: `New team registered: ${teamName}`, team: { teamName, captainName, captainPhone, city } })
+
     res.status(201).json({ 
       message: 'Team registered successfully. Please pay ₹300 advance fee to complete registration.', 
       team,
