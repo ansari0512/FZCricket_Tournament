@@ -2,9 +2,9 @@ import { Link } from 'react-router-dom'
 
 export default function Contact() {
   const contacts = [
-    { icon: '📞', label: 'Saddam Husain', value: '+91 8127021765', href: 'tel:+918127021765' },
-    { icon: '📞', label: 'Mohd Sufiyan', value: '+91 9369429653', href: 'tel:+919369429653' },
-    { icon: '💬', label: 'WhatsApp Group', value: 'Join Group', href: 'https://chat.whatsapp.com/CR4Wx8QgHbJFaTnDkuTkxu' },
+    { icon: '📞', name: 'Saddam Husain', value: '+91 8127021765', href: 'tel:+918127021765', type: 'phone' },
+    { icon: '📞', name: 'Mohd Sufiyan', value: '+91 9369429653', href: 'tel:+919369429653', type: 'phone' },
+    { icon: '💬', name: 'WhatsApp Group', value: 'Join Now', href: 'https://chat.whatsapp.com/CR4Wx8QgHbJFaTnDkuTkxu', type: 'whatsapp' },
   ]
 
   const details = [
@@ -24,52 +24,71 @@ export default function Contact() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white pb-20 page-enter">
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white py-8 px-4">
+      <div className="bg-gradient-to-r from-blue-600 to-blue-500 text-white py-10 px-4">
         <div className="max-w-2xl mx-auto text-center">
-          <h1 className="text-3xl font-bold mb-2">Get In Touch</h1>
-          <p className="text-blue-100">Questions about FZ Cricket Tournament?</p>
+          <h1 className="text-4xl font-bold mb-2">Get In Touch</h1>
+          <p className="text-blue-100 text-lg">Have questions? Contact us anytime</p>
         </div>
       </div>
 
       <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
-        {/* Quick Contact */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          {contacts.map((item, i) => {
-            const isWhatsApp = item.label === 'WhatsApp Group'
-            return (
-              <a key={i} href={item.href} target={isWhatsApp ? '_blank' : '_self'} rel={isWhatsApp ? 'noopener noreferrer' : ''} className="group">
-                <div className={`rounded-lg p-4 shadow-sm hover:shadow-md transition-all border flex flex-col items-center text-center ${
-                  isWhatsApp 
-                    ? 'bg-green-50 border-green-200 hover:border-green-400' 
-                    : 'bg-white border-gray-200 hover:border-blue-300'
+        {/* Contact Card - All in One */}
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+          <div className="bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-4">
+            <h2 className="text-xl font-bold text-white">📞 Quick Contact</h2>
+          </div>
+          <div className="p-6 space-y-4">
+            {contacts.map((item, i) => (
+              <a key={i} href={item.href} target={item.type === 'whatsapp' ? '_blank' : '_self'} rel={item.type === 'whatsapp' ? 'noopener noreferrer' : ''} className="group">
+                <div className={`flex items-center gap-4 p-4 rounded-xl transition-all border-2 ${
+                  item.type === 'whatsapp'
+                    ? 'bg-green-50 border-green-200 hover:border-green-400 hover:bg-green-100'
+                    : 'bg-blue-50 border-blue-200 hover:border-blue-400 hover:bg-blue-100'
                 }`}>
-                  <p className="text-3xl mb-3">{item.icon}</p>
-                  <p className={`font-bold mb-1 ${
-                    isWhatsApp 
-                      ? 'text-green-700 text-base' 
-                      : 'text-gray-800 text-base'
-                  }`}>{item.label}</p>
-                  <p className={`text-sm font-semibold ${
-                    isWhatsApp 
-                      ? 'text-green-600 group-hover:text-green-700' 
-                      : 'text-blue-600 group-hover:text-blue-700'
-                  }`}>{item.value}</p>
+                  <div className={`text-4xl flex-shrink-0 p-3 rounded-lg ${
+                    item.type === 'whatsapp'
+                      ? 'bg-green-200'
+                      : 'bg-blue-200'
+                  }`}>
+                    {item.icon}
+                  </div>
+                  <div className="flex-1">
+                    <p className={`font-bold text-lg ${
+                      item.type === 'whatsapp'
+                        ? 'text-green-700'
+                        : 'text-blue-700'
+                    }`}>{item.name}</p>
+                    <p className={`text-sm font-semibold ${
+                      item.type === 'whatsapp'
+                        ? 'text-green-600'
+                        : 'text-blue-600'
+                    }`}>{item.value}</p>
+                  </div>
+                  <div className={`text-2xl transition-transform group-hover:translate-x-1 ${
+                    item.type === 'whatsapp'
+                      ? 'text-green-600'
+                      : 'text-blue-600'
+                  }`}>
+                    →
+                  </div>
                 </div>
               </a>
-            )
-          })}
+            ))}
+          </div>
         </div>
 
         {/* Details */}
-        <div className="bg-white rounded-lg p-5 shadow-sm border border-gray-200">
-          <h2 className="text-lg font-bold text-gray-800 mb-4">Details</h2>
-          <div className="space-y-3">
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+          <div className="bg-gradient-to-r from-purple-500 to-purple-600 px-6 py-4">
+            <h2 className="text-xl font-bold text-white">ℹ️ Details</h2>
+          </div>
+          <div className="p-6 space-y-4">
             {details.map((item, i) => (
-              <div key={i} className="flex gap-3">
-                <span className="text-xl flex-shrink-0">{item.icon}</span>
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs text-gray-500 font-semibold mb-0.5">{item.label}</p>
-                  <p className="text-sm text-gray-800 font-medium">{item.value}</p>
+              <div key={i} className="flex gap-4 pb-4 border-b border-gray-100 last:border-b-0 last:pb-0">
+                <span className="text-3xl flex-shrink-0">{item.icon}</span>
+                <div className="flex-1">
+                  <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-1">{item.label}</p>
+                  <p className="text-gray-800 font-semibold">{item.value}</p>
                 </div>
               </div>
             ))}
@@ -77,23 +96,26 @@ export default function Contact() {
         </div>
 
         {/* Tournament Info */}
-        <div className="bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg p-5 text-white shadow-sm">
-          <h2 className="text-lg font-bold mb-3 flex items-center gap-2">
-            <span>🏏</span> FZ Cricket Tournament 2026
-          </h2>
-          <div className="grid grid-cols-3 gap-2">
-            {tournament.map((item, i) => (
-              <div key={i} className="bg-white/20 rounded-lg p-3 text-center">
-                <p className="text-xs text-blue-100 font-semibold mb-1">{item.label}</p>
-                <p className="font-bold text-sm">{item.value}</p>
-              </div>
-            ))}
+        <div className="bg-gradient-to-br from-blue-600 to-blue-500 rounded-2xl shadow-lg overflow-hidden text-white">
+          <div className="p-6">
+            <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+              <span>🏏</span> FZ Cricket Tournament 2026
+            </h2>
+            <p className="text-blue-100 mb-6 text-sm">Village level cricket tournament with exciting prizes</p>
+            <div className="grid grid-cols-3 gap-3">
+              {tournament.map((item, i) => (
+                <div key={i} className="bg-white/15 backdrop-blur-sm rounded-lg p-3 text-center border border-white/20">
+                  <p className="text-xs text-blue-100 font-semibold mb-1 uppercase">{item.label}</p>
+                  <p className="font-bold text-base">{item.value}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
         {/* Admin Link */}
         <div className="text-center">
-          <Link to="/admin" className="inline-flex items-center gap-2 px-5 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition-all text-sm">
+          <Link to="/admin" className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition-all shadow-md hover:shadow-lg">
             <span>🔐</span> Admin Panel
           </Link>
         </div>
