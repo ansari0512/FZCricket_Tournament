@@ -5,14 +5,24 @@ if (!admin.apps.length) {
 
   if (process.env.FIREBASE_SERVICE_ACCOUNT) {
     try {
-      const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)
-      // In Render.com, \n characters get escaped - fix this
-      if (serviceAccount.private_key) {
+      let serviceAccountStr = process.env.FIREBASE_SERVICE_ACCOUNT
+      
+      // Fix escaped newlines - try multiple patterns
+      serviceAccountStr = serviceAccountStr.replace(/\\n/g, '\n')
+      serviceAccountStr = serviceAccountStr.replace(/\\r/g, '\r')
+      serviceAccountStr = serviceAccountStr.replace(/\\t/g, '\t')
+      
+      const serviceAccount = JSON.parse(serviceAccountStr)
+      
+      // Double-check private_key
+      if (serviceAccount.private_key && typeof serviceAccount.private_key === 'string') {
         serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n')
       }
+      
       credential = admin.credential.cert(serviceAccount)
     } catch (err) {
       console.error('Firebase service account parse error:', err.message)
+      console.error('Env var length:', process.env.FIREBASE_SERVICE_ACCOUNT?.length)
       process.exit(1)
     }
   } else {
