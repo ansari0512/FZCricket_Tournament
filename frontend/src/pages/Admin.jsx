@@ -512,6 +512,7 @@ export default function Admin() {
                       {match.status === 'scheduled' && <button onClick={() => handleMatchStatus(match._id, 'in-progress')} className="text-xs bg-blue-100 text-blue-700 px-3 py-1.5 rounded-lg">▶ Start</button>}
                       {match.status === 'in-progress' && <button onClick={() => { setScoreModal(match); setScoreData({ t1runs: match.team1Score?.runs || '', t1wickets: match.team1Score?.wickets || '', t2runs: match.team2Score?.runs || '', t2wickets: match.team2Score?.wickets || '', winnerId: '' }) }} className="text-xs bg-sky-100 text-sky-700 px-3 py-1.5 rounded-lg">📊 Update Score</button>}
                       {match.status === 'in-progress' && <button onClick={() => handleMatchStatus(match._id, 'completed')} className="text-xs bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg">⏹ End</button>}
+                      <button onClick={() => handleDeleteMatch(match._id)} className="text-xs bg-slate-100 text-slate-700 px-3 py-1.5 rounded-lg">🗑️ Delete</button>
                     </div>
                   </div>
                 ))}

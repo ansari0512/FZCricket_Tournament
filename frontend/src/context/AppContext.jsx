@@ -79,7 +79,7 @@ export const AppProvider = ({ children }) => {
     const socketUrl = (import.meta.env.VITE_API_URL || 'https://fzcricket-backend.onrender.com/api').replace('/api', '')
     const socket = io(socketUrl)
     socket.on('connect', () => console.log('WebSocket connected'))
-    socket.on('dataUpdate', () => { fetchData() })
+    socket.on('dataUpdate', () => { fetchData(); refreshUser() })
     socket.on('disconnect', () => console.log('WebSocket disconnected'))
     return () => socket.disconnect()
   }, [fetchData])
