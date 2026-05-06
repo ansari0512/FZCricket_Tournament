@@ -220,12 +220,21 @@ function NotificationsPanel({ onRefresh }) {
         {unread > 0 && <button onClick={markRead} className="text-sm text-primary">Mark all read</button>}
       </div>
       <div className="space-y-2">
-        {notifs.map((n, i) => (
-          <div key={i} className={`p-3 rounded-xl border-l-4 text-sm ${n.type === 'success' ? 'bg-sky-50 border-sky-200' : n.type === 'error' ? 'bg-slate-50 border-slate-200' : 'bg-blue-50 border-blue-500'} ${!n.read ? 'font-medium' : 'opacity-60'}`}>
-            <p>{n.message}</p>
-            <p className="text-xs text-gray-400 mt-1">{new Date(n.createdAt).toLocaleDateString('en-IN')}</p>
-          </div>
-        ))}
+        {notifs.map((n, i) => {
+          // Parse message to extract rejection reason if present
+          const isRejection = n.message.includes('rejected') || n.message.includes('Rejected')
+          const parts = n.message.split('Reason:')
+          const mainMessage = parts[0].trim()
+          const reason = parts[1]?.trim()
+
+          return (
+            <div key={i} className={`p-3 rounded-xl border-l-4 text-sm ${n.type === 'success' ? 'bg-sky-50 border-sky-200' : n.type === 'error' ? 'bg-slate-50 border-slate-200' : 'bg-blue-50 border-blue-500'} ${!n.read ? 'font-medium' : 'opacity-60'}`}>
+              <p>{mainMessage}</p>
+              {reason && <p className="text-red-600 font-semibold mt-2">Reason: {reason}</p>}
+              <p className="text-xs text-gray-400 mt-1">{new Date(n.createdAt).toLocaleDateString('en-IN')}</p>
+            </div>
+          )
+        })}
       </div>
     </div>
   )
@@ -417,7 +426,7 @@ export default function Dashboard() {
   }
 
   const handleSubmitTeam = async () => {
-    if (players.length < 11) return setError('Minimum 11 players required')
+    if (players.length < 13) return setError('Minimum 13 players required')
     if (!confirm('Are you sure you want to submit your team? Admin will review it.')) return
     setSubmitting(true)
     try {
@@ -514,8 +523,8 @@ export default function Dashboard() {
                 <div className="mt-4 border-t pt-4">
                   <div className="flex justify-between items-center mb-3">
                     <p className="font-bold text-sm">Players ({players.length}/15)</p>
-                    {players.length < 11 && (
-                      <p className="text-xs text-primary">{11 - players.length} more players needed to submit</p>
+                    {players.length < 13 && (
+                      <p className="text-xs text-primary">{13 - players.length} more players needed to submit</p>
                     )}
                   </div>
                   <div className="space-y-2">
@@ -561,8 +570,8 @@ export default function Dashboard() {
               <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-primary/10 text-primary">{players.length}/15</span>
             </div>
             <p className="text-sm text-gray-400 mb-4">
-              Minimum 11 players required to submit.
-              {players.length >= 11 && players.length < 15 && <span className="text-emerald-600 font-semibold"> Ready to submit!</span>}
+              Minimum 13 players required to submit.
+              {players.length >= 13 && players.length < 15 && <span className="text-emerald-600 font-semibold"> Ready to submit!</span>}
             </p>
 
             {error && <div className="bg-slate-50 text-slate-800 px-3 py-2 rounded-xl mb-3 text-sm">{error}</div>}
@@ -587,14 +596,19 @@ export default function Dashboard() {
               </div>
             )}
 
-            {/* Submit button - sirf 11+ players hone ke baad */}
-            {players.length >= 11 && (
+            {/* Submit button - sirf 13+ players hone ke baad */}
+            {players.length >= 13 && (
               <button
                 onClick={handleSubmitTeam}
                 disabled={submitting}
-                className="w-full bg-primary hover:bg-sky-700 text-white font-bold py-3 rounded-xl disabled:opacity-50 text-lg"
+                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl disabled:opacity-50 text-base leading-tight"
               >
-                {submitting ? 'Submitting...' : '🚀 Submit Team (For Admin Review)'}
+                {submitting ? 'Submitting...' : (
+                  <>
+                    🚀 Submit Team<br />
+                    <span className="text-xs font-normal">(For Admin Review)</span>
+                  </>
+                )}
               </button>
             )}
           </div>
