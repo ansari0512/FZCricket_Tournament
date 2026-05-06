@@ -347,10 +347,18 @@ export default function Admin() {
     setDeletePlayerReason('')
   }
   const confirmDeletePlayer = async () => {
-    await deletePlayer(deletePlayerModal._id, deletePlayerReason)
-    setSelectedPlayers(selectedPlayers.filter(p => p._id !== deletePlayerModal._id))
-    setDeletePlayerModal(null)
-    toast.success('Player deleted')
+    if (!deletePlayerReason.trim()) {
+      toast.error('Please provide a reason for deletion')
+      return
+    }
+    try {
+      await deletePlayer(deletePlayerModal._id, deletePlayerReason)
+      setSelectedPlayers(selectedPlayers.filter(p => p._id !== deletePlayerModal._id))
+      setDeletePlayerModal(null)
+      toast.success('Player deleted and user notified')
+    } catch (err) {
+      toast.error('Delete failed')
+    }
   }
   const handleDeleteUser = async (id, name) => {
     if (!confirm(`Are you sure you want to permanently delete "${name}" user and all their data?`)) return
