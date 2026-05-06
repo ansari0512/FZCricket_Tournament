@@ -14,6 +14,9 @@ dotenv.config();
 const app = express();
 const server = http.createServer(app);
 
+// Trust proxy - Render/Vercel ke liye zaroori
+app.set('trust proxy', 1);
+
 // Allowed origins
 const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(',')
