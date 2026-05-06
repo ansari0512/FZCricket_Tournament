@@ -15,7 +15,7 @@ function RulesModal({ onClose }) {
     { icon: '🥊', color: '#818cf8', title: '8. सेमीफाइनल', text: 'दोनों ग्रुप की टॉप 2 टीमों के बीच सेमीफाइनल खेला जाएगा।' },
     { icon: '🏆', color: '#38bdf8', title: '9. फाइनल', text: 'सेमीयफाइनल जीतने वाली टीमों के बीच फाइनल मैच होगा।' },
     { icon: '💰', color: '#60a5fa', title: '10. इनाम', text: 'फाइनल जीतने वाली टीम को ₹7000 और ट्रॉफी, हारने वाली टीम को ₹3000 और ट्रॉफी।' },
-    { icon: '⭐', color: '#a5b4fc', title: '11. मैन ऑफ द मैच', text: 'प्रत्येक मैच में "मैन ऑयफ द मैच" दिया जाएगा।' },
+    { icon: '⭐', color: '#a5b4fc', title: '11. मैन ऑफ द मैच', text: 'प्रत्येक मैच में \"मैन ऑयफ द मैच\" दिया जाएगा।' },
     { icon: '📅', color: '#818cf8', title: '12. अंपायर निर्णय', text: 'अंपायर का फैसला अंतिम होगा।' },
   ]
   return (
@@ -173,39 +173,37 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="relative max-w-4xl mx-auto text-center px-4 pt-10 pb-16">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 mb-5">
-            <span className="w-2 h-2 bg-sky-400 rounded-full animate-pulse" />
-            <span className="text-white/80 text-xs font-semibold tracking-wider uppercase">Village Level Cricket</span>
-          </div>
-
-          <h1 className="text-3xl md:text-5xl font-black text-white mb-3 leading-tight">
+        <div className="relative max-w-4xl mx-auto text-center px-4 pt-6 pb-12">
+          {/* Title - Moved Up */}
+          <h1 className="text-3xl md:text-5xl font-black text-white mb-6 leading-tight">
             Firoz Shah Cricket<br />
             <span style={{ background: 'linear-gradient(90deg, #38bdf8, #818cf8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
               Tournament 2026
             </span>
           </h1>
 
-          <p className="text-white/60 text-sm mb-1">📍 Village Odajhar, Post Naseerpur, Biswan, Sitapur</p>
-          <p className="font-bold text-sm mb-8" style={{ color: '#4ade80' }}>🗓️ Tournament Start: 21 April 2026 &nbsp;•&nbsp; 8 Teams &nbsp;•&nbsp; 8 Overs</p>
+          {/* Tournament Info - 2 Lines */}
+          <div className="space-y-2 mb-8">
+            <p className="font-bold text-base" style={{ color: '#4ade80' }}>🗓️ Tournament Start: 21 April 2026</p>
+            <p className="font-bold text-base text-white/80">8 Teams  •  8 Overs  •  15 Players</p>
+          </div>
 
-          {/* Stats */}
-          <div className="flex flex-wrap justify-center gap-3 mb-8">
+          {/* Stats - Compact */}
+          <div className="flex flex-wrap justify-center gap-4 mb-8">
             {[
               { val: teams.length, label: 'Teams Registered', color: '#38bdf8' },
               { val: `${8 - teams.length}`, label: 'Spots Left', color: '#60a5fa' },
               { val: matches.filter(m => m.status === 'completed').length, label: 'Matches Played', color: '#818cf8' },
             ].map((s, i) => (
-              <div key={i} className="stat-card min-w-[100px]">
-                <p className="text-3xl font-black" style={{ color: s.color }}>{s.val}</p>
+              <div key={i} className="text-center">
+                <p className="text-2xl font-black" style={{ color: s.color }}>{s.val}</p>
                 <p className="text-white/50 text-xs mt-0.5">{s.label}</p>
               </div>
             ))}
           </div>
 
           {/* CTA Buttons */}
-          <div className="flex flex-wrap justify-center gap-3">
+          <div className="flex flex-wrap justify-center gap-3 mb-6">
             {registrationOpen ? (
               <Link to="/register" className="btn-gold text-base px-8 py-3 shadow-glow-gold">
                 Register Your Team 🚀
@@ -215,17 +213,32 @@ export default function Home() {
                 <p className="text-slate-200 font-bold text-sm">🔒 Registration Closed</p>
               </div>
             )}
+          </div>
+
+          {/* Rules - One Line */}
+          <div className="flex flex-wrap justify-center gap-3">
             <button onClick={() => setShowRules(true)}
-              className="bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold py-3 px-6 rounded-full text-sm transition-all">
+              className="bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold py-2 px-4 rounded-full text-sm transition-all">
               📋 Tournament Rules
             </button>
             <button onClick={() => setShowRegRules(true)}
-              className="bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold py-3 px-6 rounded-full text-sm transition-all">
+              className="bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold py-2 px-4 rounded-full text-sm transition-all">
               📝 Registration Rules
             </button>
           </div>
         </div>
       </section>
+
+      {/* ── Gallery ── */}
+      {gallery.length > 0 && (
+        <section className="py-12 px-4 bg-gray-50">
+          <div className="max-w-4xl mx-auto">
+            <p className="section-title">📸 Photo Gallery</p>
+            <p className="section-subtitle">Moments from our cricket ground</p>
+            <GallerySlider photos={gallery} />
+          </div>
+        </section>
+      )}
 
       {/* ── Live Match Banner ── */}
       {liveMatch && (
@@ -278,20 +291,9 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── Gallery ── */}
-      {gallery.length > 0 && (
-        <section className="py-12 px-4 bg-gray-50">
-          <div className="max-w-4xl mx-auto">
-            <p className="section-title">📸 Photo Gallery</p>
-            <p className="section-subtitle">Moments from our cricket ground</p>
-            <GallerySlider photos={gallery} />
-          </div>
-        </section>
-      )}
-
       {/* ── Teams ── */}
       {teams.length > 0 && (
-        <section className="py-12 px-4">
+        <section className="py-12 px-4 bg-gray-50">
           <div className="max-w-6xl mx-auto">
             <p className="section-title">👥 Registered Teams</p>
             <p className="section-subtitle">{teams.length} of 8 spots filled</p>
@@ -333,7 +335,7 @@ export default function Home() {
 
       {/* ── Upcoming Matches ── */}
       {matches.filter(m => m.status === 'scheduled').length > 0 && (
-        <section className="py-12 px-4 bg-gray-50">
+        <section className="py-12 px-4">
           <div className="max-w-4xl mx-auto">
             <p className="section-title">📅 Upcoming Matches</p>
             <p className="section-subtitle">Get ready for the action</p>
