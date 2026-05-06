@@ -168,33 +168,31 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="relative max-w-4xl mx-auto text-center px-4 pt-6 pb-12">
-          <h1 className="text-3xl md:text-5xl font-black text-white mb-6 leading-tight">
-            Firoz Shah Cricket<br />
-            <span style={{ background: 'linear-gradient(90deg, #38bdf8, #818cf8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-              Tournament 2026
-            </span>
+        <div className="relative max-w-4xl mx-auto text-center px-4 pt-8 pb-10">
+          <h1 className="text-4xl md:text-6xl font-black text-white mb-1 leading-tight">
+            Firoz Shah Cricket
           </h1>
+          <h2 className="text-2xl md:text-3xl font-bold text-white/80 mb-4">
+            Tournament 2026
+          </h2>
 
-          <div className="space-y-2 mb-8">
-            <p className="font-bold text-base" style={{ color: '#4ade80' }}>🗓️ Tournament Start: 21 April 2026</p>
-            <p className="font-bold text-base text-white/80">8 Teams  •  8 Overs  •  15 Players</p>
-          </div>
+          <p className="font-bold text-base mb-3" style={{ color: '#4ade80' }}>🗓️ Tournament Start: 21 April 2026</p>
+          <p className="font-bold text-base text-white/80 mb-4">8 Teams  •  8 Overs  •  15 Players</p>
 
-          <div className="flex flex-wrap justify-center gap-4 mb-8">
+          <div className="flex flex-wrap justify-center gap-6 mb-4">
             {[
               { val: teams.length, label: 'Teams Registered', color: '#38bdf8' },
               { val: `${8 - teams.length}`, label: 'Spots Left', color: '#60a5fa' },
               { val: matches.filter(m => m.status === 'completed').length, label: 'Matches Played', color: '#818cf8' },
             ].map((s, i) => (
               <div key={i} className="text-center">
-                <p className="text-2xl font-black" style={{ color: s.color }}>{s.val}</p>
-                <p className="text-white/50 text-xs mt-0.5">{s.label}</p>
+                <p className="text-3xl font-black" style={{ color: s.color }}>{s.val}</p>
+                <p className="text-white/50 text-xs mt-1">{s.label}</p>
               </div>
             ))}
           </div>
 
-          <div className="flex flex-wrap justify-center gap-3 mb-6">
+          <div className="flex flex-wrap justify-center gap-2 mb-3">
             {registrationOpen ? (
               <Link to="/register" className="btn-gold text-base px-8 py-3 shadow-glow-gold">
                 Register Your Team 🚀
@@ -206,14 +204,14 @@ export default function Home() {
             )}
           </div>
 
-          <div className="flex flex-wrap justify-center items-center gap-2">
+          <div className="flex flex-wrap justify-center items-center gap-1">
             <button onClick={() => setShowRules(true)}
-              className="bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold py-2 px-4 rounded-full text-xs md:text-sm transition-all whitespace-nowrap">
+              className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-bold py-2 px-4 rounded-full text-xs md:text-sm transition-all whitespace-nowrap shadow-lg">
               📋 Tournament Rules
             </button>
-            <span className="text-white/30">•</span>
+            <span className="text-white/40 text-lg">•</span>
             <button onClick={() => setShowRegRules(true)}
-              className="bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold py-2 px-4 rounded-full text-xs md:text-sm transition-all whitespace-nowrap">
+              className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold py-2 px-4 rounded-full text-xs md:text-sm transition-all whitespace-nowrap shadow-lg">
               📝 Registration Rules
             </button>
           </div>
