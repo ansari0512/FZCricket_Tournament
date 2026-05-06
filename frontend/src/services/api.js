@@ -75,7 +75,7 @@ export const getTeamPlayers = (id) => API.get(`/teams/${id}/players`)
 // Players
 export const registerPlayer = (teamId, data) => API.post(`/players/register/${teamId}`, data)
 export const updatePlayer = (id, data) => API.put(`/players/${id}`, data)
-export const deletePlayer = (id) => API.delete(`/players/${id}`)
+export const deletePlayer = (id, reason) => API.delete(`/players/${id}`, { data: { reason } })
 
 // Matches
 export const getMatches = () => API.get('/matches')

@@ -240,6 +240,8 @@ export default function Admin() {
   const [selectedPlayers, setSelectedPlayers] = useState([])
   const [rejectModal, setRejectModal] = useState(null)
   const [rejectReason, setRejectReason] = useState('')
+  const [deletePlayerModal, setDeletePlayerModal] = useState(null)
+  const [deletePlayerReason, setDeletePlayerReason] = useState('')
   const [scoreModal, setScoreModal] = useState(null)
   const [scoreData, setScoreData] = useState({ t1runs: '', t1wickets: '', t2runs: '', t2wickets: '', winnerId: '' })
   const [gallery, setGallery] = useState([])
@@ -340,9 +342,15 @@ export default function Admin() {
   const loadPlayers = async (teamId) => {
     const res = await getTeamPlayers(teamId); setSelectedPlayers(res.data); setActiveTab('Players')
   }
-  const handleDeletePlayer = async (id) => {
-    if (!confirm('Are you sure you want to delete this player?')) return
-    await deletePlayer(id); setSelectedPlayers(selectedPlayers.filter(p => p._id !== id)); toast.success('Player deleted')
+  const handleDeletePlayer = async (player) => {
+    setDeletePlayerModal(player)
+    setDeletePlayerReason('')
+  }
+  const confirmDeletePlayer = async () => {
+    await deletePlayer(deletePlayerModal._id, deletePlayerReason)
+    setSelectedPlayers(selectedPlayers.filter(p => p._id !== deletePlayerModal._id))
+    setDeletePlayerModal(null)
+    toast.success('Player deleted')
   }
   const handleDeleteUser = async (id, name) => {
     if (!confirm(`Are you sure you want to permanently delete "${name}" user and all their data?`)) return
@@ -539,7 +547,7 @@ export default function Admin() {
               <div className="p-4 space-y-2">
                 {selectedPlayers.length === 0 ? <p className="text-center text-gray-400 py-10">No players</p> :
                 selectedPlayers.map((p, i) => (
-                  <AdminPlayerCard key={p._id} player={p} onDelete={handleDeletePlayer}
+                  <AdminPlayerCard key={p._id} player={p} onDelete={() => handleDeletePlayer(p)}
                     onPreview={() => setPreviewIndex(i)} />
                 ))}
               </div>
@@ -708,6 +716,22 @@ export default function Admin() {
                     ))}
                   </div>
                 )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Delete Player Modal */}
+        {deletePlayerModal && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl p-6 w-full max-w-md">
+              <h3 className="font-bold text-lg mb-1">🗑️ Delete Player</h3>
+              <p className="text-sm text-gray-500 mb-4">"{deletePlayerModal.name}" ko delete karna chahte hain?</p>
+              <textarea value={deletePlayerReason} onChange={e => setDeletePlayerReason(e.target.value)}
+                placeholder="Deletion reason (user ko notification jayegi)..." rows={3} className="input mb-4" />
+              <div className="flex gap-2">
+                <button onClick={confirmDeletePlayer} className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2 rounded-xl">Delete</button>
+                <button onClick={() => setDeletePlayerModal(null)} className="flex-1 btn-secondary">Cancel</button>
               </div>
             </div>
           </div>

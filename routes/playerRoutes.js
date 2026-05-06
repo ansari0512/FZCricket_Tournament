@@ -83,10 +83,29 @@ router.put('/:id', verifyAuth, async (req, res) => {
 
 router.delete('/:id', verifyAdmin, async (req, res) => {
   try {
-    await Player.findByIdAndDelete(req.params.id);
-    res.json({ message: 'Player deleted successfully' });
+    const { reason } = req.body
+    const player = await Player.findById(req.params.id)
+    if (!player) return res.status(404).json({ message: 'Player not found' })
+
+    const team = await Team.findById(player.teamId).populate('userId')
+    await Player.findByIdAndDelete(req.params.id)
+
+    // User ko notification bhejo
+    if (team?.userId) {
+      const User = require('../models/User')
+      const msg = reason
+        ? `Player "${player.name}" deleted by admin. Reason: ${reason}`
+        : `Player "${player.name}" has been deleted by admin.`
+      await User.findByIdAndUpdate(team.userId._id || team.userId, {
+        $push: { notifications: { message: msg, type: 'error' } }
+      })
+      const io = req.app.get('io')
+      if (io) io.emit('dataUpdate', { type: 'playerDeleted' })
+    }
+
+    res.json({ message: 'Player deleted successfully' })
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: err.message })
   }
 });
 
