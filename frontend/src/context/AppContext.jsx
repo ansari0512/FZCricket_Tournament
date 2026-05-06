@@ -26,18 +26,28 @@ export const AppProvider = ({ children }) => {
     }
   }, [])
 
+  const handleFirebaseUser = useCallback(async (firebaseUser) => {
+    try {
+      const idToken = await firebaseUser.getIdToken(true) // force refresh
+      const res = await googleLogin({ token: idToken })
+      localStorage.setItem('fzToken', res.data.token)
+      localStorage.setItem('fzUser', JSON.stringify(res.data.user))
+      setCurrentUser(res.data.user)
+    } catch (err) {
+      console.error('Auth error:', err)
+      const saved = localStorage.getItem('fzUser')
+      if (saved) setCurrentUser(JSON.parse(saved))
+    }
+  }, [])
+
   useEffect(() => {
     fetchData()
 
-    // Redirect result handle karo (signInWithRedirect ke baad)
-    getRedirectResult(auth).catch(() => {})
-
-    // First load user from localStorage (instant)
+    // localStorage se instant load
     const savedUser = localStorage.getItem('fzUser')
     const savedToken = localStorage.getItem('fzToken')
     if (savedUser && savedToken) {
       try {
-        // Check if token is valid
         const payload = JSON.parse(atob(savedToken.split('.')[1]))
         const isExpired = payload.exp * 1000 < Date.now()
         if (!isExpired && payload.userId) {
@@ -50,21 +60,18 @@ export const AppProvider = ({ children }) => {
       }
     }
 
+    // Redirect result handle karo (signInWithRedirect ke baad)
+    getRedirectResult(auth)
+      .then(result => {
+        if (result?.user) {
+          handleFirebaseUser(result.user)
+        }
+      })
+      .catch(() => {})
+
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
-        try {
-          // ✅ Firebase ID token bhejo — backend yahi verify karta hai
-          const idToken = await firebaseUser.getIdToken()
-          const res = await googleLogin({ token: idToken })
-          // ✅ JWT token save karo
-          localStorage.setItem('fzToken', res.data.token)
-          localStorage.setItem('fzUser', JSON.stringify(res.data.user))
-          setCurrentUser(res.data.user)
-        } catch (err) {
-          console.error('Auth error:', err)
-          const saved = localStorage.getItem('fzUser')
-          if (saved) setCurrentUser(JSON.parse(saved))
-        }
+        await handleFirebaseUser(firebaseUser)
       } else {
         localStorage.removeItem('fzToken')
         localStorage.removeItem('fzUser')
@@ -73,7 +80,7 @@ export const AppProvider = ({ children }) => {
       setAuthLoading(false)
     })
     return unsubscribe
-  }, [])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Socket setup separate effect
   useEffect(() => {
