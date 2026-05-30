@@ -176,7 +176,7 @@ export default function Home() {
             Tournament 2026
           </h2>
 
-          <p className="font-bold text-base mb-3" style={{ color: '#4ade80' }}>🗓️ Tournament Start: 21 April 2026</p>
+          <p className="font-bold text-base mb-3" style={{ color: '#4ade80' }}>🗓️ Tournament Start: 06 June 2026</p>
           <p className="font-bold text-base text-white/80 mb-4">8 Teams  •  8 Overs  •  15 Players</p>
 
           <div className="flex flex-wrap justify-center gap-6 mb-4">
