@@ -163,7 +163,7 @@ export default function Home() {
         <div className="relative border-b border-white/10 py-2">
           <div className="marquee-container">
              <div className="marquee-banner">
-               🏏 &nbsp; Team Registration: 10–20 Apr 2026 &nbsp; • &nbsp; Tournament Start: 21 Apr 2026 &nbsp; 🏏
+               🏏 &nbsp; Team Registration: 30 May 2026 &nbsp; • &nbsp; Tournament Start: 06 June 2026 &nbsp; 🏏
              </div>
           </div>
         </div>
