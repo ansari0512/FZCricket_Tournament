@@ -2,23 +2,10 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { registerTeam } from '../services/api'
 import { useApp } from '../context/AppContext'
+import { TOURNAMENT_CONFIG } from '../config/tournamentConfig'
 import toast from 'react-hot-toast'
 
-const RULES = [
-  'इस टूर्नामेंट में भाग लेने के लिए टीम को वेबसाइट पर जाकर रजिस्टर करना अनिवार्य है।',
-  'टीम रजिस्टर करने के लिए पहले Google से Login करना होगा।',
-  'टीम रजिस्टर करते समय सभी जानकारी सही-सही भरनी होगी, गलत जानकारी पर टीम रिजेक्ट कर दी जाएगी।',
-  'प्रत्येक टीम में कुल 15 खिलाड़ियों को रजिस्टर करना अनिवार्य है और उन्हीं खिलाड़ियों को खेलने की अनुमति होगी।',
-  'टीम में 8 खिलाड़ी एक ही गांव के और अधिकतम 3 खिलाड़ी अन्य गांव के हो सकते हैं।',
-  'टीम को अपने सभी बॉलर्स की जानकारी रजिस्ट्रेशन के समय ही देनी होगी।',
-  'टीम का रजिस्ट्रेशन पहले कमेटी द्वारा चेक किया जाएगा, उसके बाद ही अप्रूवल मिलेगा।',
-  'अप्रूवल मिलने के बाद ₹300 रजिस्ट्रेशन फीस जमा करना अनिवार्य है।',
-  'मैच शुरू होने से पहले बाकी ₹800 एंट्री फीस जमा करनी होगी।',
-  'रजिस्ट्रेशन फीस किसी भी स्थिति में वापस नहीं की जाएगी।',
-  'यदि टीम रिजेक्ट होती है तो कारण देखकर दोबारा सही जानकारी के साथ रजिस्टर किया जा सकता है।',
-  'एक बार टीम अप्रूव होने के बाद री-एंट्री की अनुमति नहीं होगी।',
-  'सभी नियमों को ध्यान से पढ़कर ही टीम रजिस्टर करें।',
-]
+const RULES = TOURNAMENT_CONFIG.registrationRules
 
 export default function Register() {
   const { currentUser, registrationOpen, refreshUser } = useApp()
@@ -128,7 +115,7 @@ export default function Register() {
         <div className="bg-white rounded-3xl shadow-card overflow-hidden">
           <div className="p-6" style={{ background: 'linear-gradient(135deg, #1e3a8a, #2563eb)' }}>
             <h2 className="text-xl font-bold text-white text-center">🏏 Team Registration</h2>
-            <p className="text-center text-white/70 text-sm mt-1">Registration Fee: ₹1,100 (Cash on Arrival)</p>
+            <p className="text-center text-white/70 text-sm mt-1">Registration Fee: {TOURNAMENT_CONFIG.payment.currencySymbol}{TOURNAMENT_CONFIG.payment.registrationFeeTotal} (Cash on Arrival)</p>
           </div>
           <div className="p-6">
             <form onSubmit={handleSubmit} className="space-y-4">

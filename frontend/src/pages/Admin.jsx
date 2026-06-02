@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { adminLogin, getAdminUsers, deleteAdminUser, getAllTeams, getTeam, updateTeam, deleteTeam, getTeamPlayers, deletePlayer, getMatches, updateMatchStatus, updateMatchScore, createMatch, deleteMatch, getGallery, addGalleryPhoto, deleteGalleryPhoto, getPaymentConfig, SOCKET_URL } from '../services/api'
+import { TOURNAMENT_CONFIG } from '../config/tournamentConfig'
 import API from '../services/api'
 import toast from 'react-hot-toast'
 import io from 'socket.io-client'
@@ -10,7 +11,7 @@ function MatchCreateForm({ teams, onCreated }) {
   const approvedTeams = teams.filter(t => t.status === 'approved' && t.paymentDone)
   const [form, setForm] = useState({
     team1Id: '', team2Id: '', matchDate: '', matchTime: '09:00',
-    matchType: 'group', overs: '8', venue: 'Odajhar Village'
+    matchType: 'group', overs: String(TOURNAMENT_CONFIG.structure.groupStageOvers), venue: TOURNAMENT_CONFIG.location.defaultVenue
   })
   const [loading, setLoading] = useState(false)
 
@@ -32,7 +33,7 @@ function MatchCreateForm({ teams, onCreated }) {
         venue: form.venue
       })
       toast.success('Match created successfully!')
-      setForm({ team1Id: '', team2Id: '', matchDate: '', matchTime: '09:00', matchType: 'group', overs: '8', venue: 'Odajhar Village' })
+      setForm({ team1Id: '', team2Id: '', matchDate: '', matchTime: '09:00', matchType: 'group', overs: String(TOURNAMENT_CONFIG.structure.groupStageOvers), venue: TOURNAMENT_CONFIG.location.defaultVenue })
       onCreated()
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed')

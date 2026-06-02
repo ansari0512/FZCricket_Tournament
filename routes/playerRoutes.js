@@ -3,8 +3,9 @@ const router = express.Router();
 const Player = require('../models/Player');
 const Team = require('../models/Team');
 const { verifyAuth, verifyAdmin } = require('../middleware/auth');
+const CONFIG = require('../tournament-config');
 
-const MAX_PLAYERS = 15;
+const MAX_PLAYERS = CONFIG.structure.playersPerTeam;
 
 const canManageTeam = (req, team) => {
   return req.user.role === 'admin' || team.userId?.toString() === req.user.userId;
@@ -35,7 +36,7 @@ router.post('/register/:teamId', verifyAuth, async (req, res) => {
     if (!canManageTeam(req, team)) return res.status(403).json({ message: 'You can add players only to your own team' });
 
     const playerCount = await Player.countDocuments({ teamId });
-    if (playerCount >= MAX_PLAYERS) return res.status(400).json({ message: 'Team already has 15 players' });
+    if (playerCount >= MAX_PLAYERS) return res.status(400).json({ message: `Team already has ${MAX_PLAYERS} players` });
 
     const player = new Player({ teamId, name, age: age || 18, jerseyNumber, role, phone: phone || '', photo: photo || '', address: address || '' });
     await player.save();

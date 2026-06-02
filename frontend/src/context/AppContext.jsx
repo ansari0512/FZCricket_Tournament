@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect } from 'react'
 import { onAuthStateChanged, signOut } from 'firebase/auth'
 import { auth } from '../firebase'
 import { getTeams, getMatches, googleLogin, getMe } from '../services/api'
+import { TOURNAMENT_CONFIG } from '../config/tournamentConfig'
 import { useCallback } from 'react'
 import { io } from 'socket.io-client'
 
@@ -102,7 +103,7 @@ export const AppProvider = ({ children }) => {
     return () => socket.disconnect()
   }, [fetchData, refreshUser])
 
-  const registrationOpen = teams.length < 8
+  const registrationOpen = teams.length < TOURNAMENT_CONFIG.structure.maxTeams
 
   return (
     <AppContext.Provider value={{ teams, matches, loading, authLoading, currentUser, logout, fetchData, registrationOpen, refreshUser }}>

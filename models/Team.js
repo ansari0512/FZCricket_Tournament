@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const CONFIG = require('../tournament-config');
 
 const teamSchema = new mongoose.Schema({
   teamName: {
@@ -37,7 +38,7 @@ const teamSchema = new mongoose.Schema({
   },
   city: {
     type: String,
-    default: 'Odajhar'
+    default: CONFIG.location.defaultCity
   },
   logo: {
     type: String,
@@ -50,11 +51,11 @@ const teamSchema = new mongoose.Schema({
   // Payment tracking fields - Total: 1100 (300 advance + 800 on first match)
   advancePayment: {
     type: Number,
-    default: 300
+    default: CONFIG.payment.advancePayment
   },
   remainingPayment: {
     type: Number,
-    default: 800
+    default: CONFIG.payment.remainingPayment
   },
   advancePaymentDone: {
     type: Boolean,

@@ -5,11 +5,12 @@ const Player = require('../models/Player');
 const Payment = require('../models/Payment');
 const User = require('../models/User');
 const { verifyAdmin, verifyUser, verifyAuth } = require('../middleware/auth');
+const CONFIG = require('../tournament-config');
 
-const MAX_TEAMS = 8;
-const REGISTRATION_FEE = 1100; // Total fee: 300 advance + 800 on first match
-const ADVANCE_PAYMENT = 300;
-const REMAINING_PAYMENT = 800;
+const MAX_TEAMS = CONFIG.structure.maxTeams;
+const REGISTRATION_FEE = CONFIG.payment.registrationFeeTotal;
+const ADVANCE_PAYMENT = CONFIG.payment.advancePayment;
+const REMAINING_PAYMENT = CONFIG.payment.remainingPayment;
 
 router.get('/count', async (req, res) => {
   try {
@@ -102,7 +103,7 @@ router.post('/register', verifyUser, async (req, res) => {
     if (io) io.emit('adminAlert', { type: 'newTeam', message: `New team registered: ${teamName}`, team: { teamName, captainName, captainPhone, city } })
 
     res.status(201).json({ 
-      message: 'Team registered successfully. Please pay ₹300 advance fee to complete registration.', 
+      message: `Team registered successfully. Please pay ${CONFIG.payment.currencySymbol}${ADVANCE_PAYMENT} advance fee to complete registration.`, 
       team,
       advancePaymentDue: ADVANCE_PAYMENT,
       totalFee: REGISTRATION_FEE
@@ -164,7 +165,7 @@ router.put('/:id', verifyAuth, async (req, res) => {
     if (team.userId) {
       let msg = '', type = 'info';
       if (status === 'approved') {
-        msg = `🎉 Congratulations! Your team "${team.teamName}" has been approved! Please pay ₹300 advance fee to complete registration.`;
+        msg = `🎉 Congratulations! Your team "${team.teamName}" has been approved! Please pay ${CONFIG.payment.currencySymbol}${ADVANCE_PAYMENT} advance fee to complete registration.`;
         type = 'success';
       } else if (status === 'rejected') {
         msg = `❌ Your team "${team.teamName}" has been rejected. Reason: ${rejectReason || 'Not specified'}`;

@@ -4,13 +4,20 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>FZ Cricket Tournament 2026 | Village Odajhar, Sitapur</title>
-    <meta name="description" content="Firoz Shah Cricket Tournament 2026 - Village Odajhar, Post Naseerpur, Biswan, Sitapur. Register your team, view schedule, live scores and results." />
+    <title></title>
+    <meta name="description" content="" />
     <meta name="keywords" content="cricket tournament, village cricket, odajhar, sitapur, biswan, FZ cricket" />
     <meta name="theme-color" content="#10B981" />
-    <meta property="og:title" content="FZ Cricket Tournament 2026" />
-    <meta property="og:description" content="Village level cricket tournament - Odajhar, Sitapur. 8 Teams, 8 Overs, Big Prize!" />
+    <meta property="og:title" content="" />
+    <meta property="og:description" content="" />
     <meta property="og:type" content="website" />
+    <script type="module">
+      import { TOURNAMENT_CONFIG } from '/src/config/tournamentConfig.js'
+      document.title = TOURNAMENT_CONFIG.title
+      document.querySelector('meta[name="description"]').content = TOURNAMENT_CONFIG.description
+      document.querySelector('meta[property="og:title"]').content = TOURNAMENT_CONFIG.title
+      document.querySelector('meta[property="og:description"]').content = TOURNAMENT_CONFIG.tagline
+    </script>
   </head>
   <body>
     <div id="root"></div>

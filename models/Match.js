@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const CONFIG = require('../tournament-config');
 
 const matchSchema = new mongoose.Schema({
   matchId: {
@@ -31,7 +32,7 @@ const matchSchema = new mongoose.Schema({
   },
   venue: {
     type: String,
-    default: 'Odajhar Village'
+    default: CONFIG.location.defaultVenue
   },
   status: {
     type: String,

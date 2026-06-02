@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 import { getNotifications, markNotificationsRead, getTeam, getTeamPlayers, registerPlayer, updatePlayer, updateTeam } from '../services/api'
 import { uploadImage, uploadPaymentScreenshot } from '../services/api'
+import { TOURNAMENT_CONFIG } from '../config/tournamentConfig'
 import toast from 'react-hot-toast'
 
 const ROLE_LABELS = { batsman: '🏏 Batsman', bowler: '🎯 Bowler', 'all-rounder': '⭐ All-Rounder', 'wicket-keeper': '🧤 Wicket Keeper' }
@@ -57,7 +58,7 @@ function PaymentSection({ team, onScreenshotUploaded, upiConfig }) {
 
   const openUPI = (upiId) => {
     if (!upiId) return
-    window.location.href = `upi://pay?pa=${upiId}&pn=FZCricket&am=300&cu=INR&tn=FZCricket%20Registration`
+    window.location.href = `upi://pay?pa=${upiId}&pn=FZCricket&am=${TOURNAMENT_CONFIG.payment.advancePayment}&cu=${TOURNAMENT_CONFIG.payment.currency}&tn=FZCricket%20Registration`
   }
 
   const copyUPI = (upiId) => {
@@ -103,19 +104,19 @@ function PaymentSection({ team, onScreenshotUploaded, upiConfig }) {
       <div className="bg-white rounded-xl p-3 mb-3 text-sm space-y-1">
         <div className="flex justify-between">
           <span className="text-gray-600">Amount to pay now:</span>
-          <span className="font-bold text-primary">₹300</span>
+          <span className="font-bold text-primary">{TOURNAMENT_CONFIG.payment.currencySymbol}{TOURNAMENT_CONFIG.payment.advancePayment}</span>
         </div>
         <div className="flex justify-between">
           <span className="text-gray-600">On match day:</span>
-          <span className="font-bold text-primary">₹800</span>
+          <span className="font-bold text-primary">{TOURNAMENT_CONFIG.payment.currencySymbol}{TOURNAMENT_CONFIG.payment.remainingPayment}</span>
         </div>
         <div className="flex justify-between border-t pt-1">
           <span className="font-bold">Total:</span>
-          <span className="font-bold">₹1,100</span>
+          <span className="font-bold">{TOURNAMENT_CONFIG.payment.currencySymbol}{TOURNAMENT_CONFIG.payment.registrationFeeTotal}</span>
         </div>
       </div>
 
-      <p className="text-sm font-medium text-gray-700 mb-2">Pay now (₹300) via app - Click on your phone:</p>
+      <p className="text-sm font-medium text-gray-700 mb-2">Pay now ({TOURNAMENT_CONFIG.payment.currencySymbol}{TOURNAMENT_CONFIG.payment.advancePayment}) via app - Click on your phone:</p>
       <div className="grid grid-cols-3 gap-2 mb-3">
         <button onClick={() => openUPI(getUPIID('gpay'))}
           className="bg-sky-600 hover:bg-sky-700 text-white font-bold py-3 px-2 rounded-xl text-xs flex flex-col items-center gap-1 transition">
@@ -158,15 +159,15 @@ function PaymentSection({ team, onScreenshotUploaded, upiConfig }) {
         </button>
         {showQR && (
           <div className="mt-3 bg-white rounded-xl p-4 text-center border">
-            <p className="text-sm font-medium text-gray-700 mb-3">Scan GPay QR Code (₹300)</p>
+            <p className="text-sm font-medium text-gray-700 mb-3">Scan GPay QR Code ({TOURNAMENT_CONFIG.payment.currencySymbol}{TOURNAMENT_CONFIG.payment.advancePayment})</p>
               <img
-              src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=${encodeURIComponent(getUPIID('gpay'))}%26pn=FZCricket%26am=300%26cu=INR%26tn=FZCricket%20Registration`}
+              src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=${encodeURIComponent(getUPIID('gpay'))}%26pn=FZCricket%26am=${TOURNAMENT_CONFIG.payment.advancePayment}%26cu=${TOURNAMENT_CONFIG.payment.currency}%26tn=FZCricket%20Registration`}
               alt="UPI QR Code"
               className="w-48 h-48 mx-auto rounded-xl shadow"
             />
             <p className="text-xs text-gray-500 mt-2">Scan from GPay, PhonePe, or Paytm</p>
              <p className="text-sm font-bold text-primary mt-1">UPI: {getUPIID('gpay')}</p>
-            <p className="text-sm font-bold">Amount: ₹300</p>
+            <p className="text-sm font-bold">Amount: {TOURNAMENT_CONFIG.payment.currencySymbol}{TOURNAMENT_CONFIG.payment.advancePayment}</p>
           </div>
         )}
       </div>

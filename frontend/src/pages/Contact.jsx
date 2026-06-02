@@ -1,16 +1,9 @@
 import { Link } from 'react-router-dom'
+import { TOURNAMENT_CONFIG } from '../config/tournamentConfig'
 
 export default function Contact() {
-  const contacts = [
-    { icon: '📞', name: 'Saddam Husain', value: '+91 8127021765', href: 'tel:+918127021765', type: 'phone' },
-    { icon: '📞', name: 'Mohd Sufiyan', value: '+91 9369429653', href: 'tel:+919369429653', type: 'phone' },
-    { icon: 'whatsapp', name: 'WhatsApp Group', value: 'Join Now', href: 'https://chat.whatsapp.com/CR4Wx8QgHbJFaTnDkuTkxu', type: 'whatsapp' },
-  ]
-
-  const details = [
-    { label: 'Contact Person', value: 'Shahid Ansari', icon: '👤' },
-    { label: 'Venue', value: 'Village Odajhar, Post Naseerpur, Biswan, Sitapur - 261202', icon: '📍' },
-  ]
+  const contacts = TOURNAMENT_CONFIG.contacts
+  const details = TOURNAMENT_CONFIG.details
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white pb-20 page-enter">

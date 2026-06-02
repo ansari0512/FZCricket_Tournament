@@ -2,29 +2,17 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 import { getGallery } from '../services/api'
+import { TOURNAMENT_CONFIG } from '../config/tournamentConfig'
 
 function RulesModal({ onClose }) {
-  const rules = [
-    { icon: '👥', color: '#38bdf8', title: '1. टीमें', text: 'इस टूर्नामेंट में अधिकतम 8 टीमें ही भाग ले सकती हैं।' },
-    { icon: '🏏', color: '#818cf8', title: '2. मैच फॉर्मेट', text: 'सभी मैच 8-8 ओवर के होंगे, जबकि सेमीफाइनल और फाइनल 10-10 ओवर के होंगे।' },
-    { icon: '⚡', color: '#60a5fa', title: '3. पावर प्ले', text: 'शुरुआती 2 ओवर पावर प्ले होंगे, जिसमें सर्कल के बाहर केवल 2 खिलाड़ी ही फील्डिंग कर सकते हैं।' },
-    { icon: '🎯', color: '#c7d2fe', title: '4. बॉलिंग नियम', text: 'प्रत्येक बॉलर अधिकतम 2 ओवर ही गेंदबाजी कर सकता है।' },
-    { icon: '🎾', color: '#93c5fd', title: '5. बॉल', text: 'सभी मैच Sixit टेनिस बॉल से बिना जलाए हुए खेले जाएंगे।' },
-    { icon: '🏘️', color: '#0ea5e9', title: '6. खिलाड़ी पात्रता', text: 'केवल गांव स्तर (Village Level) के खिलाड़ी ही भाग ले सकते हैं।' },
-    { icon: '📊', color: '#6366f1', title: '7. ग्रुप स्टेज', text: '8 टीमों को 2 ग्रुप में बांटा जाएगा। हर टीम अपने ग्रुप की 3 टीमों से खेलेगी।' },
-    { icon: '🥊', color: '#818cf8', title: '8. सेमीफाइनल', text: 'दोनों ग्रुप की टॉप 2 टीमों के बीच सेमीफाइनल खेला जाएगा।' },
-    { icon: '🏆', color: '#38bdf8', title: '9. फाइनल', text: 'सेमीयफाइनल जीतने वाली टीमों के बीच फाइनल मैच होगा।' },
-    { icon: '💰', color: '#60a5fa', title: '10. इनाम', text: 'फाइनल जीतने वाली टीम को ₹7000 और ट्रॉफी, हारने वाली टीम को ₹3000 और ट्रॉफी।' },
-    { icon: '⭐', color: '#a5b4fc', title: '11. मैन ऑफ द मैच', text: 'प्रत्येक मैच में "मैन ऑयफ द मैच" दिया जाएगा।' },
-    { icon: '📅', color: '#818cf8', title: '12. अंपायर निर्णय', text: 'अंपायर का फैसला अंतिम होगा।' },
-  ]
+  const rules = TOURNAMENT_CONFIG.tournamentRules;
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={onClose}>
       <div className="bg-white rounded-3xl w-full max-w-lg max-h-[85vh] overflow-hidden shadow-2xl" onClick={e => e.stopPropagation()}>
         <div className="p-5 flex justify-between items-center" style={{ background: 'linear-gradient(135deg, #1e3a8a, #2563eb)' }}>
           <div>
             <h3 className="text-xl font-bold text-white">🏏 Tournament Rules</h3>
-            <p className="text-white/70 text-xs mt-0.5">FZ Cricket Tournament 2026</p>
+            <p className="text-white/70 text-xs mt-0.5">{TOURNAMENT_CONFIG.title}</p>
           </div>
           <button onClick={onClose} className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-all">✕</button>
         </div>
@@ -46,16 +34,7 @@ function RulesModal({ onClose }) {
 }
 
 function RegRulesModal({ onClose }) {
-  const rules = [
-    'टीम रजिस्टर करने के लिए पहले Google से Login करना होगा।',
-    'टीम रजिस्टर करते समय सभी जानकारी सही-सही भरनी होगी।',
-    'प्रत्येक टीम में कुल 15 खिलाड़ियों को रजिस्टर करना अनिवार्य है।',
-    'टीम में 8 खिलाड़ी एक ही गांव के और अधिकतम 3 अन्य गांव के हो सकते हैं।',
-    'टीम का रजिस्ट्रेशन पहले कमेटी द्वारा चेक किया जाएगा।',
-    'अप्रूवल मिलने के बाद ₹300 रजिस्ट्रेशन फीस जमा करना अनिवार्य है।',
-    'मैच शुरू होने से पहले बाकी ₹800 एंट्री फीस जमा करनी होगी।',
-    'रजिस्ट्रेशन फीस किसी भी स्थिति में वापस नहीं की जाएगी।',
-  ]
+  const rules = TOURNAMENT_CONFIG.registrationRules
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={onClose}>
       <div className="bg-white rounded-3xl w-full max-w-lg max-h-[85vh] overflow-hidden shadow-2xl" onClick={e => e.stopPropagation()}>
@@ -163,26 +142,26 @@ export default function Home() {
         <div className="relative border-b border-white/10 py-2">
           <div className="marquee-container">
              <div className="marquee-banner">
-               🏏 &nbsp; Team Registration: 30 May 2026 &nbsp; • &nbsp; Tournament Start: 06 June 2026 &nbsp; 🏏
+               {TOURNAMENT_CONFIG.dates.marqueeText}
              </div>
           </div>
         </div>
 
         <div className="relative max-w-4xl mx-auto text-center px-4 pt-8 pb-10">
           <h1 className="text-4xl md:text-6xl font-black text-white mb-1 leading-tight">
-            Firoz Shah Cricket
+            {TOURNAMENT_CONFIG.tournament.name}
           </h1>
           <h2 className="text-2xl md:text-3xl font-bold text-white/80 mb-4">
-            Tournament 2026
+            Tournament {TOURNAMENT_CONFIG.tournament.year}
           </h2>
 
-          <p className="font-bold text-base mb-3" style={{ color: '#4ade80' }}>🗓️ Tournament Start: 06 June 2026</p>
-          <p className="font-bold text-base text-white/80 mb-4">8 Teams  •  8 Overs  •  15 Players</p>
+          <p className="font-bold text-base mb-3" style={{ color: '#4ade80' }}>🗓️ Tournament Start: {TOURNAMENT_CONFIG.dates.tournamentStart}</p>
+          <p className="font-bold text-base text-white/80 mb-4">{TOURNAMENT_CONFIG.structure.maxTeams} Teams  •  {TOURNAMENT_CONFIG.structure.groupStageOvers} Overs  •  {TOURNAMENT_CONFIG.structure.playersPerTeam} Players</p>
 
           <div className="flex flex-wrap justify-center gap-6 mb-4">
             {[
               { val: teams.length, label: 'Teams Registered', color: '#38bdf8' },
-              { val: `${8 - teams.length}`, label: 'Spots Left', color: '#60a5fa' },
+              { val: `${TOURNAMENT_CONFIG.structure.maxTeams - teams.length}`, label: 'Spots Left', color: '#60a5fa' },
               { val: matches.filter(m => m.status === 'completed').length, label: 'Matches Played', color: '#818cf8' },
             ].map((s, i) => (
               <div key={i} className="text-center">
@@ -258,12 +237,12 @@ export default function Home() {
       <section className="py-12 px-4">
         <div className="max-w-4xl mx-auto">
           <p className="section-title">💰 Prize Money</p>
-          <p className="section-subtitle">Win big at FZ Cricket Tournament 2026</p>
+          <p className="section-subtitle">Win big at {TOURNAMENT_CONFIG.title}</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {[
-              { icon: '🎟️', title: 'Entry Fee', amount: '₹1,100', sub: 'Per Team', bg: 'from-sky-500 to-indigo-600', glow: 'rgba(56,189,248,0.24)' },
-              { icon: '🏆', title: 'Winner', amount: '₹7,000', sub: '1st Place + Trophy', bg: 'from-indigo-500 to-violet-600', glow: 'rgba(99,102,241,0.24)' },
-              { icon: '🥈', title: 'Runner-up', amount: '₹3,000', sub: '2nd Place + Trophy', bg: 'from-slate-500 to-slate-700', glow: 'rgba(71,85,105,0.24)' },
+              { icon: '🎟️', title: 'Entry Fee', amount: TOURNAMENT_CONFIG.prizes.entryFee.display, sub: TOURNAMENT_CONFIG.prizes.entryFee.label, bg: 'from-sky-500 to-indigo-600', glow: 'rgba(56,189,248,0.24)' },
+              { icon: '🏆', title: 'Winner', amount: TOURNAMENT_CONFIG.prizes.firstPlace.display, sub: TOURNAMENT_CONFIG.prizes.firstPlace.label, bg: 'from-indigo-500 to-violet-600', glow: 'rgba(99,102,241,0.24)' },
+              { icon: '🥈', title: 'Runner-up', amount: TOURNAMENT_CONFIG.prizes.secondPlace.display, sub: TOURNAMENT_CONFIG.prizes.secondPlace.label, bg: 'from-slate-500 to-slate-700', glow: 'rgba(71,85,105,0.24)' },
             ].map((p, i) => (
               <div key={i} className={`bg-gradient-to-br ${p.bg} text-white rounded-2xl p-6 text-center hover:scale-105 transition-all duration-300`}
                 style={{ boxShadow: `0 10px 30px ${p.glow}` }}>

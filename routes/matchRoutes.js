@@ -3,6 +3,7 @@ const router = express.Router();
 const Match = require('../models/Match');
 const Team = require('../models/Team');
 const { verifyAdmin } = require('../middleware/auth');
+const CONFIG = require('../tournament-config');
 
 const getResultUpdates = (match, winnerId, direction) => {
   const team1Id = match.team1;
@@ -122,15 +123,8 @@ router.post('/create', verifyAdmin, async (req, res) => {
       team2: team2Id,
       matchDate,
       matchType,
-      overs: overs || (matchType === 'final' ? 10 : 8),
-      venue: venue || 'Odajhar Village',
-      status: 'scheduled'
-    });
-
-    await match.save();
-    res.status(201).json({ message: 'Match created successfully', match });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+      overs: overs || (matchType === 'final' ? CONFIG.structure.finalsOvers : CONFIG.structure.groupStageOvers),
+      venue: venue || CONFIG.location.defaultVenue,
   }
 });
 
@@ -220,8 +214,8 @@ router.post('/generate-schedule', verifyAdmin, async (req, res) => {
           team1: teams[i]._id,
           team2: teams[j]._id,
           matchType: matchType || 'group',
-          overs: overs || 8,
-          venue: venue || 'Odajhar Village',
+          overs: overs || CONFIG.structure.groupStageOvers,
+          venue: venue || CONFIG.location.defaultVenue,
           status: 'scheduled',
           matchDate: new Date(Date.now() + (existingMatches * 7 * 24 * 60 * 60 * 1000)) // 1 week apart
         });
